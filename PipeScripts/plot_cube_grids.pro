@@ -1,0 +1,109 @@
+PRO plot_cube_grids
+open_ang = !pi/3.
+
+loadct,39
+!p.charsize=2
+!x.ticklen=0
+!y.ticklen=0
+cell_z=8.
+Nz=700.
+Nx=1600.
+h0=3200.
+xc=findgen(Nx)*cell_z - Nx/2*cell_z
+y0=fltarr(Nx)
+
+hmin = h0-Nz/2.*cell_z
+hmax = h0+Nz/2.*cell_z
+xmax = Nx * cell_z /2.
+xmin = -1*xmax
+theta=findgen(1000)/1000.*2*open_ang -open_ang
+mnt = min(theta)
+mxt = max(theta)
+
+na=1000
+
+;window,0
+plot,[0,0],[0,0],/xs,/ys,th=3,xra=[-7000,7000],yra=[0,6500],/nodata,xtit='Distance [comoving Mpc]',ytit='Distance [comoving Mpc]';,xtickn=replicate(' ',10),ytickn=replicate(' ',10)
+
+nslice=70
+h= h0 + (findgen(nslice+1)-nslice/2)*Nz*cell_z/nslice
+ang=Nx*cell_z / h
+for i=0,nslice-1 do oplot,[xmin,xmax],[h[i],h[i]],th=2,col=190
+oplot,[0,cos(mnt+!pi/2.)*hmax*2],[0,sin(mnt+!pi/2.)*hmax*2],th=3
+oplot,[0,cos(mxt+!pi/2.)*hmax*2],[0.,sin(mxt+!pi/2.)*hmax*2],th=3
+
+zc=[0.7,1.4]
+nzc=[200,200]
+
+ng = n_elements(zc)
+hg=dloscom(zc)
+h1=(dloscom(zc)-nzc/2.*cell_z)
+h2=(dloscom(zc)+nzc/2.*cell_z)
+for i=0,ng-1 do print,'redshift min/max = ',zfrlos(h1[i],10),zfrlos(h2[i],10)
+
+Nx_parfait = h1* 2*open_ang/8.;/sqrt(2)
+print,'Nx_parfait =',Nx_parfait
+
+nxc=[450,900]
+print,'Nx used =',nxc
+print,'Hgrids = ',hg
+
+coeff=[1.,sqrt(2.)]
+colstep=75
+for ia=0,1 do begin
+   mynxc = nxc * coeff[ia]
+   ang1=myNxc*cell_z / h1
+   ang2=myNxc*cell_z / h2
+   for i=0,ng-1 do begin
+      x1=findgen(na)/na*ang1[i] -ang1[i]/2.
+      oplot,cos(x1+!pi/2.)*h1[i],sin(x1+!pi/2.)*h1[i],col=(i+1)*colstep,th=5,li=ia
+      
+      x2=findgen(na)/na*ang2[i] -ang2[i]/2.
+      oplot,cos(x2+!pi/2.)*h2[i],sin(x2+!pi/2.)*h2[i],col=(i+1)*colstep,th=5,li=ia
+      
+      oplot,[cos(x1[0]+!pi/2.)*h1[i],cos(x2[0]+!pi/2.)*h2[i]],[sin(x1[0]+!pi/2.)*h1[i],sin(x2[0]+!pi/2.)*h2[i]],col=(i+1)*colstep,th=5,li=ia
+      oplot,[cos(x1[na-1]+!pi/2.)*h1[i],cos(x2[na-1]+!pi/2.)*h2[i]],[sin(x1[na-1]+!pi/2.)*h1[i],sin(x2[na-1]+!pi/2.)*h2[i]],col=(i+1)*colstep,th=5,li=ia
+   endfor
+endfor
+pos = intarr(ng)-300
+; pos[2] = -1200
+;pos[3] = 600
+xyouts,pos,dloscom(zc),'z='+string(zc,format='(f4.2)'),col=(indgen(ng)+1)*colstep,charth=2,charsi=1.75
+xyouts,pos,dloscom(zc),'z='+string(zc,format='(f4.2)'),charsi=1.75
+xyouts,1800,700,'Comoving radial distance',ori=32
+
+print,'Volume (Gpc^3) = ',1.d*cell_z^3*nxc*nxc*nzc/1.e9
+stop
+
+write_jpeg,'/sps/lsst/dev/rcecile/BAO_InOut/plot_cube_2grids.jpg'  ,tvrd(true=3),true=3
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+window,1,xs=600,ys=600
+!p.charsize=2
+!x.ticklen=0
+!y.ticklen=0
+phi=findgen(1000)/1000.*2.*!pi
+r = h2*open_ang
+plot,cos(phi)*r[ng-1],sin(phi)*r[ng-1],th=3,/nodata,xtit='Transverse distance [comoving Mpc]',ytit='Transverse distance [comoving Mpc]',yma=[6,2]
+for i=ng-1,0,-1 do oplot,cos(phi)*r[i],sin(phi)*r[i],th=5,col=(i+1)*80,li=1
+r = h1*open_ang
+for i=ng-1,0,-1 do oplot,cos(phi)*r[i],sin(phi)*r[i],th=3,col=(i+1)*80
+nxc *= cell_z
+for i=0,ng-1 do begin
+   oplot,[-nxc[i]/2,nxc[i]/2],[-nxc[i]/2,-nxc[i]/2],col=(i+1)*80,th=3
+   oplot,[-nxc[i]/2,nxc[i]/2],[nxc[i]/2,nxc[i]/2],col=(i+1)*80,th=3
+   oplot,[-nxc[i]/2,-nxc[i]/2],[-nxc[i]/2,nxc[i]/2],col=(i+1)*80,th=3
+   oplot,[nxc[i]/2,nxc[i]/2],[-nxc[i]/2,nxc[i]/2],col=(i+1)*80,th=3
+endfor
+
+print,nxc^2 /4./!pi/h1^2
+print,4.*!pi*h1^2
+print,nxc^2
+
+
+stop
+
+END
+

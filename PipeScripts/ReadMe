@@ -1,0 +1,23 @@
+Mode d'emploi : des parametres cosmo a l'echelle BAO
+
+1/ faire les cubes d'univers (big_cube)
+
+2/ le couper en tranche (cut_cube sous IDL)
+3/ faire le catalogue simple + sel func (cat_simple)
+4/ refaire le catalogue avec tranches ordonnees en z (rangez sous IDL, mode qlogin)
+5/ faire les erreurs (cat_err)
+6/ concatener les redshifts cata (cata_concat sous IDL, mode qlogin)
+7/ calculer les fonctions de selection avec erreur (self_err) 
+
+-- etapes 2 a 7 faites pour simu avec BAO et N simus sans BAO --
+
+8/ lisser les fonctions de selection (self sous IDL)
+9/ preparer la projection des grids ( plot_cube_grid et cube_grids_info sous IDL pour ajuster proj_grid)
+
+10/ projeter dans les grilles (proj_grid)
+11/ calculer le spectre de puissance (comp_ps)
+
+-- etapes 10 a 11 a faire pour simu avec BAO et N simus sans BAO --
+
+11/ calcul des oscillations (save_ps_mean sous IDL)
+12/ calculer l'echelle BAO (dofit)
