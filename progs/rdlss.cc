@@ -67,8 +67,7 @@ void usage(void) {
   cout << endl;
         
   cout << "  To simulate a catalog where the z dimension is made to be"<<endl;
-  cout << "  the 'radial' direction use option -z. Only applies if    "<<endl;
-  cout << "  simulating full galaxy catalog.                          "<<endl;
+  cout << "  the 'radial' direction use option -z.                    "<<endl;
   cout << endl;
         
   cout << "  To not simulate galaxy clustering use option -s to supply"<<endl;
@@ -131,7 +130,7 @@ void usage(void) {
   cout << "       circular) [default=2PI]                              "<<endl;
   cout << " -s : ngal: No galaxy clustering in simulation, instead     "<<endl;
   cout << "            constant galaxy density equal to ngal/pixel     "<<endl;
-  cout << " -z : z dimension is 'radial' direction [default=NO]        "<<endl;
+  cout << " -z : z dimension of the over_dens_file is 'radial' [default=NO] "<<endl;
   cout << " -N : debug_out: Output mass cube, ngals cube to files      "<<endl;
   cout <<"       [debug_out]_ngals.fits and [debug_out]_mass.fits      "<<endl;
   cout << endl;
@@ -263,7 +262,7 @@ int main(int narg, char* arg[]) {
   if (doProbaGoldenCut && out_type==0)
     cout << "    Removing galaxies using PhotoZ probabilities " << endl;
   if (isZRadial && out_type==0)
-    cout << "     z-dimension is 'radial dimension'"<<endl;
+    cout << "     z-dimension is of the input cube is 'radial dimension'"<<endl;
   if (noClustering) {
     cout << "     Catalog will be simulated with a constant number"<<endl;
     cout << " density of "<< ngal_per_cell <<endl;

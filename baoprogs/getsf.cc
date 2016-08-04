@@ -82,7 +82,6 @@ void usage(void) {
 	cout << " -O : ObsCat     FITS file containing observed catalog(s)       "<<endl;
 	cout << " -o : sfunc      root name of selection function file           "<<endl;
 	cout << " -z : zp,zs,zz   column names to read redshifts from (see above)"<<endl;
-	cout << " -R : [noarg]    z-axis is Radial (LOS comoving distance)       "<<endl;
 	cout << " -d : [noarg]    Save n(z) Histos to a ppf file                 "<<endl;
 	//cout << " -N : nFiles: Number of FITS files containing RDLSS output [default=1]"<<endl;
 	cout << endl;
@@ -98,7 +97,6 @@ int main(int narg, char *arg[])	{
 	//int nFiles = 1;
 	bool DoDebug = false;
 	bool isZColSpecified = false;
-	bool isZRadial=false;     // z dimension IS 'radial' direction
 	string ZCol;
 	string ZOCol = "zp"; // read in photo-z's as OBSERVED redshifts from OBSERVED catalog
 	string ZSCol = "z";  // read in SPECTRO-z from OBSERVED catalog
@@ -125,10 +123,7 @@ int main(int narg, char *arg[])	{
 			    ZCol = optarg;
 			    isZColSpecified = true;
 			    break;
-                    case 'R' :
-		            isZRadial=true;
-		            break;
-	            case 'd' :
+ 	            case 'd' :
 			    DoDebug=true;
 			    break;
 		    case 'h' :
@@ -161,8 +156,6 @@ int main(int narg, char *arg[])	{
 	cout << "     SPECTRO redshifts to be read from "<< ZFCol <<endl;
 	cout << "     Selection function will be written to "<< SFFileName <<"_nofz.txt and ";
 	cout << SFFileName <<"_specz_nofz.txt"<<endl;
-	if (isZRadial) 
-	  cout << "     z-axis is radial direction: read x, y instead of phi, theta"<<endl;
 
 	if (DoDebug)
 		cout << "     Saving n(z)'s to ppf file "<< SFFileName <<"_histo.ppf"<< endl;
@@ -232,7 +225,7 @@ int main(int narg, char *arg[])	{
 		RandomGenerator rg;
 		string tmp="tmptmp";
 		FitsInOutFile fos(tmp,FitsInOutFile::Fits_Create);
-		Cat2Grid cat(dt, su, rg, fos, ZOCol, ZSCol, isZRadial, 0., true, ObsCat);
+		Cat2Grid cat(dt, su, rg, fos, ZOCol, ZSCol, 0., true, ObsCat);
 
 		string OutRoot = "tmp";
 		if (DoDebug)
@@ -248,8 +241,8 @@ int main(int narg, char *arg[])	{
 //	if(inp.fail()) {
 //	   inp.clear(ios::failbit);
  	    cout <<" DONE" << endl;
-			cat.SaveSelecFunc(SFFileName, FullCat, ObsCat, ZFCol, ZSCol, ZOCol);
-			// both SPECTRO-z and OBSERVED-z sf's are computed here
+	    cat.SaveSelecFunc(SFFileName, FullCat, ObsCat, ZFCol, ZSCol, ZOCol);
+	    // both SPECTRO-z and OBSERVED-z sf's are computed here
 //			}
 //	else cout << " RIEN " << endl;
 		if( remove(tmp.c_str()) != 0 )

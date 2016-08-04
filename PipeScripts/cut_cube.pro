@@ -2,6 +2,7 @@ PRO cut_cube,do_cut,suff
 ; cut_cube,0,'' to see the slices z
 ; cut_cube,1,'' to cut the cube with BAO
 ; cut_cube,1,'0' to cut the cube 0 with noBAO
+; for i=0,9 do  cut_cube,1,strtrim(i,2)
 
 Nz_tot = 700 
 dlref = 3200

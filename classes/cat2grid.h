@@ -109,13 +109,12 @@ class Cat2Grid
       @param fos      FITS file containing gridded galaxy data
       @param ZOCol    name of column in galaxy catalog containing observed z
       @param ZSCol    name of column in galaxy catalog containing spec z
-      @param RadialZ  if true sets the z-dimension to be radial direction 
       @param PZerrAxis    size of Gaussian photo-z error on Z axis
       @param PzerrReds    size of Gaussian photo-z error on redshift
       @param Print    if true prints extra to the screen                    */
   Cat2Grid(SwFitsDataTable& dt, SimpleUniverse& su, RandomGenerator& rg,
            FitsInOutFile& fos, string ZOCol="zp", string ZSCol="z",
-           bool RadialZ=false, double PZerr=0,bool Print=true, string ObsCat="");
+           double PZerr=0,bool Print=true, string ObsCat="");
                  
   /** Constructor - Takes the interp z->d functions as arguments rather than
       calculating them every time so you can use the Row2Record, 
@@ -126,11 +125,10 @@ class Cat2Grid
       @param dist2z   distance to redshift conversion table
       @param z2dist   redshift to distance conversion table
       @param ZOCol    name of column in data table containing observed z
-      @param ZSCol    name of column in data table containgin spec z
-      @param RadialZ  if true sets the z-dimension to be radial direction   */
+      @param ZSCol    name of column in data table containgin spec z   */
   Cat2Grid(SwFitsDataTable& dt, SimpleUniverse& su, RandomGenerator& rg,
            SInterp1D dist2z, SInterp1D z2dist, 
-           string ZOCol="zp", string ZSCol="zs", bool RadialZ=false);
+           string ZOCol="zp", string ZSCol="zs");
 
   /** Copy constructor */
   Cat2Grid(Cat2Grid const& a);
@@ -307,10 +305,7 @@ class Cat2Grid
       @param theta  angle                                                   */        
   sa_size_t GetNTransPix(sa_size_t Np, double theta);
 
-  /** Output catalog in Euclidean coords (for debugging)                    */
-  void OutputEuclidCat(double SkyArea);
-
-  /** Write FITS header */
+   /** Write FITS header */
   void WriteHeader(string IncatName);
         
   /** Zero the size of the galaxy grids                                     */
@@ -424,7 +419,6 @@ class Cat2Grid
   bool AddPhotoErrReds_;          /**< true if adding photo-z error on redshift (Adeline)   */
   bool ErrRandomSeed_ ;     /**< true if the seed for the error generation is new at each execution */
   bool sfcompute_;        /**< true if selection function has been set        */
-  bool RadialZ_;                  /**< if true z-dimension IS radial direction        */
 
   FitsInOutFile& fos_;  /**< FITS file containing gridded galaxy data     */
   string debugoutroot_;/**< root file name to save things to when debugging */

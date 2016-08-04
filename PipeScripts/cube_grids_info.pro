@@ -7,8 +7,10 @@ z_step = z_max / nslicez
 zslice = findgen(nslicez+1)*z_step
 
 zref=[0.7,1.4]
+zref=[0.65,1.3]
 thick = [200.,200.] ;Nz du cube produit par cat_grid
 nxc=[450,900]
+nxc=[432,864]
 cell=8.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -38,8 +40,8 @@ for i=0,n_elements(zref)-1 do begin
       derr = dmax - d[i]
 
       print,'z = ',zref[i], '  d = ', d[i], '  d err= ', derr, '  err = ', err[e], '  central slice = ',i0,'  range [',i1,', ',i2, $
-            '] or in Mpc [',dmin,', ',dmax, '] for grids in the redshit range [',z_min,', ',z_max, ']'
-      print," volume [Gpc3] = ",thick[i]*nxc[i]*nxc[i]*cell*cell*cell/1.e9
+            '] or in Mpc [',dmin,', ',dmax, '] for grids in the redshit range [',z_min,', ',z_max, ']',$
+            " volume [Gpc3] = ",thick[i]*nxc[i]*nxc[i]*cell*cell*cell/1.e9
    endfor
    print,' '
 endfor

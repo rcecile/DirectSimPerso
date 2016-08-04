@@ -25,10 +25,15 @@ na=1000
 ;window,0
 plot,[0,0],[0,0],/xs,/ys,th=3,xra=[-7000,7000],yra=[0,6500],/nodata,xtit='Distance [comoving Mpc]',ytit='Distance [comoving Mpc]';,xtickn=replicate(' ',10),ytickn=replicate(' ',10)
 
-nslice=70
+nslice=75
 h= h0 + (findgen(nslice+1)-nslice/2)*Nz*cell_z/nslice
 ang=Nx*cell_z / h
 for i=0,nslice-1 do oplot,[xmin,xmax],[h[i],h[i]],th=2,col=190
+for i=0,nslice-1 do begin 
+   x=findgen(na)/na*ang[i] -ang[i]/2.
+;   oplot,x,y0+h[i],th=2,col=190
+   oplot,h[i]*sin(x),h[i]*cos(x),th=2,col=190
+endfor
 oplot,[0,cos(mnt+!pi/2.)*hmax*2],[0,sin(mnt+!pi/2.)*hmax*2],th=3
 oplot,[0,cos(mxt+!pi/2.)*hmax*2],[0.,sin(mxt+!pi/2.)*hmax*2],th=3
 

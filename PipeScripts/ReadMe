@@ -1,23 +1,24 @@
 Mode d'emploi : des parametres cosmo a l'echelle BAO
+.sh : jobs a soumettre avec qsub -P P-lsst toto.sh
+.pro : jobs a executer sous IDL 
 
-1/ faire les cubes d'univers (big_cube)
+1/ faire les cubes d'univers (big_cube.sh)
 
-2/ le couper en tranche (cut_cube sous IDL)
-3/ faire le catalogue simple + sel func (cat_simple)
-4/ refaire le catalogue avec tranches ordonnees en z (rangez sous IDL, mode qlogin)
-5/ faire les erreurs (cat_err)
-6/ concatener les redshifts cata (cata_concat sous IDL, mode qlogin)
-7/ calculer les fonctions de selection avec erreur (self_err) 
+2/ le couper en tranche (cut_cube.pro)
+3/ faire le catalogue simple + sel func (cat_simple.sh)
+4/ faire les erreurs (cat_err.sh)
+5/ concatener les redshifts cata (cata_concat.pro, mode qlogin)
+6/ calculer les fonctions de selection avec erreur (self_err.sh) 
 
--- etapes 2 a 7 faites pour simu avec BAO et N simus sans BAO --
+-- etapes 2 a 6 faites pour simu avec BAO et N simus sans BAO --
 
-8/ lisser les fonctions de selection (self sous IDL)
-9/ preparer la projection des grids ( plot_cube_grid et cube_grids_info sous IDL pour ajuster proj_grid)
+7/ moyenner les fonctions de selection (self.pro)
+8/ preparer la projection des grids ( plot_cube_grids.pro et cube_grids_info.pro pour ajuster proj_grid.sh)
 
-10/ projeter dans les grilles (proj_grid)
-11/ calculer le spectre de puissance (comp_ps)
+9/ projeter dans les grilles (proj_grid.sh)
+10/ calculer le spectre de puissance (comp_ps.sh)
 
--- etapes 10 a 11 a faire pour simu avec BAO et N simus sans BAO --
+-- etapes 9 a 10 a faire pour simu avec BAO et N simus sans BAO --
 
-11/ calcul des oscillations (save_ps_mean sous IDL)
-12/ calculer l'echelle BAO (dofit)
+11/ calcul des oscillations (save_ps_mean.rpro)
+12/ calculer l'echelle BAO (dofit.sh)

@@ -188,6 +188,7 @@ void Mass2Gal::ReadHeader(FitsInOutFile& fin)
   cout << "    dx's: (DX,DY,DZ)="<< Dx_ <<","<< Dy_ <<","<< Dz_ <<endl;
   cout << "    N's: (NX,NY,NZ)="<< Nx_ <<","<< Ny_ <<","<< Nz_ <<endl;
   cout << "    zref:"<< zref_ <<endl;
+  cout << "    radial distance to central pixel:"<< DCref_ <<endl;
   cout << "    index of centre pixel (z,y,x)="<< idmidz_ <<","<< idmidy_ <<",";
   cout << idmidx_ <<endl<<endl;
         

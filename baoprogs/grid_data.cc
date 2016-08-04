@@ -3,13 +3,11 @@
   * @brief grid galaxy data and output arrays of gridded data ready for power 
   *        spectrum computation
   *
-  * @todo sky area, cosmology and z dim as radial dir should be read from galaxy 
-  *       catalog header instead of supplied to the program as arguments or 
-  *       hard coded
-  *
+ *
   * @author Alex Abate
   * Contact: abate@email.arizona.edu
-  *
+  * modification Cecile Renault
+  *  Contact: rcecile@in2p3.fr
   */
 
 
@@ -64,11 +62,6 @@ void usage(void) {
   cout << "  covered by the observation cone. This variable is    "<<endl;
   cout << "  used in determining how many pixels of the gridded   "<<endl;
   cout << "  data should in fact contain data.                    "<<endl;
-  cout << endl;
-  
-  cout << "  If the galaxy catalog was simulated such that the z  "<<endl;
-  cout << "  dimension is the radial direction then this is       "<<endl;
-  cout << "  indicated with option -r                             "<<endl;
   cout << endl;
   
   cout << "  The names of the redshift columns to read in can be  "<<endl;
@@ -134,7 +127,6 @@ void usage(void) {
   cout << " -e : Error : Add a Gaussian error on redshift of          "<<endl;
   cout << "      sigma = e*(1+redshift)                               "<<endl;
   cout << " -S : Error : random seed, must be set for simulations     "<<endl;
-  cout << " -r : isZRadial: z-dimension of catalog IS radial direction"<<endl;
   cout << " -P : Nx,Ny,Nz,zref,ResXY,ResZ : Number of pixels, redshift of    "<<endl;
   cout << "      central pixel OR comobile distance of central pixel, pixel size in X,Y and Z - to specify how to grid   "<<endl;
   cout << " -z : ZOCol,ZSCol: read OBSERVED redshifts from column named"<<endl;
@@ -168,7 +160,6 @@ int main(int narg, char* arg[]) {
 	string ZOCol = "z"; // by default OBSERVED redshift col labelled "z" read in
 	string ZSCol = "z"; // by default SPECTRO redshift col labelled "z" read in
 	double SkyArea = 999;	// Catalog covers angle radius SkyArea [999==full sky]
-	bool isZRadial = false; // if true, catalog z-dimension IS radial direction
 	// SELECTION FUNCTION CORRECTION PARAMETERS
 	string sffiles;			  // list of selection function files
 	bool doSFCorr = false;	  // if true, apply selection function correction
@@ -215,9 +206,6 @@ int main(int narg, char* arg[]) {
 	  case 'R' :
 	    Write_Redshift = false;
 	    cout << "Grid of redshift not written (HDU 3 of the output FITS file)"<< endl;
-	    break;
-	  case 'r' :
-	    isZRadial = true;
 	    break;
 	  case 'P' :
 	    sscanf(optarg,"%ld,%ld,%ld,%lf,%lf,%lf",&Nx,&Ny,&Nz,&zref,&R_XY,&R_Z);
@@ -289,9 +277,6 @@ int main(int narg, char* arg[]) {
 	cout << "     Galaxy catalog read from file "<< input_catalog;
 	cout << "     Reading redshifts from columns named "<< ZOCol <<" and ";
 	cout << ZSCol << endl;
-	if (isZRadial)
-		cout << "     Z dimension IS the radial direction"<<endl;
-	cout << endl;
 		
 	// SF CORRECTION
 	cout << "     *SELECTION FUNCTION DETAILS*"<<endl;
@@ -419,7 +404,7 @@ int main(int narg, char* arg[]) {
 	  rg.SetSeed(seed);
 	}
 
-	Cat2Grid cat(galaxy_catalog, su, rg, fos, ZOCol, ZSCol, isZRadial, 0, true, input_catalog);
+	Cat2Grid cat(galaxy_catalog, su, rg, fos, ZOCol, ZSCol, 0, true, input_catalog);
 	if (DoDebug)
 		cat.SetDebugOutroot(debug_out);
 	cout << "    The number of gals in whole simulation is "<< cat.ReturnNgAll() <<endl;
@@ -504,42 +489,34 @@ int main(int narg, char* arg[]) {
 	  cout <<"    .... not being correcting for "<<endl;
 	cout<<endl<<endl;
 	
+	// Project galaxies onto the grid
+	cout << "4/ Project galaxies onto grid & write to the file ..."<<endl;
+	cat.GalGrid(SkyArea);
+	cout <<"    - zero size the arrays to save space"<<endl;
+	cat.ZeroGalArrays();
+	cout << endl;
 	
-	// If debugging just output something here not sure what or why - Warning does not adapted to multiple input files
-	if (DoDebug) {
-	  cat.OutputEuclidCat(SkyArea);
-	}
-	else {	
 	  
-	  // Project galaxies onto the grid
-	  cout << "4/ Project galaxies onto grid & write to the file ..."<<endl;
-	  cat.GalGrid(SkyArea);
-	  cout <<"    - zero size the arrays to save space"<<endl;
-	  cat.ZeroGalArrays();
-	  cout << endl;
+	cout <<"    Return actual grid specification:"<<endl;
+	TVector<r_8> gridv = cat.ReturnGridSpec();
+	cout <<"    Nx,Ny,Nz,L="<< gridv(0) <<","<< gridv(1) <<","<< gridv(2);
+	cout <<","<< gridv(3) <<endl;
+	cout << endl;
+	
+	// Make random galaxy grid with mean density 
+	cout << "5/ Make random catalog galaxy grid ..."<<endl;
+	cout <<"    Mean density of random grid = "<< nc <<endl;
+	cat.RandomGrid(nc, Write_Redshift);
+	res.Update();
+	cout << "    Memory size increase (KB):" << res.getDeltaMemorySize() << endl;
+	cout << "    Resource usage info : \n" << res << endl;
+	
+	
+	// Write headers to FITS file that contains array
+	// include input galaxy catalog file name in header
+	cat.WriteHeader(input_catalog);
+	
 	  
-	  
-	  cout <<"    Return actual grid specification:"<<endl;
-	  TVector<r_8> gridv = cat.ReturnGridSpec();
-	  cout <<"    Nx,Ny,Nz,L="<< gridv(0) <<","<< gridv(1) <<","<< gridv(2);
-	  cout <<","<< gridv(3) <<endl;
-	  cout << endl;
-	  
-          // Make random galaxy grid with mean density 
-	    cout << "5/ Make random catalog galaxy grid ..."<<endl;
-	    cout <<"    Mean density of random grid = "<< nc <<endl;
-	    cat.RandomGrid(nc, Write_Redshift);
-	    res.Update();
-	    cout << "    Memory size increase (KB):" << res.getDeltaMemorySize() << endl;
-	    cout << "    Resource usage info : \n" << res << endl;
-	  
-	  
-	  // Write headers to FITS file that contains array
-	  // include input galaxy catalog file name in header
-	  cat.WriteHeader(input_catalog);
-	  
-	  
-	}// end of if not debugging
 	
 }  // End of try bloc 
 	
