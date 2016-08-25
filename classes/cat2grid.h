@@ -173,7 +173,7 @@ class Cat2Grid
       if >1 file to read files are named FullCat_#ofn.fits
       @param ZCol          name of column in FullCat containing true z
       @param Nfiles        number of files n to read in  */
-  void SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, string ZFCol="zs", string  ZSCol="zs",  string ZOCol="zp");
+  void SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, string ZFCol="zs", string  ZSCol="zs",  string ZOCol="zp", bool MakeFullHist=true);
         
   /** Set selection function                                                */
   inline void SetSelectionFunction(SelectionFunctionInterface& sf) { 

@@ -46,6 +46,7 @@ void usage(void) {
     cout << endl;
 	
 	cout << "  Read in a catalog containing all the simulated galaxies  "<<endl;
+	cout << "  (or the histogram already made from it ...)  "<<endl;
 	cout << "  and a catalog of the observed galaxies. The catalog that "<<endl;
 	cout << "  that contains all the simulated galaxies may be stored in"<<endl;
 	cout << "  more than one file. Supply all these filenames separated "<<endl;
@@ -79,6 +80,7 @@ void usage(void) {
     cout << endl;
 	
 	cout << " -F : FullCat    FITS filename containing simulated catalog(s)  "<<endl;
+	cout << " -H : FullHist   text file containing the histogram from simulated catalog(s) "<<endl;
 	cout << " -O : ObsCat     FITS file containing observed catalog(s)       "<<endl;
 	cout << " -o : sfunc      root name of selection function file           "<<endl;
 	cout << " -z : zp,zs,zz   column names to read redshifts from (see above)"<<endl;
@@ -93,9 +95,10 @@ int main(int narg, char *arg[])	{
 	SophyaInit();
 	FitsIOServerInit();
   
-	string FullCat, ObsCat, SFFileName;
+	string FullCat, FullHist, ObsCat, SFFileName;
 	//int nFiles = 1;
 	bool DoDebug = false;
+	bool MakeFullHist = true;
 	bool isZColSpecified = false;
 	string ZCol;
 	string ZOCol = "zp"; // read in photo-z's as OBSERVED redshifts from OBSERVED catalog
@@ -105,12 +108,16 @@ int main(int narg, char *arg[])	{
 	//--- decoding command line arguments 
 	cout << " ==== decoding command line arguments ===="<<endl;
 	char c;
-	while((c = getopt(narg,arg,"hdRF:O:o:z:")) != -1) { 
+	while((c = getopt(narg,arg,"hdRF:H:O:o:z:")) != -1) { 
 	    switch (c) {
 		    case 'F' :
 			    FullCat = optarg;
 			    break;
-//			case 'N' :
+		    case 'H' :
+			    FullHist = optarg;
+			    MakeFullHist = false;
+			    break;
+///			case 'N' :
 //			    sscanf(optarg,"%d",&nFiles);
 //			    break;
 		    case 'O' :
@@ -152,7 +159,11 @@ int main(int narg, char *arg[])	{
 	cout << "     Observed catalog in file(s) "<< ObsCat <<endl;
 	cout << "     OBSERVED redshifts to be read from "<< ZOCol <<" column"<<endl;
 	cout << "     SPECTRO redshifts to be read from "<< ZSCol <<" column"<<endl;
-	cout << "     True redshifts in file(s) " << FullCat << endl;
+	if (MakeFullHist)
+	  cout << "     True redshifts in file(s) " << FullCat << endl;
+	else 
+	  cout << "     True redshifts histogram in file " << FullHist << endl;
+
 	cout << "     SPECTRO redshifts to be read from "<< ZFCol <<endl;
 	cout << "     Selection function will be written to "<< SFFileName <<"_nofz.txt and ";
 	cout << SFFileName <<"_specz_nofz.txt"<<endl;
@@ -241,7 +252,11 @@ int main(int narg, char *arg[])	{
 //	if(inp.fail()) {
 //	   inp.clear(ios::failbit);
  	    cout <<" DONE" << endl;
-	    cat.SaveSelecFunc(SFFileName, FullCat, ObsCat, ZFCol, ZSCol, ZOCol);
+	    if (MakeFullHist)
+	      cat.SaveSelecFunc(SFFileName, FullCat, ObsCat, ZFCol, ZSCol, ZOCol,MakeFullHist);
+	    else
+	      cat.SaveSelecFunc(SFFileName, FullHist, ObsCat, ZFCol, ZSCol, ZOCol,MakeFullHist);
+
 	    // both SPECTRO-z and OBSERVED-z sf's are computed here
 //			}
 //	else cout << " RIEN " << endl;

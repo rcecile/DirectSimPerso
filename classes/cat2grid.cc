@@ -543,7 +543,7 @@ void Cat2Grid::SetGrid(int_8 Nx, int_8 Ny, int_8 Nz, double R_XY, double R_Z, do
 };
 
 
-void Cat2Grid::SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, string ZFCol, string  ZSCol,  string ZOCol)
+void Cat2Grid::SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, string ZFCol, string  ZSCol,  string ZOCol, bool MakeFullHist)
 // Create Histo of observed redshifts/true redshifts and save to
 // a text file called [SFTextFile]_nofz.txt
 // Reads in a Fits file containing ALL the true redshifts in the
@@ -555,14 +555,17 @@ void Cat2Grid::SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, s
   cout <<"    Cat2Grid::SaveSelecFunc()"<<endl;
   cout << "OBSCAT : " << ObsCat_ << endl;
   Timer tm("SaveSelecFunc");
-
+  
   //READ HISTOGRAM VALUES INTO A FILE
   string outfile = SFTextFile+"_nofz.txt";
   string outfile2 = SFTextFile+"_specz_nofz.txt";
-    
+  string outfile0;
+  if (MakeFullHist)
+    outfile0 = SFTextFile+"_ZONLY.txt";
+  
   cout <<"    Write n^o(z)/n^t(z) histograms to text files "<<endl;
   ifstream inp;
-  ofstream outp,outp2;
+  ofstream outp,outp2,outp0;
     
   inp.open(outfile.c_str(), ifstream::in);
   inp.close();
@@ -570,20 +573,7 @@ void Cat2Grid::SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, s
     cout << "Error...file """ << outfile.c_str() << """ exists" << endl;
     exit(-1);
   }
-  
-  // Get full catalog file name(s)
-  string delim=",";
-  vector<string> fnames;
-  stringSplit(FullCat,delim,fnames);
-  int Nfiles = fnames.size();
-  
-  /*// Set name of catalog containing the "full" set of z's
-    string FullCatFile;
-    if(Nfiles>1)
-    cout <<"    Reading in "<< Nfiles <<" full catalog files"<<endl; 
-    else
-    FullCatFile = FullCat;*/
-  
+    
   // Initialise random generator to specified seed
   long seed=1; 
   rg_.SetSeed(seed);
@@ -596,41 +586,107 @@ void Cat2Grid::SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, s
   // (will be same as above if spec-z used in analysis)
   Histo nzOCsz(minz, maxz, nbin); // obs catalog Histo (using spec-z) 
   
-  // Read in Fits file containing column with all true redshifts
-  // FULL CATALOG               
-  double minzt, maxzt;
   
-  for (int ic=0; ic<Nfiles; ic++) {
+  if (MakeFullHist) {
+    // Get full catalog file name(s)
+    string delim=",";
+    vector<string> fnames;
+    stringSplit(FullCat,delim,fnames);
+    int Nfiles = fnames.size();
     
-    string FullCatFile = fnames[ic];
-    cout <<"    Read in full catalog redshifts from "<< FullCatFile;
-    cout <<" from column labelled "<< ZFCol <<endl;
-    FitsInOutFile fin(FullCatFile,FitsInOutFile::Fits_RO);
-    fin.MoveAbsToHDU(2);
-    SwFitsDataTable dt(fin,512,false);
-    cout <<endl;
+    /*// Set name of catalog containing the "full" set of z's
+      string FullCatFile;
+      if(Nfiles>1)
+      cout <<"    Reading in "<< Nfiles <<" full catalog files"<<endl; 
+      else
+      FullCatFile = FullCat;*/
+    // Read in Fits file containing column with all true redshifts
+    // FULL CATALOG               
+    double minzt, maxzt;
     
-    sa_size_t ncat = dt.NEntry();
-    sa_size_t Izf = dt.IndexNom(ZFCol);
-    dt.GetMinMax(Izf,minzt,maxzt); 
-    DataTableRow rowin = dt.EmptyRow();
-    cout <<"    Number of galaxies in this FULL catalog = "<< ncat <<endl;
-    cout <<"    Min z of this FULL catalog = "<<minzt;
-    cout <<", max z of this FULL catalog = "<<maxzt<<endl;
-    
-    cout <<"    Add to Histogram ... "<<endl;
-    for(sa_size_t i=0; i<ncat; i++) { 
-      dt.GetRow(i, rowin);
-      double zs=rowin[Izf];
-      nzFC.Add(zs);
+    for (int ic=0; ic<Nfiles; ic++) {
+      
+      string FullCatFile = fnames[ic];
+      cout <<"    Read in full catalog redshifts from "<< FullCatFile;
+      cout <<" from column labelled "<< ZFCol <<endl;
+      FitsInOutFile fin(FullCatFile,FitsInOutFile::Fits_RO);
+      fin.MoveAbsToHDU(2);
+      SwFitsDataTable dt(fin,512,false);
+      cout <<endl;
+      
+      sa_size_t ncat = dt.NEntry();
+      sa_size_t Izf = dt.IndexNom(ZFCol);
+      dt.GetMinMax(Izf,minzt,maxzt); 
+      DataTableRow rowin = dt.EmptyRow();
+      cout <<"    Number of galaxies in this FULL catalog = "<< ncat <<endl;
+      cout <<"    Min z of this FULL catalog = "<<minzt;
+      cout <<", max z of this FULL catalog = "<<maxzt<<endl;
+      
+      cout <<"    Add to Histogram ... "<<endl;
+      for(sa_size_t i=0; i<ncat; i++) { 
+	dt.GetRow(i, rowin);
+	double zs=rowin[Izf];
+	nzFC.Add(zs);
+      }
+    }
+    sa_size_t ngFC = nzFC.NEntries();
+  }
+  else {
+    string sffile = FullCat + "_ZONLY.txt";
+    ifstream inp;
+    inp.open(sffile.c_str(), ifstream::in);
+    inp.close();
+    if(inp.fail()) { 
+      // sffile does NOT exist
+      string emsg = "ERROR! Selection function in file " + sffile;
+      emsg += " does not exist";
+      throw ParmError(emsg);
+    }
+    else {
+      // sffile DOES exist
+      cout <<" Histogram from all galaxies will be read from file " << sffile.c_str() <<endl;
+      SInterp1D histo_full;
+      vector<double> xsv, ysv;// the two columns to be read in
+      
+      size_t cnt=0; // count number of lines
+      double cola, colb;
+      inp.open(sffile.c_str(), ifstream::in);
+      while(!inp.eof()) {  
+        inp.clear();
+        inp >> cola >> colb; // read each line into cola and colb
+        cout <<" histo ZONLY = "<< cola <<", "<< colb << endl;
+        
+	//       if ( (!inp.good()) || inp.eof() ) {   
+        if ( inp.eof() ) {   
+	  break; // read until end of file
+	}
+	nzFC.Add(cola,colb); 
+	if (cnt == 0) 
+	  if (cola != minz + (maxz-minz)/nbin/2.) {
+	    // sffile does NOT exist
+	    string emsg = "ERROR! Histogram in file " + sffile;
+	    emsg += " does not have the right minimum redshift";
+	    throw ParmError(emsg);	
+	  }
+	
+        cnt++;
+      }
+      inp.close();
+      
+      if (cola != maxz - (maxz-minz)/nbin/2.) {
+	// sffile does NOT exist
+	string emsg = "ERROR! Histogram in file " + sffile;
+	emsg += " does not have the right maximum redshift";
+	throw ParmError(emsg);	
+      }
     }
   }
-  sa_size_t ngFC = nzFC.NEntries();
-    
   // OBS CATALOG - loop over and add to Histo
   cout <<"    Histogram up OBSERVED catalog"<<endl;
  
+  string delim=",";
   vector<string> fobsnames;
+  double minzt, maxzt;
   stringSplit(ObsCat_,delim,fobsnames);
   int Nobsfiles = fobsnames.size();
   double x=1e8,y=1e8,z=-1e8,redshift=-10;
@@ -692,9 +748,14 @@ void Cat2Grid::SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, s
       
   inp.clear(ios::failbit);
   cout << "    Writing to file ..." << outfile.c_str() << " and " << outfile2.c_str() <<endl;
+  if (MakeFullHist)
+      cout << "  ...  and " << outfile0.c_str() <<endl;
+
   outp.open(outfile.c_str(), ofstream::out);
   outp2.open(outfile2.c_str(), ofstream::out);
-  
+  if (MakeFullHist)
+    outp0.open(outfile0.c_str(), ofstream::out);
+
   for(int_4 i=0;i<nbin;i++) {
     r_8 bc=nzFC.BinCenter(i);
     r_8 bc2=nzFC.BinCenter(i);
@@ -724,11 +785,15 @@ void Cat2Grid::SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, s
     
     outp << bc <<"      "<< sf1 <<endl;
     outp2 << bc <<"      "<< sf2 <<endl;
+    if (MakeFullHist)
+      outp0 << bc <<"      "<< nzt <<endl;
     // cout << bc <<"      "<< sf1 <<endl;
   }
   outp.close();
   outp2.close();
-    
+  if (MakeFullHist)
+      outp0.close();
+
   tm.Split();
   cout <<"    Elapsed time "<< tm.TotalElapsedTime() <<endl;
   cout <<"    EXIT Cat2Grid::SaveSelecFunc()"<<endl<<endl;
@@ -1249,7 +1314,7 @@ void Cat2Grid::SetPhotozErrRedshift(string pdfFileName, bool seed, double zcat_m
     }
   }
   
-  nz = int( (z_max-z_min)/binz )+1;
+  nz = int( (z_max-z_min)/binz +0.5)+1;
   ntype = int( (type_max-type_min)/binType)+1;
   nmag = int( (mag_max-mag_min)/binMag)+1;
   
@@ -1281,7 +1346,7 @@ void Cat2Grid::SetPhotozErrRedshift(string pdfFileName, bool seed, double zcat_m
     if (qualcutfile.eof())
       break;
     qualcutfile >> it >> imag >> p;
-    //cout << "Read " << iz << " " << it << " " << imag << endl;
+    cout << "Read " << iz << " " << it << " " << imag << endl;
     allprob*=p;
     QualCutProb[iz][it][imag] = p;
   }
