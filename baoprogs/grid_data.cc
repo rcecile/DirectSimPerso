@@ -122,8 +122,6 @@ void usage(void) {
   cout << " -C : input_catalog : FITS filename containing galaxy catalog"<<endl;
   cout << " -O : out_grids_name : Write gridded data to this FITS file"<<endl;
   cout << " -a : SkyArea : Specify sky area (radians)                 "<<endl;
-  cout << " -E : Error : Add a Gaussian error on z-axis of            "<<endl;
-  cout << "      sigma = E(1+redshift) (properly translated in Mpc)   "<<endl;
   cout << " -e : Error : Add a Gaussian error on redshift of          "<<endl;
   cout << "      sigma = e*(1+redshift)                               "<<endl;
   cout << " -S : Error : random seed, must be set for simulations     "<<endl;
@@ -171,7 +169,7 @@ int main(int narg, char* arg[]) {
 	double R_XY = 8.;		    // Grid cell size in Mpc along x & y axis (exact)
 	double R_Z = 8.;		    // Grid cell size in Mpc along z axis (exact)
 	long Nx=0,Ny=0,Nz=0;	// Grid has Nx,Ny,Nz pixels (approx)
-	double zref=0,PZerrAxis=0,PzerrReds=0;	// Grid centered at zref (exact) + (Cecile) error on z (redshit or coordinate, it depends)
+	double zref=0,PzerrReds=0;	// Grid centered at zref (exact) + (Cecile) error on z (redshit or coordinate, it depends)
 	double nc=1;			// Mean density of random grid
 	// DEBUGGING
 	string debug_out;
@@ -182,7 +180,7 @@ int main(int narg, char* arg[]) {
 	//--- decoding command line arguments 
 	cout << " ==== decoding command line arguments ===="<<endl;
 	char c;
-	while((c = getopt(narg,arg,"hrSRC:O:a:E:e:p:g:r:P:z:m:s:d:h:")) != -1) {
+	while((c = getopt(narg,arg,"hrSRC:O:a:e:p:g:r:P:z:m:s:d:h:")) != -1) {
 	  switch (c) {
 	  case 'C' :
 	    input_catalog = optarg;
@@ -192,9 +190,6 @@ int main(int narg, char* arg[]) {
 	    break;
 	  case 'a' :
 	    sscanf(optarg,"%lf",&SkyArea);
-	    break;
-	  case 'E' :
-	    sscanf(optarg,"%lf",&PZerrAxis);
 	    break;
 	  case 'e' :
 	    sscanf(optarg,"%lf",&PzerrReds);
@@ -409,7 +404,6 @@ int main(int narg, char* arg[]) {
 		cat.SetDebugOutroot(debug_out);
 	cout << "    The number of gals in whole simulation is "<< cat.ReturnNgAll() <<endl;
 	
-	if (PZerrAxis > 0.)  cat.SetGaussErrAxis(PZerrAxis,zref,RandomSeed);
 	if (PzerrReds > 0.)  cat.SetGaussErrRedshift(PzerrReds,zref,RandomSeed);
 
 	// Compute min and max coordinates and min max redshift

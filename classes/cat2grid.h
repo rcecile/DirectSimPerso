@@ -71,9 +71,9 @@ class GalRecord {
   double delta;    /**< declination coodinate                               */
   double glong;    /**< galactic longitude coordinate                       */
   double glat;     /**< galactic latitude coordinate                        */
-  double xcoo;     /**< Euclidean x coordinate                              */
-  double ycoo;     /**< Euclidean y coordinate                              */
-  double zcoo;     /**< Euclidean z coordinate                              */
+  double xcoo;     /**< shell x coordinate                              */
+  double ycoo;     /**< shell y coordinate                              */
+  double zcoo;     /**< shell z coordinate                              */
   double zs;       /**< spectroscopic redshift                              */
   double zo;       /**< observed redshift                                   */
   int type;        /**< galaxy type                                         */
@@ -109,7 +109,6 @@ class Cat2Grid
       @param fos      FITS file containing gridded galaxy data
       @param ZOCol    name of column in galaxy catalog containing observed z
       @param ZSCol    name of column in galaxy catalog containing spec z
-      @param PZerrAxis    size of Gaussian photo-z error on Z axis
       @param PzerrReds    size of Gaussian photo-z error on redshift
       @param Print    if true prints extra to the screen                    */
   Cat2Grid(SwFitsDataTable& dt, SimpleUniverse& su, RandomGenerator& rg,
@@ -118,7 +117,7 @@ class Cat2Grid
                  
   /** Constructor - Takes the interp z->d functions as arguments rather than
       calculating them every time so you can use the Row2Record, 
-      Rec2EuclidCoord functions
+      Rec2ShellCoord functions
       @param dt       data table containing galaxy catalog
       @param su       cosmology calculator
       @param rg       random number generator
@@ -195,20 +194,20 @@ class Cat2Grid
       currently accepted                                                    */
   bool Filter(GalRecord& rec); 
         
-  /** Convert galaxy position in GalRecord (phi,theta,z) into Euclidean 
+  /** Convert galaxy position in GalRecord (phi,theta,z) into Shell 
       coordinates
       @param rec        galaxy record
-      @param x          Euclidean x coordinate
-      @param y          Euclidean y coordinate
-      @param z          Euclidean z coordinate
+      @param x          Shell x coordinate
+      @param y          Shell y coordinate
+      @param z          Shell z coordinate
       @param redshift   redshift of galaxy                                  */
-  void Rec2EuclidCoord(GalRecord& rec, double& x, double& y, double& z, double& redshift);
+  void Rec2ShellCoord(GalRecord& rec, double& x, double& y, double& z, double& redshift);
         
   /** Add galaxy with position x,y,z and weighting 1/phi to correct pixel in
       galaxy grid
-      @param x          galaxy Euclidean x coordinate
-      @param y          galaxy Euclidean y coordinate
-      @param z          galaxy Euclidean z coordinate
+      @param x          galaxy Shell x coordinate
+      @param y          galaxy Shell y coordinate
+      @param z          galaxy Shell z coordinate
       @param phi        weight of galaxy                                    */
   void AddToCell(double x, double y, double z,double phi=1);
         
@@ -249,9 +248,6 @@ class Cat2Grid
         
   /** Normalise galaxy random grid                                          */
   void NormRArray();
-
-  /** Add Gaussian errors to z coordinate   */
-  void SetGaussErrAxis(double Err, double zref, bool randomseed);
 
 
   /** Add Gaussian errors to redshifts  (Cecile)
@@ -414,7 +410,6 @@ class Cat2Grid
         
   bool DoDebug_;                  /**< true if debugging                              */
   bool AddGaussErr_;        /**< true if adding Gaussian error  */
-  bool AddGaussErrAxis_;    /**< true if adding Gaussian error to  z-coordinate axis  */
   bool AddGaussErrReds_;    /**< true if adding Gaussian error to redshifts (Cecile)   */
   bool AddPhotoErrReds_;          /**< true if adding photo-z error on redshift (Adeline)   */
   bool ErrRandomSeed_ ;     /**< true if the seed for the error generation is new at each execution */

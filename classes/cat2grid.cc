@@ -34,7 +34,6 @@ Cat2Grid::Cat2Grid(SwFitsDataTable& dt, SimpleUniverse& su, RandomGenerator& rg,
   sfcompute_ = false; // flag becomes true after selection function is set
   PZDerr_=0;// set photoz error in Mpc equal to zero to start with
   AddGaussErr_     = false; // flag to add Gaussian photo-z err
-  AddGaussErrAxis_ = false; // flag to add Gaussian photo-z err on z-axis
   AddGaussErrReds_ = false; // flag to add Gaussian photo-z err on redshift
   AddPhotoErrReds_ = false; // flag to add photo-z photo-z err on redshift
 
@@ -103,7 +102,7 @@ Cat2Grid::Cat2Grid(SwFitsDataTable& dt, SimpleUniverse& su, RandomGenerator& rg,
 };
 
 
-// make interpolation table outside Cat2Grid, just use Row2Record, Rec2EuclidCoord functions
+// make interpolation table outside Cat2Grid, just use Row2Record, Rec2ShellCoord functions
 Cat2Grid::Cat2Grid(SwFitsDataTable& dt,SimpleUniverse& su,RandomGenerator& rg,
                    SInterp1D dist2z, SInterp1D z2dist,string ZOCol,string ZSCol)
 		   : dt_(dt) , su_(su) , rg_(rg) , defselfunc_(1.), selfuncp_(&defselfunc_) , fos_(fosdefault_) ,
@@ -121,7 +120,6 @@ Cat2Grid::Cat2Grid(SwFitsDataTable& dt,SimpleUniverse& su,RandomGenerator& rg,
   sfcompute_ = false; // flag becomes true after selection function is set
   PZDerr_=0;// set photoz error in Mpc equal to zero to start with
   AddGaussErr_     = false; // flag to add Gaussian photo-z err
-  AddGaussErrAxis_ = false; // flag to add Gaussian photo-z err on z-axis
   AddGaussErrReds_ = false; // flag to add Gaussian photo-z err on redshift
         
   // Data table column names
@@ -172,7 +170,6 @@ Cat2Grid& Cat2Grid::Set(const Cat2Grid& a)
   debugoutroot_=a.debugoutroot_;        
   PZDerr_=a.PZDerr_;    
   AddGaussErr_    =a.AddGaussErr_;
-  AddGaussErrAxis_=a.AddGaussErrAxis_;
   AddGaussErrReds_=a.AddGaussErrReds_;
   selfuncp_=a.selfuncp_;
   ZSCol_=a.ZSCol_;
@@ -265,7 +262,7 @@ double Cat2Grid::FindMinMaxCoords()
     dt_.GetRow(ig, rowin);
     Row2Record(rowin,grec);
     if (!Filter(grec)) continue;
-    Rec2EuclidCoord(grec,x,y,z,redshift);
+    Rec2ShellCoord(grec,x,y,z,redshift);
     // the redshift returned here is the redshift to be used
     // in the analysis, could be spec-z, phot-z, gauss-z
         
@@ -716,7 +713,7 @@ void Cat2Grid::SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, s
       Row2Record(rowino,grec);
       if (!Filter(grec)) continue; 
       // not significantly slower than reading the redshifts and allow more possibilities
-      Rec2EuclidCoord(grec,x,y,z,redshift);
+      Rec2ShellCoord(grec,x,y,z,redshift);
       
       nzOC.Add(redshift); // histo up OBSERVED -z
       nzOCsz.Add(grec.zs);// histogram up spec-z no matter what
@@ -897,8 +894,8 @@ void Cat2Grid::GalGrid(double SkyArea)
       else if (redshift != 10)
         ngo_++; 
 
-      // convert galaxy position into Euclid coord - it is here that z error really matters
-      Rec2EuclidCoord(grec,x,y,z,redshift);
+      // convert galaxy position into Shell coord - it is here that z error really matters
+      Rec2ShellCoord(grec,x,y,z,redshift);
             
       // return selection function value at gal redshift
       selphi = (*selfuncp_)(redshift);
@@ -1061,7 +1058,7 @@ double Cat2Grid::ComputeErrorFromPhotoz(GalRecord& rec){
   return zs + photozErrorArray[iz_reduced][itype][imag] -> GetRandom();
 }
 
-void Cat2Grid::Rec2EuclidCoord(GalRecord& rec, double& x, double& y, double& z, double& redshift)
+void Cat2Grid::Rec2ShellCoord(GalRecord& rec, double& x, double& y, double& z, double& redshift)
 // From GalRecord object which contains:
 // double alpha,delta,glong,glat,xcoo,ycoo,zcoo;
 // double zs,zo;
@@ -1071,38 +1068,29 @@ void Cat2Grid::Rec2EuclidCoord(GalRecord& rec, double& x, double& y, double& z, 
 // Choice of 3 redshifts: photometric, spectroscopic and spectroscopic + Gaussian error
 {
 
-  redshift = rec.zo;// zo is redshift to be used in analysis (could be spec-z,phot-z,gauss-z)
-  if (AddGaussErrReds_) {
-    redshift += PZerr_ * (1.+redshift) * rg_.Gaussian();
-  }
-  //Photo-z error (Adeline)
-  //redshift = 10 means galaxies don't pass the quality cut 
-  if(AddPhotoErrReds_){
-    redshift = ComputeErrorFromPhotoz(rec);
-  }
-
+  // x,y must computed with the spectroZ : not affected by the redshift error (Cecile)
+  redshift = rec.zs;
   double dc = z2dist_(redshift);
-  double zref;
-
   double ph=rec.alpha;
   double th=rec.delta;
   if(isnan(th)) {
-    cout <<"    Cat2Grid::Rec2EuclidCoord/PB theta=nan -> set theta=0"<<endl;
+    cout <<"    Cat2Grid::Rec2ShellCoord/PB theta=nan -> set theta=0"<<endl;
     th=0;
   }
-  
-  //  x=dc*cos(ph)*sin(th);
-  //  y=dc*sin(ph)*sin(th);
-  z=dc;
   double r = dc*tan(th);
   x = r*cos(ph);
   y = r*sin(ph);
 
-  zref = z;
-  if (AddGaussErrAxis_) {
-    z += ZErr2CoDistErr(su_,PZerr_,redshift)*rg_.Gaussian();
-    // We have to compute back the redshift 
-    redshift = dist2z_(z);
+  
+  // zo is redshift to be used in analysis (could be spec-z,phot-z,gauss-z). It can be spectro or already with error or with error computed bellow
+  redshift = rec.zo;
+
+  if (AddGaussErrReds_) {
+    redshift += PZerr_ * (1.+redshift) * rg_.Gaussian();
+  }
+
+  if(AddPhotoErrReds_){
+    redshift = ComputeErrorFromPhotoz(rec);
   }
 };
 
@@ -1268,17 +1256,6 @@ void Cat2Grid::NormRArray(){
   VarianceRandomGrid();
 }
 
-void Cat2Grid::SetGaussErrAxis(double Err, double zref, bool randomseed) {
-  AddGaussErr_    = true;
-  AddGaussErrAxis_= true;
-  ErrRandomSeed_  = randomseed;
-  PZerr_ = Err; 
-  PZDerr_ = ZErr2CoDistErr(su_,Err,zref);
-  cout <<"    Gaussian errors WILL be added to z-coordinate from a reshift error of "<< PZerr_ ; 
-  if (ErrRandomSeed_) cout << " in Montecarlo mode" << endl<<endl; 
-  else cout << endl<<endl; 
-}
-
 void Cat2Grid::SetGaussErrRedshift(double Err, double zref, bool seed) {
   AddGaussErr_    = true;
   AddGaussErrReds_= true;
@@ -1346,7 +1323,7 @@ void Cat2Grid::SetPhotozErrRedshift(string pdfFileName, bool seed, double zcat_m
     if (qualcutfile.eof())
       break;
     qualcutfile >> it >> imag >> p;
-    cout << "Read " << iz << " " << it << " " << imag << endl;
+    //cout << "Read " << iz << " " << it << " " << imag << endl;
     allprob*=p;
     QualCutProb[iz][it][imag] = p;
   }
