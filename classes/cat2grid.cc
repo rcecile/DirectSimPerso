@@ -1080,10 +1080,10 @@ void Cat2Grid::Rec2ShellCoord(GalRecord& rec, double& x, double& y, double& z, d
   double r = dc*tan(th);
   x = r*cos(ph);
   y = r*sin(ph);
-
   
   // zo is redshift to be used in analysis (could be spec-z,phot-z,gauss-z). It can be spectro or already with error or with error computed bellow
   redshift = rec.zo;
+  z = z2dist_(redshift);
 
   if (AddGaussErrReds_) {
     redshift += PZerr_ * (1.+redshift) * rg_.Gaussian();
@@ -1103,6 +1103,7 @@ void Cat2Grid::AddToCell(double x, double y, double z,double phi)
   sa_size_t indexx=(sa_size_t)floor((x-Xmin_)/cellsizeXY_);
   sa_size_t indexy=(sa_size_t)floor((y-Ymin_)/cellsizeXY_);
   sa_size_t indexz=(sa_size_t)floor((z-Zmin_)/cellsizeZ_);
+ 
   if (indexx<Nx_&&indexy<Ny_&&indexz<Nz_&&indexx>=0&&indexy>=0&&indexz>=0) {
         
     ngals_(indexx,indexy,indexz)++;
@@ -1202,7 +1203,7 @@ void Cat2Grid::RandomGrid(double nc, bool SaveArr)
   } // end of loop over  (x-direction)
   nrand_=randomcat_.Sum(); 
   wnrand_=wrgals_.Sum();
-  cout <<"    number of gals in in grid = "<< ng_;
+  cout <<"    number of gals in grid = "<< ng_;
   cout <<", number of gals in random grid = "<< nrand_ <<endl;
   cout <<"    Number of galaxies in RANDOM weighted grid = "<< wnrand_;
   cout <<", should be approximately input density*npixels = "<< nc*n_obs_pixels_ <<endl;

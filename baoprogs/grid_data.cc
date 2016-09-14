@@ -166,10 +166,10 @@ int main(int narg, char* arg[]) {
 	bool doSFCompute = false; // if true, do selection function computation here
 	bool isForceZspec =false; // force selection function to be computed using the SPEC-z
 	// GRID SPEC PARS
-	double R_XY = 8.;		    // Grid cell size in Mpc along x & y axis (exact)
-	double R_Z = 8.;		    // Grid cell size in Mpc along z axis (exact)
-	long Nx=0,Ny=0,Nz=0;	// Grid has Nx,Ny,Nz pixels (approx)
-	double zref=0,PzerrReds=0;	// Grid centered at zref (exact) + (Cecile) error on z (redshit or coordinate, it depends)
+	double R_XY;		    // Grid cell size in Mpc along x & y axis (exact)
+	double R_Z;		    // Grid cell size in Mpc along z axis (exact)
+	long Nx,Ny,Nz;	// Grid has Nx,Ny,Nz pixels (approx)
+	double zref,PzerrReds=0;	// Grid centered at zref (exact) + (Cecile) error on z (redshit or coordinate, it depends)
 	double nc=1;			// Mean density of random grid
 	// DEBUGGING
 	string debug_out;

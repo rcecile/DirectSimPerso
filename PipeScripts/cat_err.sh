@@ -9,17 +9,17 @@
 # for noBAO case, just change the dir & dirg paths & nCase
 
 function do_err {
-     command="${code1}addGausszerr -C ${dir}cat_G2$3_$1.fits -E $2 -c ZS -d 0.09 -O ${dir}cat_G2$3_$1_err$2.fits"
-     echo "I launch " $command
-     $command
+#     command="${code1}addGausszerr -C ${dir}cat_G2$3_$1.fits -E $2 -c ZS -d 0.09 -O ${dir}cat_G2$3_$1_err$2.fits"
+#     echo "I launch " $command
+#     $command
 
-     command="${code1}addGausszerr -C ${dir}cat_G2$3_$1.fits -c ZS -p $pdf  -d 0.09 -O ${dir}cat_G2$3_$1_errP.fits"
+#     command="${code1}addGausszerr -C ${dir}cat_G2$3_$1.fits -c ZS -p $pdf  -d 0.09 -O ${dir}cat_G2$3_$1_errP.fits"
 #     echo "I launch " $command
 #     $command
 
      command="${code1}addGausszerr -C ${dir}cat_G2$3_$1.fits -c ZS -p $podds -d 0.09 -O ${dir}cat_G2$3_$1_errPpodds.fits"
-#     echo "I launch " $command
-#     $command
+     echo "I launch " $command
+     $command
 }
 
 dir="/sps/lsst/data/rcecile/TJP_BAO/"
@@ -31,8 +31,10 @@ nCase=1
 #nCase=10
 
 code1="/sps/lsst/dev/rcecile/BAOProgs/DirectSimPerso/exe/"
-pdf="/sps/lsst/PhotozBAO/ricol/SIMU50deg/newgrid_absmag/pdfz"
-podds="/sps/lsst/PhotozBAO/ricol/SIMU50deg/newgrid_absmag/pdfz_podds"
+#pdf="/sps/lsst/PhotozBAO/ricol/SIMU50deg/newgrid_absmag/pdfz"
+#podds="/sps/lsst/PhotozBAO/ricol/SIMU50deg/newgrid_absmag/pdfz_podds"
+pdf="/sps/lsst/PhotozBAO/ricol/SIMU50deg/grid_absmag_atm/pdfz"
+podds="/sps/lsst/PhotozBAO/ricol/SIMU50deg/grid_absmag_atm/pdfz_podds"
 
 Nslicez=70
  

@@ -2,7 +2,7 @@ PRO cata_concat,suff,simu
 ; cata_concat,'_err0.03',''
 ; cata_concat,'_errP',''
 ; cata_concat,'_errPpodds','0'
-; for i=1,9 do cata_concat,'_err0.03',strtrim(i,2)
+; for i=0,9 do cata_concat,'_err0.03',strtrim(i,2)
 
 dir='/sps/lsst/data/rcecile/'
 if (strlen(simu) eq 0) then dir = dir+"TJP_BAO/" else  dir = dir+"TJP_noBAO/"

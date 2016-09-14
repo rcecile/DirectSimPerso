@@ -1,0 +1,121 @@
+#!/bin/bash 
+#$ -l sps=1
+#$ -o /sps/lsst/data/rcecile/TJP_BAO_PS/output_ps
+#$ -M rcecile@in2p3.fr
+#$ -m eas
+#$ -q huge
+#! /usr/local/bin/bash -l
+
+ function do_big {
+     echo "==========================================================================="
+     command="${code0}cmvginit3d -o ${4}simu_ps_${1}_z$2 -u 0.7,0.3,0.05,0.7,-1.,0.,9.06581172724113E-05 -8 0.8154,-8. -G 2 -s 1000,0.001,0.5 -x $1,${cell_i} -y $1,${cell_i} -z $3,${cell_i} -Z $2 -O 2,2"
+     $command
+ }
+
+ function do_big_no {
+     echo "==========================================================================="
+     command="${code0}cmvginit3d -o ${4}simu_ps_${1}_z$2 -u 0.7,0.3,0.05,0.7,-1.,0.,9.06581172724113E-05 -8 0.8154,-8. -L -G 2 -s 1000,0.001,0.5 -x $1,${cell_i} -y $1,${cell_i} -z $3,${cell_i} -Z $2 -O 2,2"
+     $command
+ }
+
+ function do_ps_base {
+     echo "==========================================================================="
+     command="${code1}computepsfromarray -C ${3}grid_G2${sj}_${1}_z$2.fits -S ${4}simu_ps_${1}_z$2_r.fits  -O ${dirp}PS_G2${sj}_${1}_z$2"
+     $command
+  }
+
+#########################################################################################################
+ function do_ps_err {
+     echo "==========================================================================="
+     command="${code1}computepsfromarray -C ${4}grid_G2${sj}_${1}_z${2}_G$3.fits -S ${5}simu_ps_${1}_z$2_r.fits -O ${5}PS_G2${sj}_${1}_z${2}_err${3}"
+     $command
+  }
+
+ function do_ps_perr {
+     command="${code1}computepsfromarray -C ${3}grid_G2${sj}_${1}_z${2}_errP.fits -S ${4}simu_ps_${1}_z$2_r.fits  -O ${4}PS_G2${sj}_${1}_z${2}_errP"
+     $command
+     command="${code1}computepsfromarray -C ${3}grid_G2${sj}_${1}_z${2}_errPpodds.fits -S ${4}simu_ps_${1}_z$2_r.fits  -O ${4}PS_G2${sj}_${1}_z${2}_errPpodds"
+     $command
+ }
+
+ function do_ps_perr_k {
+     command="${code1}computepsfromarray -C ${4}grid_G2${sj}_${1}_z${2}_errPpodds.fits -S ${5}simu_ps_${1}_z$2_r.fits -m $3  -O ${5}PS_G2${sj}_${1}_z${2}_k${3}_errPpodds"
+     $command
+ }
+#########################################################################################################
+
+dir="/sps/lsst/data/rcecile/TJP_BAO_grids/"
+dirp="/sps/lsst/data/rcecile/TJP_BAO_PS/"
+
+dirn="/sps/lsst/data/rcecile/TJP_noBAO_grids/"
+dirpn="/sps/lsst/data/rcecile/TJP_noBAO_PS/"
+nCase=10
+
+code0="/sps/lsst/dev/rcecile/BAOProgs/SimLSS/exe/"     
+code1="/sps/lsst/dev/rcecile/BAOProgs/DirectSimPerso/exe/"     
+err2=0.03
+
+cell=8
+	
+z=('0.7' '1.4' '0.9' '1.3' '1.8')
+D=(2507 4176 3055 3975 4875)
+nz=(200 200 125 75 65)
+nx=(450 875 640 900 1024)
+nk=(-1 -1 -1 -1 0.03)
+
+z=('0.7' '1.4' '0.9' '1.3' '1.8')
+D=(2507 4176 3055 3975 4875)
+nz=(200 200 125 75 75)
+nx=(450 875 640 900 500)
+nk=(-1 -1 -1 -1 -1)
+cell=(8 8 8 8 16)
+
+
+#########################################################################################################
+sj=""
+for i in 4
+do
+    nx_i=$((${nx[i]}))
+    nz_i=$((${nz[i]}))
+    z_i=${z[i]}
+    k_i=${nk[i]}
+#    do_big ${nx_i} ${z_i} ${nz_i} ${dirp} 
+    do_ps_base ${nx_i} ${z_i}   ${dir} ${dirp} 
+    do_ps_err ${nx_i} ${z_i} $err2   ${dir} ${dirp} 
+    if [ ${k_i} -lt 0 ]
+    then 
+	do_ps_perr ${nx_i} ${z_i} ${dir} ${dirp}  
+    else
+	do_ps_perr_k ${nx_i} ${z_i} ${k_i} ${dir}  ${dirp} 
+    fi
+done
+
+j=20
+while [ ${j} -lt ${nCase} ]
+do
+    sj=_$j
+    for i in 4
+    do
+	nx_i=$((${nx[i]}))
+	nz_i=$((${nz[i]}))
+	z_i=${z[i]}
+	k_i=${nk[i]}
+	
+	if [ ${j} -eq 0 ]
+	then 
+	    echo do_big_no
+	    do_big_no ${nx_i} ${z_i} ${nz_i} ${dirpn}
+	fi
+
+	do_ps_base ${nx_i} ${z_i}  ${dirn} ${dirpn}
+	do_ps_err ${nx_i} ${z_i} $err2 ${dirn} ${dirpn}
+	if [ ${k_i} -lt 0 ]
+	then 
+	    do_ps_perr ${nx_i} ${z_i}  ${dirn} ${dirpn}
+	else
+	    do_ps_perr_k ${nx_i} ${z_i}  ${k_i} ${dirn}  ${dirpn}
+	fi
+	
+    done
+    ((j++ ))
+done

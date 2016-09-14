@@ -13,13 +13,11 @@ function do_sel {
     echo "==========================================================================="
     echo "===========================================================================%"
 
-    command="${code1}getsf -F $2 -O $4 -o ${dirg}SelFunc_G2$5_errPpodds -z $3"
-    echo "I launch " $command
+    command="${code1}getsf -O $3 -o ${dirg}SelFunc_G2$4_errPpodds_full -H ${dirg}SelFunc_G2$4_full -z $2"
     rm -f tmptmp
     $command
 
-    command="${code1}getsf -F $2 -O $1 -o ${dirg}SelFunc_G2$5_errP -z $3"
-    echo "I launch " $command
+    command="${code1}getsf -O $1 -o ${dirg}SelFunc_G2$4_errP_full -H ${dirg}SelFunc_G2$4_full -z $2"
     rm -f tmptmp
     $command
 }
@@ -28,21 +26,21 @@ function do_sel {
 function do_sel_gauss {
     echo "==========================================================================="
 
-    command="${code1}getsf -F $2 -O $1 -o ${dirg}SelFunc_G2$4_Gauss0.03 -z $3"
+    command="${code1}getsf -O $1 -o ${dirg}SelFunc_G2$3_Gauss0.03_full -H ${dirg}SelFunc_G2$3_full -z $2"
     echo "I launch " $command
     rm -f tmptmp
     $command
 }
 
-dir="/sps/lsst/data/rcecile/TJP_BAO/"
-dirg="/sps/lsst/data/rcecile/TJP_BAO_grids/"
-nCase=1
+#dir="/sps/lsst/data/rcecile/TJP_BAO/"
+#dirg="/sps/lsst/data/rcecile/TJP_BAO_grids/"
+#nCase=1
 
-#dir="/sps/lsst/data/rcecile/TJP_noBAO/"
-#dirg="/sps/lsst/data/rcecile/TJP_noBAO_grids/"
-#nCase=10
+dir="/sps/lsst/data/rcecile/TJP_noBAO/"
+dirg="/sps/lsst/data/rcecile/TJP_noBAO_grids/"
+nCase=10
 
-code1="/sps/lsst/dev/rcecile/BAOProgs/DirectSim/exe/"
+code1="/sps/lsst/dev/rcecile/BAOProgs/DirectSimPerso/exe/"
 
 Nslice=70
  
@@ -55,20 +53,8 @@ do
     else
 	sj=_$j
     fi
-
+   
     i_min=0
-    i_max=$((${Nslice} -1 ))
-    full_list=${dir}/cat_G2${sj}_Slice${i_min}_ZONLY.fits
-    i1=$((${i_min} + 1))
-    while [ ${i1} -le  ${i_max} ]
-    do
-	full=${dir}/cat_G2${sj}_Slice${i1}_ZONLY.fits
-	full_list=${full_list},$full
-	(( i1++ ))
-    done
-    
-    
-    i_min=3
     i_max=$((${Nslice} -1 ))
     obs_list=${dir}cat_G2${sj}_AllSlice_errP_cataLT10.fits
     obs_list2=${dir}cat_G2${sj}_AllSlice_errPpodds_cataLT10.fits
@@ -89,7 +75,7 @@ do
 	(( i1++ ))
     done
     
-    do_sel_gauss $obs_list4 $full_list ZG,ZS,zs ${sj}
-#    do_sel $obs_list $full_list ZP,ZS,zs $obs_list2 ${sj}
+#    do_sel_gauss $obs_list4 ZG,ZS,zs ${sj}
+    do_sel $obs_list ZP,ZS,zs $obs_list2 ${sj}
     ((j++ ))
 done

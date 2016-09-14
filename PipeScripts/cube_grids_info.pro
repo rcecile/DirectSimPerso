@@ -1,17 +1,20 @@
 PRO cube_grids_info
 
-
-nslicez = 100
-z_max = 3.
-z_step = z_max / nslicez
-zslice = findgen(nslicez+1)*z_step
+nslicez = 70
+cell=8.
+Nz=700.
+h0=3200.
+hmin = h0-Nz/2.*cell
+hmax = h0+Nz/2.*cell
+h= h0 + (findgen(nslicez+1)-nslicez/2)*Nz*cell/nslicez
 
 zref=[0.7,1.4]
-zref=[0.65,1.3]
 thick = [200.,200.] ;Nz du cube produit par cat_grid
-nxc=[450,900]
-nxc=[432,864]
-cell=8.
+nxc=[450,875]
+
+zref=[0.9,1.3,1.8,1.8]
+thick = [125.,75,150,65] ;Nz du cube produit par cat_grid
+nxc=[640,900,1000,1024]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -31,16 +34,18 @@ for i=0,n_elements(zref)-1 do begin
    for e=0,n_elements(err)-1 do begin
       z_min =  zmin[i] - (zmin[i]+1.)*err[e] *3. 
       z_max =  zmax[i] + (zmax[i]+1.)*err[e] *3. 
-      i0 = fix(zref[i]/z_step + 0.5)
-      i1 = fix(z_min   /z_step + 0.5) - 1
-      i2 = fix(z_max   /z_step + 0.5) + 1
+      d_min = Dloscom(z_min)
+      d_max = Dloscom(z_max)
 
-      dmin = Dloscom(z_min)
-      dmax = Dloscom(z_max)
-      derr = dmax - d[i]
+
+      i0 = max(where (h lt d[i]))
+      i1 = max(where (h lt d_min))
+      i2 = max(where (h lt d_max)) + 1
+
+      derr = d_max - d[i]
 
       print,'z = ',zref[i], '  d = ', d[i], '  d err= ', derr, '  err = ', err[e], '  central slice = ',i0,'  range [',i1,', ',i2, $
-            '] or in Mpc [',dmin,', ',dmax, '] for grids in the redshit range [',z_min,', ',z_max, ']',$
+            '] or in Mpc [',d_min,', ',d_max, '] for grids in the redshit range [',z_min,', ',z_max, ']',$
             " volume [Gpc3] = ",thick[i]*nxc[i]*nxc[i]*cell*cell*cell/1.e9
    endfor
    print,' '

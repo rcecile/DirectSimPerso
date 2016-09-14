@@ -1,0 +1,24 @@
+PRO frac_cata
+
+loadct,39
+!p.charsize=2
+!p.thick=3
+lcol  = [0,80, 150, 240, 210]
+
+dir='/sps/lsst/data/rcecile/TJP_BAO/'
+
+suff=["_err0.03","_errp","_errpodds"]
+nsuff = n_elements(suff)
+
+hmin=0.1
+hmax=2.6
+hbin=0.05
+x=findgen((hmax-hmin)/hbin+)*hbin+hmin
+
+for i=0,nsuff-1 do begin
+   name=dir+"cat_zOrd_AllSlice"+suff[is]+"_cataLT10.fits"
+
+endfor
+
+
+END

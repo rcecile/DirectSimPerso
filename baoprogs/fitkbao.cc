@@ -86,13 +86,13 @@ int main(int narg, char *arg[]) {
 	string ps_file, cosmo_file, ref_file;
 	// output file
 	string outfile_root;
-	double maxk = 0.1;	// modif Marion 07.03.2016 (1 -> 0.15)
+	double maxk;
 	double Sigma8, n_s;
 	bool simu_mode = false;
 
 	//--- decoding command line arguments 
 	char c;
-	while ((c = getopt(narg,arg,"hsP:U:R:O:d")) != -1) {
+	while ((c = getopt(narg,arg,"hsP:U:R:O:k:d")) != -1) {
 	    switch (c) {
 		    case 'P' :
 			    ps_file = optarg;
@@ -108,6 +108,9 @@ int main(int narg, char *arg[]) {
 			    break;
 		    case 's' :
 			    simu_mode = true;
+			    break;
+		    case 'k' :
+			    sscanf(optarg,"%lf",&maxk);
 			    break;
 		    case 'h' :
 		        default :

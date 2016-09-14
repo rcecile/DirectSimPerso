@@ -12,50 +12,53 @@ function do_rdlss {
     echo "==========================================================================="
     echo "==========================================================================="
     # R = randomize in cell, z = z-axis of the cube is los axis = redshift
-    command="${code1}rdlss -C ${dir}simu$2_$1_r.fits -O ${dir}cat_G2$2_$1.fits -i 1 -R -M -z -g ${filecut} -a 1.04720 "
+    command="${code1}rdlss -C ${dir}simu$2_$1_r.fits -O ${dir}cat_G2$3_$1.fits -i 1 -R -M -z -g ${filecut} -a 1.04720 "
     echo "I launch " $command
-#    $command
+    $command
 }
 
 
 function do_sel_simple {
     echo "==========================================================================="
 
-    command="${code1}getsf -F $2 -O $1 -o ${dirg}SelFunc_G2$4 -z $3"
+    command="${code1}getsf -F $2 -O $1 -o ${dirg}SelFunc_G2$4_full -z $3"
     echo "I launch " $command
     rm -f tmptmp
     $command
 
 }
 
-#dir="/sps/lsst/data/rcecile/TJP_BAO/"
-#dirg="/sps/lsst/data/rcecile/TJP_BAO_grids/"
-#nCase=1
+dir="/sps/lsst/data/rcecile/TJP_BAO/"
+dirg="/sps/lsst/data/rcecile/TJP_BAO_grids/"
+nCase=1
 
-dir="/sps/lsst/data/rcecile/TJP_noBAO/"
-dirg="/sps/lsst/data/rcecile/TJP_noBAO_grids/"
-nCase=10
+#dir="/sps/lsst/data/rcecile/TJP_noBAO/"
+#dirg="/sps/lsst/data/rcecile/TJP_noBAO_grids/"
+#nCase=10
 
 code1="/sps/lsst/dev/rcecile/BAOProgs/DirectSimPerso/exe/"
-filecut="/sps/lsst/PhotozBAO/ricol/SIMU50deg/newgrid_absmag/goldencut.txt"
+#filecut="/sps/lsst/PhotozBAO/ricol/SIMU50deg/newgrid_absmag/goldencut.txt"
+filecut="/sps/lsst/PhotozBAO/ricol/SIMU50deg/grid_absmag_atm/goldencut.txt"
 
 Nslice=70
  
-j=0
+j=10
 while [ ${j} -lt  ${nCase} ]
 do
     if [ ${nCase} -le  1 ]
     then
 	sj=""
+	sj2=""
     else
-	sj=_$j
-    fi
+	sj=$j
+	sj2=_$j
+     fi
 
     i0=0
     while [ ${i0} -lt  ${Nslice} ]
     do
-	simu="do_rdlss Slice$i0 $sj  "
-#	$simu
+	simu="do_rdlss Slice$i0 ${sj} ${sj2}  "
+	$simu ${sj} ${sj2}
 	((i0++ ))
     done
     ((j++ ))

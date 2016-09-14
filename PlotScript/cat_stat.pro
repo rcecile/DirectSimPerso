@@ -20,6 +20,7 @@ loadct,39
 !p.thick=3
 ;recopie une tranche sauf les catastrophiques (> 3 sigma de G 0.03), regroupes
 nSlice=70
+nSlice=65
      
 n=dblarr(nSlice,nsuff)
 z=dblarr(nSlice+1)
@@ -33,10 +34,10 @@ for is=0,nsuff-1 do begin
          zmin = sxpar(h,'ZCAT_MIN')
          zmax = sxpar(h,'ZCAT_MAX')
          z[i] = (zmin+zmax)/2.
-         endif
+      endif
       nn = sxpar(h,'NAXIS2')
       n[i,is] = double(nn)
-      print,is,i,name,nn
+      print,is,i,"",name,nn
    endfor
    if (is le 1 ) then continue
    name=dir+"cat_G2"+cas+"_AllSlice"+suff[is]+"_cataLT10.fits"
@@ -54,6 +55,7 @@ for is=0,nsuff-1 do mytot[is] = total(n[*,is])
 myformat='(E8.2)'
 myout = string(mytot,format=myformat)
 
+!p.multi=0
 plot,z[0:nSlice-1],n[0:nSlice-1,0],/xs,/ys,xtit='Redshift',ytit='Nb of galaxies / slice 80 Mpc thick',psym=10,/yl,/nodata,yra=[1e5,2e9]
 for is=0,nsuff-1 do oplot,z,n[*,is],col=lcol[is]
 what=['No magnitude cut             ',$

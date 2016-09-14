@@ -1,5 +1,5 @@
 Mode d'emploi : des parametres cosmo a l'echelle BAO
-.sh : jobs a soumettre avec qsub -P P-lsst toto.sh
+.sh : jobs a soumettre avec qsub -P P_lsst toto.sh
 .pro : jobs a executer sous IDL 
 
 1/ faire les cubes d'univers (big_cube.sh)
@@ -20,5 +20,5 @@ Mode d'emploi : des parametres cosmo a l'echelle BAO
 
 -- etapes 9 a 10 a faire pour simu avec BAO et N simus sans BAO --
 
-11/ calcul des oscillations (save_ps_mean.rpro)
+11/ calcul des spectres "undampes" sans oscillations (save_ps_mean.pro)
 12/ calculer l'echelle BAO (dofit.sh)

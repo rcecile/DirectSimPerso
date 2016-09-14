@@ -20,7 +20,7 @@ hh=dblarr(n_elements(x),nsuff,6)
 z=dblarr(6)
 for i=10,60,10 do begin
    for is=0,nsuff-1 do begin
-      name=dir+"cat_zOrd_Slice"+strtrim(i,2)+suff[is]+".fits"
+      name=dir+"cat_G2_Slice"+strtrim(i,2)+suff[is]+".fits"
       m=mrdfits(name,1,hd)
       h=histogram((m.(6)-m.(3))/(1.+m.(3)),min=hmin,max=hmax,bin=hbin)
       h = h/double(h[nx/2+1])

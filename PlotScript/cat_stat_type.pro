@@ -2,8 +2,8 @@ PRO cat_stat_type,doplot
 ;cat_stat_type,0 : to compute the histogram (long), must be done first
 ;cat_stat_type,1 : to do the plot (fast)
 loadct,39
-!p.charsize=2
-!p.thick=5
+!p.charsize=2.
+!p.thick=4
 lcol  = [0,80]
 
 if (doplot eq 0) then begin
@@ -58,26 +58,37 @@ if (doplot eq 2) then begin
 ; current plotting device.
    mydevice = !D.NAME
    SET_PLOT, 'PS'
-   DEVICE, FILENAME='/sps/lsst/dev/rcecile/Fig/cat_stat_type.eps', /PORTRAIT,/COLOR,XSIZE=8.8,YSIZE=8.8,FONT_SIZE=6
+   DEVICE, FILENAME='/sps/lsst/dev/rcecile/Fig/cat_stat_type.eps', /PORTRAIT,/COLOR,XSIZE=8.8,YSIZE=8.8,FONT_SIZE=4
 
 endif
 
 if (doplot ge 1) then restore,'/sps/lsst/data/rcecile/TJP_BAO/cat_stat_type.save'
 
+h=dloscom(z)
+ang=1600.*8. / h / sqrt(2.)
+correct = where(ang lt 120./180*!pi)
+nonlyc= nonly
+nallc = nall
+nonlyc[correct] = nonlyc[correct] / ang[correct]*120./180*!pi
+nallc[correct] = nallc[correct] / ang[correct]*120./180*!pi
+
+
 !p.multi=[0,1,2]
-plot,z,nonly,/xs,/ys,ytit='Ngal / 80 Mpc thick',/yl,yra=[1e5,2e9],xmar=[7,1],ymar=[0,2],xtickname=replicate(" ",10),xticklen=1
-oplot,z,nall,col=lcol[1]
+plot,z,alog10(nonly),/xs,/ys,ytit='log10(Ngal)',yra=[5,9.5],xmar=[7,1],ymar=[0,2],xtickname=replicate(" ",10);,xticklen=1
+oplot,z,alog10(nall),col=lcol[1]
+oplot,z,alog10(nonlyc),li=2
+oplot,z,alog10(nallc),col=lcol[1],li=2
 what=['No magnitude cut      ',$
       'Golden selection        ']+':  N gal  ='+myout
 legend,what,col=[lcol[0],lcol[1]],line=0,box=1,/fill,/left,/bottom,charsize=1.5
 
-plot,z,[0,100],/xs,/ys,xtit='Redshift',ytit='Fraction [%]',psym=10,yra=[0,100],xmar=[7,1],ymar=[4,0],/nodata,xticklen=1
-for i=0,n_type-1 do oplot,z,ntype[*,i]/nall*100.,col=lcol[1],lin=i+1
+plot,z,alog10([1,100]),xtit='Redshift',/xs,/ys,ytit='log10(Ngal)',psym=10,yra=[1.5,7.9],xmar=[7,1],ymar=[4,0],/nodata;,xticklen=1
+for i=0,n_type-1 do oplot,z,alog10(ntype[*,i]),col=lcol[1],lin=2-i
 what=['Early type    ',$
       'Late type     ',$
       'StarBurst type' ]
 
-legend,what,col=lcol[1],line=[indgen(n_type)+1],box=1,/fill,/center,/top,charsize=1.5
+legend,what,col=lcol[1],line=[2-indgen(n_type)],box=1,/fill,/center,/bottom,charsize=1.75
 
 if (doplot eq 2) then begin
    DEVICE, /CLOSE
