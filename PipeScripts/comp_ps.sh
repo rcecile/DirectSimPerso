@@ -75,7 +75,7 @@ do
     z_i=${z[i]}
     k_i=$((${nk[i]}))
     cell_i=$((${cell[i]}))
-    do_big 
+#    do_big 
     do_ps_base 
     do_ps_err $err2
     if [ ${k_i} -lt 0 ]
@@ -103,7 +103,7 @@ do
 	if [ ${j} -eq 0 ]
 	then 
 	    echo do_big_no
-	    do_big_no
+#	    do_big_no
 	fi
 
 	do_ps_base

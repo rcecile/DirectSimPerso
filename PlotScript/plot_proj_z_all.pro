@@ -19,14 +19,14 @@ mycol=80*(indgen(nErr))
       DEVICE, FILENAME='/sps/lsst/dev/rcecile/Fig/proj_z_grids.eps', /PORTRAIT,/COLOR,XSIZE=8.8,YSIZE=8.8,FONT_SIZE=5
    endif
 
-!p.multi=[0,1,3]
+!p.multi=[0,1,4]
 
 for id = 0,nD-1 do begin
 
 
  ;  if (saveplot eq 0) then  window,id+20,xs=1000,ys=600
    snx2 = 1.*snx[id]*snx[id]
-   plot,z[id,0:nz[id]-1],tot[0,id,0,0:nz[id]-1]/snx2,/ys,/nodata,ytit='Normalized Ngal / cell',xs=9 ,xtit=myzxt,yra=[0.97,1.07],xma=[7,3],yma=[3,3]
+   plot,z[id,0:nz[id]-1],tot[0,id,0,0:nz[id]-1]/snx2,/ys,/nodata,ytit='Normalized Ngal / cell',xs=9 ,xtit=myzxt,yra=[0.95,1.10],xma=[7,3],yma=[3,3]
    for in=ngrids,0,-1 do begin
       for ie=0,nErr-1 do begin
          oplot,z[id,0:nz[id]-1],tot[in,id,ie,0:nz[id]-1]/snx2,col=mycol[ie],th=1,psym=10

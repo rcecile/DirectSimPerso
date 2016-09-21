@@ -8,20 +8,16 @@ hmin = h0-Nz/2.*cell
 hmax = h0+Nz/2.*cell
 h= h0 + (findgen(nslicez+1)-nslicez/2)*Nz*cell/nslicez
 
-zref=[0.7,1.4]
-thick = [200.,200.] ;Nz du cube produit par cat_grid
-nxc=[450,875]
-
 zref=[0.9,1.3,1.8,1.8]
-thick = [125.,75,150,65] ;Nz du cube produit par cat_grid
-nxc=[640,900,1000,1024]
-
+thick = [125.,75,65,75] ;Nz du cube produit par cat_grid
+nxc=[640,900,1024,500]
+cellg=[8,8,8,16]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 err=[0., 0.03]
 d = Dloscom(zref)
-dmin = d - thick/2.*cell
-dmax = d + thick/2.*cell
+dmin = d - thick/2.*cellg
+dmax = d + thick/2.*cellg
 zmin=zref
 zmax=zmin
 for i=0,n_elements(zref)-1 do zmin[i] = zfrlos(dmin[i],7)
@@ -46,7 +42,7 @@ for i=0,n_elements(zref)-1 do begin
 
       print,'z = ',zref[i], '  d = ', d[i], '  d err= ', derr, '  err = ', err[e], '  central slice = ',i0,'  range [',i1,', ',i2, $
             '] or in Mpc [',d_min,', ',d_max, '] for grids in the redshit range [',z_min,', ',z_max, ']',$
-            " volume [Gpc3] = ",thick[i]*nxc[i]*nxc[i]*cell*cell*cell/1.e9
+            " volume [Gpc3] = ",thick[i]*nxc[i]*nxc[i]*cellg[i]*cellg[i]*cellg[i]/1.e9
    endfor
    print,' '
 endfor

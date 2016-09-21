@@ -51,9 +51,9 @@ nzc=[200,200]
 zc=[0.9,1.6]
 nzc = [125.,150.] ;Nz du cube produit par cat_grid
 
-zc=[0.9,1.3,1.8]
-nzc = [125.,75.,75.] ;Nz du cube produit par cat_grid
-cell_g=[8, 8, 16]
+zc=[0.9,1.3,1.8,1.8]
+nzc = [125.,75.,65.,75.] ;Nz du cube produit par cat_grid
+cell_g=[8, 8, 8, 16]
 
 ng = n_elements(zc)
 hg=dloscom(zc)
@@ -65,32 +65,29 @@ Nx_parfait = h1* 2*open_ang/8.;/sqrt(2)
 print,'Nx_parfait =',Nx_parfait
 
 nxc=[450,875]
-nxc=[640,900,500]
+nxc=[640,900,1024,500]
 print,'Nx used =',nxc
 print,'Hgrids = ',hg
 
 coeff=[1.,sqrt(2.)]
-colstep=75
+mycol=[50,90,250,150]
 for ia=0,1 do begin
    mynxc = nxc * coeff[ia]
    ang1=myNxc*cell_g / h1 / sqrt(2.)
    ang2=myNxc*cell_g / h2 / sqrt(2.)
    for i=0,ng-1 do begin
       x1=findgen(na)/na*ang1[i] -ang1[i]/2.
-      oplot,cos(x1+!pi/2.)*h1[i],sin(x1+!pi/2.)*h1[i],col=(i+1)*colstep,th=5,li=ia
+      oplot,cos(x1+!pi/2.)*h1[i],sin(x1+!pi/2.)*h1[i],col=mycol[i],th=5,li=ia
      
       x2=findgen(na)/na*ang2[i] -ang2[i]/2.
-      oplot,cos(x2+!pi/2.)*h2[i],sin(x2+!pi/2.)*h2[i],col=(i+1)*colstep,th=5,li=ia
+      oplot,cos(x2+!pi/2.)*h2[i],sin(x2+!pi/2.)*h2[i],col=mycol[i],th=5,li=ia
      
-      oplot,[cos(x1[0]+!pi/2.)*h1[i],cos(x2[0]+!pi/2.)*h2[i]],[sin(x1[0]+!pi/2.)*h1[i],sin(x2[0]+!pi/2.)*h2[i]],col=(i+1)*colstep,th=5,li=ia
-      oplot,[cos(x1[na-1]+!pi/2.)*h1[i],cos(x2[na-1]+!pi/2.)*h2[i]],[sin(x1[na-1]+!pi/2.)*h1[i],sin(x2[na-1]+!pi/2.)*h2[i]],col=(i+1)*colstep,th=5,li=ia
+      oplot,[cos(x1[0]+!pi/2.)*h1[i],cos(x2[0]+!pi/2.)*h2[i]],[sin(x1[0]+!pi/2.)*h1[i],sin(x2[0]+!pi/2.)*h2[i]],col=mycol[i],th=5,li=ia
+      oplot,[cos(x1[na-1]+!pi/2.)*h1[i],cos(x2[na-1]+!pi/2.)*h2[i]],[sin(x1[na-1]+!pi/2.)*h1[i],sin(x2[na-1]+!pi/2.)*h2[i]],col=mycol[i],th=5,li=ia
 
    endfor
 endfor
 pos = intarr(ng)+300
-; pos[2] = -1200
-;pos[3] = 600
-xyouts,pos,hg,'z='+string(zc,format='(f4.2)'),col=(indgen(ng)+1)*colstep
 xyouts,pos,hg,'z='+string(zc,format='(f4.2)')
 ;xyouts,1800,700,'Comoving radial distance',ori=28
 

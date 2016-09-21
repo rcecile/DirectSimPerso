@@ -1,18 +1,13 @@
 PRO save_ps_mean
 
-namez = ['0.7','1.4', '0.9','1.3','1.8']
-nx= ['_450', '_875', '_640', '_900', '_1024']
-
-namez = ['0.9','1.3','1.8']
-nx= ['_640', '_900', '_500']
+namez = ['0.9','1.3','1.8','1.8']
+nsuff = ['', '', ' thin', ' thick']
+nx= ['_640', '_900', '_1024', '_500']
 nameerr = ['', '_err0.03', '_errPpodds']
 
 
-;namez = ['1.8']
-;nx= ['_500']
 
-
-lcol  = [80, 100, 150, 210, 240]
+lcol  = [50,90,250,150]
 lerr=['spectroZ','Gaussian 0.03','photoZ podds']
 lpsym=[0,-5,-4]
 llin = [0,3,2]
@@ -84,7 +79,7 @@ for iz = 0,nz-1 do begin
       print,'ICI ',  mean(err[iz,ir,*]), ' et ', mean(err[iz,0,okerr])
       print,'  ' ,suff,(pobs.(0))[40],(pobs.(7))[40],newp7[40],(newp1[40]-(pobs.(6))[40])/((pobs.(1)[40]-pobs.(6))[40])
 
-read,xx
+;read,xx
       for i=0,n_elements(p2fit)-1 do  printf, lun1, (pobs.(0))[i], $
                                               newp1[i], $ ;spectre
                                               (pobs.(2))[i], (pobs.(3))[i], (pobs.(4))[i], (pobs.(5))[i], (pobs.(6))[i], $
@@ -96,7 +91,7 @@ read,xx
    endfor
    oplot,xt,ptheo.(2),li=2
 endfor
-legend,'z = '+ namez,col=lcol,box=1,line=0,/fill,/left,/bottom,charsize=1.5
+legend,'z = '+ namez+nsuff,col=lcol,box=1,line=0,/fill,/left,/bottom,charsize=1.5
 legend,lerr,li=0,box=1,/fill,/center,/bottom,charsize=1.5,thick=[5,3,1]
 
 for iz = 0,nz-1 do begin

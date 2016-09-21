@@ -10,14 +10,17 @@ loadct,39
 restore,'temp_ascii.sav'        ; contient dir
 dir="/sps/lsst/data/rcecile/TJP_BAO_PS/"
 
-
-namez = ['0.7','1.4']
-z=[0.7, 1.4]
-nx= ['_450', '_875']
-
-z=[0.9, 1.3,1.8]
-namez = ['0.9','1.3','1.8']
-nx= ['_640', '_900', '_1000']
+z=[0.9, 1.3,1.8,1.8]
+namez = ['0.9','1.3','1.8','1.8']
+nx= ['_640', '_900', '_1024', '_500']
+gsuff = ['', '', ' thin grid', ' thick grid']
+kmax = [12, 12, 12, 6]
+lkmax = kmax/100.
+skmax = strarr(n_elements(kmax))
+for i=0,n_elements(kmax)-1 do $
+   if (kmax[i] ge 10) then skmax[i] = '_k0.'+strtrim(kmax[i],2) $
+   else skmax[i] = '_k0.0'+strtrim(kmax[i],2) 
+print,skmax
 
 nz = n_elements(namez)
 
@@ -50,24 +53,22 @@ if (saveplot) then begin
 ; current plotting device.
    mydevice = !D.NAME
    SET_PLOT, 'PS'
-   DEVICE, FILENAME='/sps/lsst/dev/rcecile/Fig/plot_ps2fit'+wtit+'_'+strtrim(fix(z[iz]*10),2)+'.eps', /PORTRAIT,/COLOR,XSIZE=8.8,YSIZE=4.4,FONT_SIZE=4
+   DEVICE, FILENAME='/sps/lsst/dev/rcecile/Fig/plot_ps2fit'+wtit+'_'+strtrim(fix(z[iz]*10),2)+nx[iz]+'.eps', /PORTRAIT,/COLOR,XSIZE=8.8,YSIZE=4.4,FONT_SIZE=4
 endif
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 !p.multi=0
-myformat='(F10.0)'
+myformat='(F10.1)'
 ltext ='z = '+ namez
 lline= 0
-;plot,[0.02,0.1],[1e4,1e4],/xs,/ys,xra=[0.02,0.1],ytit='[(Mpc)^-3]',/nodata,yra=[0.9,1.2],xtit='wavenumber [Mpc^-1]',tit='Normalized PS @ z = '+namez[iz],xma=[7,2],yma=[3,2]
-plot,[0.02,0.1],[1e4,1e4],/xs,/ys,xra=[0.02,0.1],ytit='[(Mpc)^-3]',/nodata,yra=[0.75,1.25],xtit='wavenumber [Mpc^-1]',tit='Normalized PS @ z = '+namez[iz],xma=[7,2],yma=[3,2]
+plot,[0.02,0.1],[1e4,1e4],/xs,/ys,xra=[0.02,lkmax[iz]],ytit='Normalized PS [(Mpc)^-3]',/nodata,yra=[0.75,1.25],xtit='wavenumber [Mpc^-1]',xma=[7,2],yma=[3,2]
 
 for ir=0,n_elements(suff)-1 do begin
 
    mysuff = suff[ir]
-  ; spectre observ?? corrig?? du damping de l'erreur 
-   t  =  dir + 'PS_G2_2fitErr'+nx[iz]+'_z'+namez[iz]+mysuff+'_wngal.txt'
-;   t  =  dir + 'PS_G2_2fitErr'+nx[iz]+'_z'+namez[iz]+mysuff+'_wngal.txt'
+  ; spectre observe corrige du damping de l'erreur 
+   t  =  dir + 'PS_G2_2fitErr2'+nx[iz]+'_z'+namez[iz]+mysuff+'_wngal.txt'
 ;   if (ir eq 2 and iz eq 2) then t  =  dir + 'PS_G2_2fitErr'+nx[iz]+'_z'+namez[iz]+'_k0.06'+mysuff+'_wngal.txt'
    pcorr = read_ascii(t, template =  TEMP_2FIT)     
    print,t
@@ -90,7 +91,8 @@ for ir=0,n_elements(suff)-1 do begin
    errplot,xs+0.0003*ir,psm,psp,col=lcol[ir]
 
    ;fit
-   ffit = dir + 'fit_G2_Err_k0.15'+nx[iz]+'_z'+namez[iz]+mysuff+'_result.txt'
+   ffit = dir + 'fit_G2_Err'+skmax[iz]+nx[iz]+'_z'+namez[iz]+mysuff+'_result.txt'
+   print,ffit
   ; if (ir eq 3 and iz eq 2) then ffit = dir + 'fit_G2_Err'+nx[iz]+'_z'+namez[iz]+'_k0.03'+mysuff+'_result.txt'
    pfit = read_ascii(ffit, template =  TEMP_POW_SPEC_FIT)     
    oplot,xs,decay_func(xs,pfit.(1),h),col=lcol[ir],li=2,th=5
@@ -107,7 +109,7 @@ for ir=0,n_elements(suff)-1 do begin
  ;  read,xx
 endfor
 legend,lerr,col=lcol,li=0,box=1,/fill,/right,/top,charsize=1.5
-
+legend,'z = '+namez[iz]+gsuff[iz],box=1,/fill,/right,/bottom,charsize=2
 print,"====================================================== "
 print,serr
 print,"====================================================== "

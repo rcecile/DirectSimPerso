@@ -8,17 +8,9 @@ loadct,39
 restore,'temp_ascii.sav'        ; contient dir
 dir="/sps/lsst/data/rcecile/TJP_BAO_PS/"
 
-;namez = ['0.7','1.4']
-;nx= ['_450', '_875']
-
-namez = ['0.9','1.3','1.8']
-nx= ['_640', '_900', '_1000']
-
-namez = ['0.7','1.4','0.9'];,'1.3','1.8']
-nx= ['_450', '_875','_640', '_900', '_1000']
-
-namez = ['0.9','1.3','1.8']
-nx= ['_640', '_900', '_500']
+namez = ['0.9','1.3','1.8','1.8']
+nx= ['_640', '_900','_1024', '_500']
+gsuff = ['', '', ' thin', ' thick']
 
 nz = n_elements(namez)
 nk = n_elements(namek)
@@ -33,9 +25,8 @@ if (saveplot eq 1) then begin
    DEVICE, FILENAME='/sps/lsst/dev/rcecile/Fig/plot_ps_wosc.eps', /PORTRAIT,/COLOR,XSIZE=8.8,YSIZE=5.5,FONT_SIZE=4
 endif
 
-ltext ='z = '+ namez
 lpsym=[0,1,0,0]
-lcol  = [0,80,150,210]
+lcol= [0,80,150,210]
 lpsym=[0,4,0,0]
 lth=[2,4,4,4]
 
@@ -77,7 +68,7 @@ endfor
 mytext=['spectroZ','Gauss 0.03','photoZ with podds cut']
 mytext = ['theoretical spectrum with BAO',mytext]
 legend,mytext,psym=lpsym,col=lcol,box=1,/fill,/left,/bottom,charsize=1.5,th=4
-legend,'z = '+ namez,line=indgen(nz)*2,box=1,/fill,/right,/top,charsize=1.5,th=4
+legend,'z = '+ namez+gsuff,line=indgen(nz)*2,box=1,/fill,/right,/top,charsize=1.5,th=4
 
 if (saveplot eq 1) then begin
    DEVICE, /CLOSE

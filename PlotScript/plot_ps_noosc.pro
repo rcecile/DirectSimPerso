@@ -8,10 +8,9 @@ loadct,39
 restore,'temp_ascii.sav'        ; contient dir
 dirn="/sps/lsst/data/rcecile/TJP_noBAO_PS/"
 
-namez = ['0.7','1.4','0.9','1.3','1.8']
-nx= ['_450', '_875', '_640', '_900', '_1000']
-namez = ['0.9','1.3','1.8']
-nx= ['_640', '_900', '_500']
+namez = ['0.9','1.3','1.8','1.8']
+nx= ['_640', '_900', '_1024', '_500']
+gsuff = ['', '', ' thin', ' thick']
 nz = n_elements(namez)
 nk = n_elements(namek)
 
@@ -25,7 +24,6 @@ if (saveplot) then begin
    DEVICE, FILENAME='/sps/lsst/dev/rcecile/Fig/plot_ps_noosc.eps', /PORTRAIT,/COLOR,XSIZE=8.8,YSIZE=5.5,FONT_SIZE=4
 endif
 
-ltext ='z = '+ namez
 lpsym=[0,1,0,0]
 lcol  = [0,80,150,210]
 lpsym=[0,4,0,0]
@@ -75,7 +73,7 @@ endfor
 mytext=['spectroZ','Gauss 0.03','photoZ with podds cut']
 mytext = ['theoretical spectrum wo BAO',mytext]
 legend,mytext,line=0,col=lcol,box=1,/fill,/left,/bottom,charsize=1.5,th=2
-legend,'z = '+ namez,line=indgen(nz),box=1,/fill,/right,/top,charsize=1.5,th=4
+legend,'z = '+ namez+gsuff,line=indgen(nz),box=1,/fill,/right,/top,charsize=1.5,th=4
 oplot,[0.02,0.02],[5e1,1e5],li=2,th=2
 oplot,[0.06,0.06],[5e1,8e2],li=2,th=2
 oplot,[0.12,0.12],[1e2,5e3],li=2,th=2
