@@ -1,0 +1,110 @@
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <math.h>
+#include <typeinfo>
+
+// sophya
+#include "machdefs.h"
+#include "sopnamsp.h"
+#include "timing.h"
+#include "array.h"
+#include "hisprof.h"
+#include "histerr.h"
+#include "histinit.h"
+#include "fiosinit.h"
+#include "fitsioserver.h"
+#include "fftwserver.h"
+#include "swfitsdtable.h"
+#include "resusage.h"
+
+// DirectSim
+#include "mydefrg.h"
+#include "geneutils.h"
+#include "cat2grid.h"
+#include "powerspec.h"
+#include "mass2gal.h"
+#include "pkspectrum.h"
+#include "fitkbaoscale.h"
+#include "chisqstats.h"
+
+int main(int narg, char* arg[]) {
+
+  cout << " ==== simu_grid_syst.cc program , produce grids and spectra to correct for cell size and sigma effects"<<endl;
+  
+  // Make sure SOPHYA modules are initialized 
+  SophyaInit();  
+  InitTim();
+
+  int  cell_test[2];
+  cell_test[0]= 8;
+  cell_test[1]= 16;
+
+  double mu = 1.;
+
+  int rc = 1;  
+  try {  // exception handling try bloc at top level
+    TArray<r_8> gbase,gcell0,gcell1; 
+    int ndim=3;
+    int Nxyz = 256;
+    sa_size_t mydim[3] = {Nxyz,Nxyz,Nxyz}; // a l'envers
+    gbase.SetSize(ndim, mydim);  
+    gcell0.SetSize(ndim, mydim);  
+    gcell1.SetSize(ndim, mydim);  
+
+    RandomGenerator rg; 
+    long seed=1;
+    uint_8 npoiss;
+    rg.SetSeed(seed);
+    for(int i=0; i<Nxyz; i++) { 
+      for(int j=0; j<Nxyz; j++) { 
+	for(int k=0; k<Nxyz; k++)  {
+	  npoiss = rg.PoissonAhrens(mu); // Poisson fluctuate
+	  gbase(i,j,k) = (double)npoiss;
+
+	  double cell=0;
+	  for (int id=0; id<cell_test[0];  id++) {
+	    npoiss = rg.PoissonAhrens(mu); 
+	    cell += (double)npoiss;
+	  }
+	  cell /= (double)cell_test[0];
+	  gcell0(i,j,k) = cell;
+
+	  cell=0;
+	  for (int id=0; id<cell_test[1];  id++) {
+	    npoiss = rg.PoissonAhrens(mu); 
+	    cell += (double)npoiss;
+	  }
+	  cell /= (double)cell_test[1];
+	  gcell1(i,j,k) = cell;
+	}
+      }
+    }
+
+    for (int i=0; i<12 ;i++) cout << gbase(0,i,123) << " "; cout << endl;
+    for (int i=0; i<12 ;i++) cout << gcell0(0,i,123) << " "; cout << endl;
+    for (int i=0; i<12 ;i++) cout << gcell1(0,i,123) << " "; cout << endl;
+    cout << "au boulot "<< endl;
+
+  }  // End of try bloc 
+  
+  catch (PThrowable & exc) {
+    // catching SOPHYA exceptions
+    cerr << " simu_grid_syst.cc: Catched Exception (PThrowable)" << (string)typeid(exc).name() 
+         << "\n...exc.Msg= " << exc.Msg() << endl;
+    rc = 99;
+  }
+  catch (std::exception & e) {  
+    // catching standard C++ exceptions
+    cerr << " simu_grid_syst.cc: Catched std::exception "  << " - what()= " << e.what() << endl;
+    rc = 98;
+  }
+  catch (...) {  
+    // catching other exceptions
+    cerr << " simu_grid_syst.cc: some other exception (...) was caught ! " << endl;
+    rc = 97;
+  }
+  cout << " ==== End of grid_data.cc program  Rc= " << rc << endl;
+  return rc;	
+}

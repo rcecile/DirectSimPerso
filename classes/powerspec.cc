@@ -192,7 +192,6 @@ double PowerSpec::AccumulatePowerSpectra(HProf& hp, bool pixcor, double maxk,
 // tol_corr: if divide Fourier coefficient by number greater than this power spectrum will blow up
  { 
    cout << "    PowerSpec::AccumulatePowerSpectra():"<<endl;
-   cout << "    Err = "<< Err << endl;
    maxk_=maxk;
    Err_=Err;
    tol_corr_=tol_corr;
@@ -301,11 +300,12 @@ double PowerSpec::AccumulatePowerSpectra(HProf& hp, bool pixcor, double maxk,
 	 if (hmode_) 
 	   hmode_->Add(kmod);
 	 
-	 if(Err_>0 && undamp_ && kz>0)  // if want to undamp	
+	 if(Err_>0 && undamp_)  // if want to undamp	
 	   
 	   g = exp(-(kz*Err_)*(kz*Err_));
+	 
 	 else g =  1.;
-		 
+	 
 	 if (kz<=maxk_)
 	   { hp.Add(kmod, pk/(f*g));  sum+=pk; nkeep++; if (hkeepMode_)   hkeepMode_->Add(kmod);
 	     //  hp_z.Add(kmod, pk_z/(f*g)); 

@@ -1,0 +1,6 @@
+dir='/sps/lsst/data/rcecile/TJP_BAO/'
+nslice =70
+binz=0.01
+zmax=3.
+x=findgen(zmax/binz+1)*binz
+all_hist = dindgen(nz)

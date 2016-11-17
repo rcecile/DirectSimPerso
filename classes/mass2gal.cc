@@ -9,8 +9,8 @@
 
 //******* Constructors *******************************************************//
 
-Mass2Gal::Mass2Gal(TArray<r_8> drho,  SimpleUniverse& su, RandomGeneratorInterface& rg, int nbadplanes, bool ZisRad)
-  : su_(su) , rg_(rg) , ZisRad_(ZisRad)
+Mass2Gal::Mass2Gal(SOPHYA::TArray<r_8> drho,  SimpleUniverse& su, RandomGeneratorInterface& rg, int nbadplanes, bool ZisRad)
+  : su_(su) , rg_(rg) , ZisRad_(ZisRad) // CHECK-REZA-JS Ne pas oublier d'initialiser le pointeur de TAM
                   // Reads in SimLSS output which is a 3D cube of delta values
                   // NOTE: SimLSS outputs cube so:
                   // AXIS 1 = Z (RADIAL) AXIS
@@ -26,7 +26,7 @@ Mass2Gal::Mass2Gal(TArray<r_8> drho,  SimpleUniverse& su, RandomGeneratorInterfa
   cout <<"    Mass2Gal constructor: reads in density cube with nbadplanes="<< nbadplanes << " and sizeX= " << drho.SizeX() << endl;
   mass_ = drho(Range(0, drho.SizeX()-nbadplanes-1), Range::all(), Range::all()).PackElements();
 
-  cout << "    Mass2Gal::Mass2Gal(TArray<r_4> drho" << endl;
+  cout << "    Mass2Gal::Mass2Gal(SOPHYA::TArray<r_4> drho" << endl;
   mass_.Show();
   
   cout <<"    Length of each dimension of mass cube: "<<endl;
@@ -58,10 +58,14 @@ Mass2Gal::Mass2Gal(TArray<r_8> drho,  SimpleUniverse& su, RandomGeneratorInterfa
 
   zcat_min = 10.;
   zcat_max = 0.;
+
+  am = new TAM();
+  
+  
 }
 
 Mass2Gal::Mass2Gal(sa_size_t ng, SimpleUniverse& su, RandomGeneratorInterface& rg)
-  : ng_(ng) , su_(su) , rg_(rg)
+  : ng_(ng) , su_(su) , rg_(rg), am( new TAM ) // CHECK_REZA-JS Ne pas oublier d'initialiser le pointeur de TAM
                   // Constructor for when simulating a catalog without clustering information
                   // used by SimData class
 {
@@ -111,6 +115,7 @@ Mass2Gal& Mass2Gal::Set(const Mass2Gal& a)
   idmidx_ = a.idmidx_;
   mass_ = a.mass_;
   ngals_ = a.ngals_;
+  am = a.am;   // Ne pas oublier le pointeur de TAM 
   //if (NbDimensions() < 1)             
   //    xvals_ = a.xvals_;
   //    yvals_ = a.yvals_;
@@ -122,6 +127,7 @@ Mass2Gal& Mass2Gal::Set(const Mass2Gal& a)
   //    MB_ = a.MB_;    
   //    typeint_ = a.typeint_;           
   //    extincBmV_ = a.extincBmV_;      
+  return *this;
 }
 
 //******* Methods  ***********************************************************//
@@ -474,7 +480,7 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
         double mag,gtype,gext;  // galaxy absolute magnitude and type and internal extinction
         // dc = sqrt(xc*xc+yc*yc+zc*zc);// comoving distance to each pixel center Cecile - useless here and wrong is cae of z-radial
         rtet = -1;
-              
+
         for(int ing=0; ing<ng; ing++) { // from gal 1 to gal n in cell...
           if(RandPos_) {
             // We generate random positions with flat distribution inside the cell
@@ -488,7 +494,7 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
             ry = yc;
             rz = zc;
           }
-                
+	  
           if (ZisRad_)
             Conv2ParaCoord(rx,ry,rz,rr,rphi,rtet);
           else
@@ -501,27 +507,36 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
           mag = DrawMagType(gfd, gtype);
           gext=0.;// extinction is set to 0 for now
           ngsum++;// should be same as ng_
-                
+	  
           double mAM =  0.;
           if (!GoldCut && ! ProbaCut) mAM = (*maxAM)(rreds); // given redshift of galaxy what's max (faintest) absolute mag possible
           
           bool pass = 1;
 
 	  bool print = 0;
-	    
-          if(GoldCut){  
-                
-            if(gtype>=1 && gtype<2)
+	  double mag_i = 30;
+	  
+	  int itype = int(gtype-1);
+	  float typeval = gtype;
+	  typeval-=float(int(gtype));
+	  typeval*=100;
+	  int type = (int) (typeval+0.1);
+	  
+	  if(GoldCut){  
+	    /*
+	      if(gtype>=1 && gtype<2)
               mAM =  (*maxAM_type0)(rreds);
-            if(gtype>=2 && gtype<3)
+	      if(gtype>=2 && gtype<3)
               mAM =  (*maxAM_type1)(rreds);
-            if(gtype>=3 && gtype<4)
+	      if(gtype>=3 && gtype<4)
               mAM =  (*maxAM_type2)(rreds);
+	    */
+	    pass = am->PassGoldenCut(mag, type, rreds);
           }
           
           if (ProbaCut) {
             int iz = int((rreds-zmin)/zbin +0.5);
-            int itype = int(gtype-1);
+            
             int imag = int((mag-magmin)/magbin +0.5);
             double prob = 0;
 	    
@@ -557,7 +572,7 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
             if (prob<1e-9)
               pass = 0;
             else {
-              double rand_prob = rand.Uniform();
+              double rand_prob = rg_.Flat01();  // Reza - dist plate entre 0,1 - rand.Uniform();
               if (rand_prob>prob)
                 pass = 0;
             }
@@ -577,23 +592,9 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
               gid = gid0+seq;
                   
               row[0] = gid;
-              // row[1] = rx;  // filled just after
-              // row[2] = ry;  // filled just after
               row[3] = rreds; 
               row[4] = gtype; 
               row[5] = mag; 
-              //row[5] = nginfile;
-              //row[5] = gext;
-              //row[7] = creds;
-                  
-	      /*              if (ZisRad_) {
-                row[1] = rx; 
-                row[2] = ry; 
-              }
-              else {
-                row[1] = rphi; 
-                row[2] = rtet; 
-		}*/
 	      row[1] = rphi; 
 	      row[2] = rtet; 
                   
@@ -1025,7 +1026,7 @@ void Mass2Gal::MaxAbsMag(string goldencutFileName){
     pgold[iz][it][im]=p;
   }
   goldfile.close();
-  rand.SetSeed(0);
+  // CHECK-REZA-JS , c'est quoi ca ?  rand.SetSeed(0);
   
 }
 
@@ -1040,7 +1041,6 @@ void Mass2Gal::MaxAbsMag(bool doGoldenCut)
 
   cout << "ADELINE FAINT CUT" << endl;
   
-
   double lmin=5e-8, lmax=2.5e-6;
   
   // Read in CWWK SEDs
@@ -1294,7 +1294,7 @@ void Mass2Gal::SetRandomGrid(int mean_dens)
 };
 
 
-TArray<r_8> Mass2Gal::ExtractSubArray(sa_size_t x1, sa_size_t x2, sa_size_t y1, 
+SOPHYA::TArray<r_8> Mass2Gal::ExtractSubArray(sa_size_t x1, sa_size_t x2, sa_size_t y1, 
                                       sa_size_t y2, sa_size_t z1, sa_size_t z2)
 // x1, x2 refer to 3RD dimension of array
 // y1, y2 refer to 2ND dimension of array
@@ -1308,14 +1308,14 @@ TArray<r_8> Mass2Gal::ExtractSubArray(sa_size_t x1, sa_size_t x2, sa_size_t y1,
 
   cout <<"    Size of mass array = "<< mass_.SizeX() <<","<< mass_.SizeY();
   cout <<","<< mass_.SizeZ() <<endl;
-  TArray<r_8> submass = mass_(Range(z1,z2),Range(y1,y2),Range(x1,x2)).PackElements();
+  SOPHYA::TArray<r_8> submass = mass_(Range(z1,z2),Range(y1,y2),Range(x1,x2)).PackElements();
   return submass;
 
 
 };
 
 
-TArray<r_8> Mass2Gal::ExtractSubArray(double Z, sa_size_t nx, sa_size_t ny, sa_size_t nz)
+SOPHYA::TArray<r_8> Mass2Gal::ExtractSubArray(double Z, sa_size_t nx, sa_size_t ny, sa_size_t nz)
 // Assume the dimensions of the SimLSS cube are this way round: (Nz,Ny,Nx)
 // BUT the nx,ny,nz refer to a cube with dimensions the OTHER way round: (nx,ny,nz)
 {
@@ -1337,7 +1337,7 @@ TArray<r_8> Mass2Gal::ExtractSubArray(double Z, sa_size_t nx, sa_size_t ny, sa_s
   cout <<"    2nd dim: "<< iy_start <<","<< iy_end <<endl;
   cout <<"    3rd dim: "<< iz_start <<","<< iz_end <<endl;
         
-  TArray<r_8> submass = mass_(Range(ix_start,ix_end), Range(iy_start,iy_end), Range(iz_start,iz_end)).PackElements();
+  SOPHYA::TArray<r_8> submass = mass_(Range(ix_start,ix_end), Range(iy_start,iy_end), Range(iz_start,iz_end)).PackElements();
   return submass;
 };
 
@@ -1441,14 +1441,22 @@ double Mass2Gal::DrawMagType(GalFlxTypDist& gfd, double& type)
   // type 40 = SB3_kin_fix2.txt
   // type 50 = SB2_kin_fix2.txt
 
+  /*
   int a1=0,  b1=5;    //early (1)
   int a2=6,  b2=40;   //late  (2)
   int a3=41, b3=50;   //starburst (3)
+  */
 
   // Then type 1 (early) : a1-b1 (0-5)
   //            type 2 (late)  : a2-b2 (6-40)
   //            type 3 (SBurst): a3-b3 (41-50)
   // Choice is same as Dahlen et al arXiv:0710.5532
+  
+  int a1=0,  b1=5;    //early (1)
+  int a2=6,  b2=25;   //late  (2)
+  int a3=31, b3=50;   //starburst (3)
+  // separation at 25 : irregular are considered as starburst galaxies. It is pessimist for the goldencut, optmist for the BDT efficiency. It can be balanced by a BDT at 90% to recover a similar nb of galaxies. JSR/CR 
+
   //
   // The intermediate spectra are interpolated via:
   // type 0: 1.0*type0+0.0*type10
@@ -1492,7 +1500,7 @@ double Mass2Gal::DrawMagType(GalFlxTypDist& gfd, double& type)
   switch (t123) {
   case 1 : {
     double typ1=floor(a1+(b1-a1)*rg_.Flat01()+0.5); 
-    type=1.0+typ1/100.0; }
+    type=1.0+typ1/100.0;}
     break;
   case 2 :
     { double typ2=floor(a2+(b2-a2)*rg_.Flat01()+0.5); 
@@ -1548,7 +1556,7 @@ double Mass2Gal::FindPixelAtZ(double Z, sa_size_t nx, sa_size_t ny, sa_size_t nz
         // convert comoving distance into a redshift
         zsc=dist2Redshift(dc);
 
-        if ( (abs(zsc-Z)<diffz)&&(ix!=0)&&(iy!=0)&&(iz!=0) ) {
+        if ( (fabs(zsc-Z)<diffz)&&(ix!=0)&&(iy!=0)&&(iz!=0) ) { // CHECK-REZA-JS , fabs au lieu de abs 
           // perform extra check to make sure sub-array can 
           // actually be within the array at each pixel
                                         
@@ -1557,7 +1565,7 @@ double Mass2Gal::FindPixelAtZ(double Z, sa_size_t nx, sa_size_t ny, sa_size_t nz
             i = iz; 
             j = iy;
             k = ix; 
-            diffz = abs(zsc-Z);
+            diffz = fabs(zsc-Z);  // CHECK-REZA-JS , fabs au lieu de abs 
             zclose = zsc;
           }
         }

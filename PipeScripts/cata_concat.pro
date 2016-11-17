@@ -2,7 +2,7 @@ PRO cata_concat,suff,simu
 ; cata_concat,'_err0.03',''
 ; cata_concat,'_errP',''
 ; cata_concat,'_errPpodds','0'
-; for i=0,9 do cata_concat,'_err0.03',strtrim(i,2)
+; for i=0,9 do cata_concat,'_errPBDT',strtrim(i,2)
 
 dir='/sps/lsst/data/rcecile/'
 if (strlen(simu) eq 0) then dir = dir+"TJP_BAO/" else  dir = dir+"TJP_noBAO/"
@@ -31,6 +31,7 @@ for i=i_min,i_max do begin
    name=dir+"cat_G2"+cas+"_Slice"+strtrim(i,2)+suff+"_cata.fits"
    m=mrdfits(name,1,h) 
    ok = where(m.(6) lt 10,nok)
+;   ok = where(m.(6) lt 10 and m.(6) gt 0.15*(1.+m.(1)),nok)
    if (i eq i_min) then mtot = m[ok] else mtot=[mtot,m[ok]]
    nok_tot[i-i_min] = nok
    print,name,n_elements(m.(6)),nok
@@ -56,9 +57,11 @@ oplot,z_tot,nok_tot,th=3,col=123
 oplot,z_tot,n10_tot+n20_tot+n50_tot+n60_tot,th=3,col=80
 
 nametot=dir+"cat_G2"+cas+"_AllSlice"+suff+"_cataLT10.fits"
+;nametot=dir+"cat_G2"+cas+"_AllSlice"+suff+"_cata015.fits"
 MWRFITS,mtot, nametot, h
 
 save,z_tot,nok_tot,n_tot,n10_tot,n20_tot,n50_tot,n60_tot,file=dir+'/StatCata_TJP_'+suff+'.sav'
+;save,z_tot,nok_tot,n_tot,n10_tot,n20_tot,n50_tot,n60_tot,file=dir+'/StatCata015_TJP_'+suff+'.sav'
 
 
 

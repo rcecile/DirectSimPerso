@@ -2,6 +2,11 @@
 ##  makefile                                                                  ##
 ################################################################################
 
+ifndef SOPHYABASE
+	SOPHYABASE := /sps/lsst/dev/rcecile/BAOProgs/LUC/SrcSophyaPersoPourTests/SObjs/
+	echo "sophyabase = ${SOPHYABASE}"
+endif
+
 include $(SOPHYABASE)/include/sophyamake.inc
 
 #### Automatically set up GALSIM variable if it doesn't exist
@@ -34,7 +39,10 @@ $(MYCL)/schechter.h $(MYCL)/sinterp.h $(MYCL)/simdata.h $(MYCL)/reddening.h \
 $(MYCL)/sedfilter.h $(MYCL)/sedpca.h $(MYCL)/genefluct3d.h  $(MYCL)/pkspectrum.h \
 $(MYCL)/mass2gal.h $(MYCL)/powerspec.h $(MYCL)/matrix.h $(MYCL)/igm.h \
 $(MYCL)/hpoly.h $(MYCL)/shapelets.h $(MYCL)/em.h $(MYCL)/cat2grid.h \
-$(MYCL)/fitkbaoscale.h $(MYCL)/chisqstats.h
+$(MYCL)/fitkbaoscale.h $(MYCL)/chisqstats.h \
+$(MYCL)/TAM.h $(MYCL)/TApparentMagnitude.h $(MYCL)/TDataCard.h $(MYCL)/TFilter.h $(MYCL)/TIGM.h \
+$(MYCL)/TReddening.h $(MYCL)/TBFilter.h $(MYCL)/TDistance.h $(MYCL)/TFlux.h \
+$(MYCL)/TKcorrection.h  $(MYCL)/TSed.h
 #$(MYCL)/constcosmo.h
 #$(MYCL)/root_plots.h
 
@@ -42,11 +50,14 @@ LIBO := $(OBJ)/cosmocalcs.o $(OBJ)/geneutils.o $(OBJ)/gftdist.o \
 $(OBJ)/schechter.o $(OBJ)/sinterp.o $(OBJ)/simdata.o $(OBJ)/reddening.o \
 $(OBJ)/sedfilter.o $(OBJ)/sedpca.o $(OBJ)/genefluct3d.o  $(OBJ)/pkspectrum.o $(OBJ)/mass2gal.o \
 $(OBJ)/powerspec.o $(OBJ)/matrix.o $(OBJ)/igm.o $(OBJ)/hpoly.o $(OBJ)/shapelets.o\
-$(OBJ)/em.o $(OBJ)/cat2grid.o $(OBJ)/fitkbaoscale.o $(OBJ)/chisqstats.o
+$(OBJ)/em.o $(OBJ)/cat2grid.o $(OBJ)/fitkbaoscale.o $(OBJ)/chisqstats.o \
+$(OBJ)/TAM.o $(OBJ)/TApparentMagnitude.o $(OBJ)/TDataCard.o $(OBJ)/TFilter.o $(OBJ)/TIGM.o \
+$(OBJ)/TReddening.o $(OBJ)/TBFilter.o $(OBJ)/TDistance.o $(OBJ)/TFlux.o \
+$(OBJ)/TKcorrection.o  $(OBJ)/TSed.o
 #$(OBJ)/root_plots.o
 
 # root libraries
-ROOTLIB   = $(shell root-config --libs)
+ROOTLIB   = $(shell root-config --libs) -lMathMore
 ROOTINC = $(shell root-config --incdir)
 
 MYLIB = -lfftw3_threads
@@ -55,27 +66,27 @@ MINUIT = -lMinuit
 
 ################################################################################
 
-#all : progs tests bao
-all : progs bao
+all : progs tests bao
 
-#progs : addIGMToSED analyzeBPZ baseSimulation calculateKcorrections cfhtColors \
+progs : addIGMToSED analyzeBPZ baseSimulation calculateKcorrections cfhtColors \
 colorDistributions convertSEDS fitLSSTspectra lineOfSightLymanAlpha lineOfSightMagnitude \
 lsstPicklesLibrary lymanAlphaToDensity pcaTemplates photoZdist priorFitter \
 projectTemplates rdlss sdssElColors sdssPicklesLibrary simdensity  \
 simulateAbsorberLinesOfSight simulateLSSTobs simulateLSSTobsFromTruth 
-progs : rdlss
-#tests : test2Dinterp testbasesim testEMalgorithm testErrors testgoodsmagsim \
+
+tests : test2Dinterp testbasesim testEMalgorithm testErrors testgoodsmagsim \
 testKcorrColors testKcorrMethod testLF testLymanAlphaAbs testMadau testMeiksin \
-testSimReadKcorr testsimulateIGM testSimulation testTemplateFitting
+testSimReadKcorr testsimulateIGM testSimulation testTemplateFitting testGoldenInterp2D
 # testsimdensity 
 
 #bao : addGausszerr computepsfromarray fitkbao getpzconvf getsf grid_data \
 sim_mcgrids subfromfull 
-bao : addGausszerr computepsfromarray fitkbao  getsf grid_data 
+bao : addGausszerr computepsfromarray fitkbao getpzconvf getsf grid_data \
+ subfromfull 
 
 clean : 
 	rm  $(OBJ)/* $(EXE)/*
-	
+
 # MAIN PROGS
 
 addIGMToSED : $(EXE)/addIGMToSED
@@ -86,13 +97,13 @@ analyzeBPZ : $(EXE)/analyzeBPZ
 
 baseSimulation : $(EXE)/baseSimulation
 	@echo 'makefile : baseSimulation made'
-	
+
 calculateKcorrections : $(EXE)/calculateKcorrections
 	@echo 'makefile : calculateKcorrections made'
-	
+
 cfhtColors : $(EXE)/cfhtColors
 	@echo 'makefile : cfhtColors made'
-	
+
 colorDistributions	: $(EXE)/colorDistributions
 	@echo 'makefile : colorDistributions made'
 
@@ -101,7 +112,7 @@ convertSEDS	: $(EXE)/convertSEDS
 
 fitLSSTspectra : $(EXE)/fitLSSTspectra
 	@echo 'makefile : fitLSSTspectra made'
-	
+
 lineOfSightLymanAlpha : $(EXE)/lineOfSightLymanAlpha
 	@echo 'makefile : lineOfSightLymanAlpha made'
 
@@ -110,31 +121,31 @@ lineOfSightMagnitude : $(EXE)/lineOfSightMagnitude
 
 lsstPicklesLibrary : $(EXE)/lsstPicklesLibrary
 	@echo 'makefile : lsstPicklesLibrary made'
-	
+
 lymanAlphaToDensity : $(EXE)/lymanAlphaToDensity
 	@echo 'makefile : lymanAlphaToDensity made'
-	
+
 pcaTemplates : $(EXE)/pcaTemplates
 	@echo 'makefile : pcaTemplates made'
-	
+
 photoZdist : $(EXE)/photoZdist
 	@echo 'makefile : photoZdist made'
 
 priorFitter : $(EXE)/priorFitter
 	@echo 'makefile : priorFitter made'
-	
+
 projectTemplates : $(EXE)/projectTemplates
 	@echo 'makefile : projectTemplates made'
 
 rdlss : $(EXE)/rdlss
 	@echo 'makefile : rdlss made'
-	
+
 sdssElColors : $(EXE)/sdssElColors
 	@echo 'makefile : sdssElColors made'
 
 sdssPicklesLibrary : $(EXE)/sdssPicklesLibrary
 	@echo 'makefile : sdssPicklesLibrary made'
-	
+
 simdensity : $(EXE)/simdensity
 	@echo 'makefile : simdensity made'
 
@@ -143,10 +154,10 @@ simulateAbsorberLinesOfSight : $(EXE)/simulateAbsorberLinesOfSight
 
 simulateCFHTobs : $(EXE)/simulateCFHTobs
 	@echo 'makefile : simulateCFHTobs made'
-	
+
 simulateLSSTobs : $(EXE)/simulateLSSTobs
 	@echo 'makefile : simulateLSSTobs made'	
-	
+
 simulateLSSTobsFromTruth : $(EXE)/simulateLSSTobsFromTruth
 	@echo 'makefile : simulateLSSTobsFromTruth made'
 
@@ -154,16 +165,16 @@ simulateLSSTobsFromTruth : $(EXE)/simulateLSSTobsFromTruth
 
 addGausszerr : $(EXE)/addGausszerr
 	@echo 'makefile : addGausszerr made'
-	
+
 computepsfromarray : $(EXE)/computepsfromarray
 	@echo 'makefile : computepsfromarray made'
 
 fitkbao : $(EXE)/fitkbao
 	@echo 'makefile : fitkbao made'
-	
+
 getpzconvf : $(EXE)/getpzconvf
 	@echo 'makefile : getpzconvf made'
-	
+
 getsf : $(EXE)/getsf
 	@echo 'makefile : getsf made'
 	
@@ -180,6 +191,9 @@ subfromfull : $(EXE)/subfromfull
 
 test2Dinterp : $(EXE)/test2Dinterp 
 	@echo 'makefile :test2Dinterp made'
+
+testGoldenInterp2D : $(EXE)/testGoldenInterp2D 
+	@echo 'makefile :testGoldenInterp2D made'
 	
 testbasesim : $(EXE)/testbasesim 
 	@echo 'makefile :testbasesim made'
@@ -600,6 +614,19 @@ $(OBJ)/subfromfull.o : $(BAOPROGS)/subfromfull.cc $(LIBH)
 
 
 ###################### TESTING PROGRAMS ########################################
+
+
+# TEST GOLDENCUT 2D INTERPOLATION
+$(EXE)/testGoldenInterp2D : $(OBJ)/testGoldenInterp2D.o $(LIBO) 
+	mkdir -p $(EXE)
+	mkdir -p $(TESTS)
+	$(CXXLINK) -o $(EXE)/testGoldenInterp2D $(OBJ)/testGoldenInterp2D.o $(LIBO) \
+	$(SOPHYAEXTSLBLIST) $(MYLIB) $(ROOTLIB)
+
+$(OBJ)/testGoldenInterp2D.o : $(PROGS)/testGoldenInterp2D.cc $(LIBH)  
+	mkdir -p $(OBJ)
+	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testGoldenInterp2D.o $(PROGS)/testGoldenInterp2D.cc
+
 
 # TEST 2D INTERPOLATION
 $(EXE)/test2Dinterp : $(OBJ)/test2Dinterp.o $(LIBO) 

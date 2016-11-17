@@ -40,9 +40,9 @@
 #include "simdata.h"
 #include "selectfunc.h"
 
-#include "TRandom3.h"
+#include "TAM.h"  // TAM.h modified to avoid including ROOT files 
 
-//namespace SOPHYA {
+namespace SOPHYA {
 
 /** @class Mass2Gal class 
  *
@@ -63,7 +63,7 @@ class Mass2Gal
       @param su           Crosmology calculator
       @param rg           random generator
       @param nbadplanes   how many redundant planes to removed from @param drho cube */
-  Mass2Gal(TArray<r_8> drho, SimpleUniverse& su, RandomGeneratorInterface& rg,
+  Mass2Gal(SOPHYA::TArray<r_8> drho, SimpleUniverse& su, RandomGeneratorInterface& rg,
            int nbadplanes=0, bool ZisRad=false); 
 
   /** Constructor: use when NOT simulating galaxy clustering 
@@ -76,27 +76,29 @@ class Mass2Gal
       @param su           Cosmology calculator
       @param rg           random generator                                  */
   Mass2Gal(SimpleUniverse& su, RandomGeneratorInterface& rg)
-    : su_(su) , rg_(rg) {
-    ng_=1;
-    SFApplied = false; };
-    
-    /**  Copy constructor */
-    Mass2Gal(Mass2Gal const& a)
-      :  su_(a.su_) , rg_(a.rg_) {
-      cout <<"    Mass2Gal COPY constructor"<<endl;
-      Set(a); };
+    : su_(su) , rg_(rg), am( new TAM ) // CHECK-REZA-JS Ne pas oublier d'initialiser le pointeur de TAM 
+    {
+      ng_=1;
+      SFApplied = false; 
+    }
 
-      /** Destructor */
-      virtual ~Mass2Gal(void) {
-	/*	for (int iz=0; iz<nz; iz++){
-	  for (int it=0; it<ntype; it++){
-	    delete pgold[iz][it];
-	  }
-	  delete pgold[iz];
+  /**  Copy constructor */
+    Mass2Gal(Mass2Gal const& a)
+      :  su_(a.su_) , rg_(a.rg_), am(a.am) {
+    cout <<"    Mass2Gal COPY constructor"<<endl;
+    Set(a); };
+  
+  /** Destructor */
+  virtual ~Mass2Gal(void) {
+    /*	for (int iz=0; iz<nz; iz++){
+	for (int it=0; it<ntype; it++){
+	delete pgold[iz][it];
+	}
+	delete pgold[iz];
 	}
 	delete pgold;
-	*/
-      };
+    */
+  };
 
 
       /** Copy class variables in Mass2Gal                                      */
@@ -188,10 +190,10 @@ class Mass2Gal
       void GetCellZBounds(sa_size_t i, sa_size_t j, sa_size_t k,double& zl, double& zc, double& zh);
 
       /** Return grid of galaxies after photo-z smearing applied                */
-      void NGalSmArray(TArray<r_8>& ngalssm_array) { ngalssm_array = ngalssm_; }
+      void NGalSmArray(SOPHYA::TArray<r_8>& ngalssm_array) { ngalssm_array = ngalssm_; }
 
       /** Return random grid after photo-z smearing applied                     */
-      void RGalSmArray(TArray<r_8>& rgalssm_array) { rgalssm_array = randgsm_; }
+      void RGalSmArray(SOPHYA::TArray<r_8>& rgalssm_array) { rgalssm_array = randgsm_; }
 
       /** Set the mean density of the random grid 
           @param mean_dens    mean density in the grid cells of the random grid */
@@ -206,7 +208,7 @@ class Mass2Gal
           @param nx   size of sub-grid along 1st dimension
           @param ny   size of sub-grid along 2nd dimension
           @param nz   size of sub-grid along 3rd dimension                      */
-      TArray<r_8> ExtractSubArray(double Z, sa_size_t nx, sa_size_t ny, sa_size_t nz);
+      SOPHYA::TArray<r_8> ExtractSubArray(double Z, sa_size_t nx, sa_size_t ny, sa_size_t nz);
 
       /** Extract a sub grid from the full grid from pixel x1 to x2 along 1st 
           dimension, y1 to y2 along 2nd dimension, z1 to z2 along 3rd dimension
@@ -216,7 +218,7 @@ class Mass2Gal
           @param y2   end of sub-grid along 2nd dimension                     
           @param z1   start of sub-grid along 3rd dimension
           @param z2   end of sub-grid along 3rd dimension                       */
-      TArray<r_8> ExtractSubArray(sa_size_t x1, sa_size_t x2, sa_size_t y1, sa_size_t y2, 
+      SOPHYA::TArray<r_8> ExtractSubArray(sa_size_t x1, sa_size_t x2, sa_size_t y1, sa_size_t y2, 
                                   sa_size_t z1, sa_size_t z2);
 
       // ---- Added methods Aug 2011 (AA)       
@@ -267,9 +269,9 @@ class Mass2Gal
                                                                                     
       // ---- Return grids
       /** Return mass array                                                     */
-      void MassArray(TArray<r_8>& mass_array) { mass_array = mass_; }
+      void MassArray(SOPHYA::TArray<r_8>& mass_array) { mass_array = mass_; }
       /** Return galaxy array                                                   */
-      void NGalArray(TArray<int_4>& ngals_array) { ngals_array = ngals_; }
+      void NGalArray(SOPHYA::TArray<int_4>& ngals_array) { ngals_array = ngals_; }
     
       /** Return total number of galaxies in simulation                         */
       sa_size_t ReturnTotNgals() {return ng_;} // set in ConvertToMeanNGal()
@@ -361,14 +363,14 @@ class Mass2Gal
       double zcat_max;  /**< maximal value of the redshift in the catalog */
 
       /* arrays */
-      TArray<r_8> mass_;          /**< 3D array holding rho/rho^bar             */
+      SOPHYA::TArray<r_8> mass_;          /**< 3D array holding rho/rho^bar             */
       vector<double> MBmax_;      /**< Maximum observable absolute magnitude as a function of z     */
-      TArray<r_4> MBmax_type_;    /**< Maximum observable absolute magnitude as a function of z and type    */
+      SOPHYA::TArray<r_4> MBmax_type_;    /**< Maximum observable absolute magnitude as a function of z and type    */
       vector<double> zv_;               /**< z values MBmax_ defined as               */
       vector<double> magv_;               /**< z values MBmax_ defined as               */
-      TArray<int_8> ngals_;             /**< 3D array holding total galaxy number in each pixel           */
-      TArray<r_8> ngalssm_;       /**< array of n galaxies per cell after applying photo-z smearing */
-      TArray<r_8> randgsm_;       /**< array of random grid after applying photo-z smearing         */
+      SOPHYA::TArray<int_8> ngals_;             /**< 3D array holding total galaxy number in each pixel           */
+      SOPHYA::TArray<r_8> ngalssm_;       /**< array of n galaxies per cell after applying photo-z smearing */
+      SOPHYA::TArray<r_8> randgsm_;       /**< array of random grid after applying photo-z smearing         */
     
       // golden cut params//
       double ***pgold;
@@ -376,8 +378,10 @@ class Mass2Gal
       float typemin, typemax, typebin;
       float magmin, magmax, magbin;
       int nz, ntype, nmag;
-      TRandom3 rand;
+
+      TAM *am;
+
 };
 
-//} // End namespace SOPHYA
+} // End namespace SOPHYA
 #endif

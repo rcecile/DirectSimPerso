@@ -1,34 +1,39 @@
 PRO plot_ps2fit,saveplot,option,iz
 
+; restore,'temp_ascii.sav'        ; contient dir
+; f='/sps/lsst/data/rcecile/TJP_BAO_PS/fit_G2_Err_1024_z1.8_chisq.txt'
+; TEMP_POW_SPEC_FITCHI2 = ASCII_TEMPLATE(f)
+; save,TEMP_2FIT,TEMP_INFO,TEMP_INFOS,TEMP_PDF,TEMP_POW_SPEC,TEMP_POW_SPEC_FIT,TEMP_POW_SPEC_FITCHI2,TEMP_POW_SPEC_TH,TEMP_POW_SPEC_TXT,TEMP_SEL_FUNC,TEMP_POW_SPEC_ZXY ,file='temp_ascii.sav'
+
 !p.charsize=2
 !p.thick=2
 !p.symsize=4
 h= 0.679
 h3 = h*h*h
 
-loadct,39
+loadct,12
 restore,'temp_ascii.sav'        ; contient dir
 dir="/sps/lsst/data/rcecile/TJP_BAO_PS/"
 
-z=[0.9, 1.3,1.8,1.8]
-namez = ['0.9','1.3','1.8','1.8']
-nx= ['_640', '_900', '_1024', '_500']
+z=[0.5,0.9, 1.3,1.8,1.8,1.8,1.8];,1.8]
+namez = ['0.5','0.9','1.3','1.8','1.8','1.8','1.8'];,'1.8']
+nx= ['_350','_640', '_900', '_1024', '_1024', '_1024', '_1024'];, '_500']
 gsuff = ['', '', ' thin grid', ' thick grid']
-kmax = [12, 12, 12, 6]
+gsuff = ['', '', '', '', '', '', '']
+kmax = [12, 12, 12, 12,10,8,6]
 lkmax = kmax/100.
 skmax = strarr(n_elements(kmax))
 for i=0,n_elements(kmax)-1 do $
    if (kmax[i] ge 10) then skmax[i] = '_k0.'+strtrim(kmax[i],2) $
    else skmax[i] = '_k0.0'+strtrim(kmax[i],2) 
 print,skmax
-
 nz = n_elements(namez)
 
 if (option eq 0) then begin
    suff=['','_err0.03','_errPpodds']
    lerr=['spectroZ','Gaussian 0.03','photoZ podds']
    lpsym=[-1,-5,-4]
-   lcol  = [80, 150, 210]
+   lcol  = [80,35,  135]
    wtit='_SGP'
 endif
 
@@ -36,7 +41,7 @@ if (option eq 1) then begin
    suff=['','_errPpodds']
    lerr=['spectroZ','photoZ podds']
    lpsym=[-1,-4]
-   lcol  = [80, 210]
+   lcol  = [105, 135]
    wtit='_SP'
 endif
 
@@ -44,8 +49,25 @@ if (option eq 2) then begin
    suff=['','_err0.03']
    lerr=['spectroZ','Gaussian 0.03']
    lpsym=[-1,-5]
-   lcol  = [80, 150]
+   lcol  = [80,35]
    wtit='_SG'
+endif
+
+if (option eq 3) then begin
+   suff=['','_errPpodds','_errPBDT']
+   lerr=['spectroZ','photoZ podds','photoZ BDT']
+   lpsym=[-1,-5,-3]
+   lcol  = [80,135,125]
+   wtit='_SPB'
+endif
+
+
+if (option eq 4) then begin
+   suff=['','_err0.03','_errPpodds','_errPBDT']
+   lerr=['spectroZ','Gaussian 0.03','photoZ podds','photoZ BDT']
+   lpsym=[-1,-5,-3,-2]
+   lcol  = [80,35,135,125]
+   wtit='_SGPB'
 endif
 
 
@@ -59,6 +81,7 @@ endif
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 !p.multi=0
+;window,iz
 myformat='(F10.1)'
 ltext ='z = '+ namez
 lline= 0
@@ -68,7 +91,7 @@ for ir=0,n_elements(suff)-1 do begin
 
    mysuff = suff[ir]
   ; spectre observe corrige du damping de l'erreur 
-   t  =  dir + 'PS_G2_2fitErr2'+nx[iz]+'_z'+namez[iz]+mysuff+'_wngal.txt'
+   t  =  dir + 'PS_G2_2fitErr'+nx[iz]+'_z'+namez[iz]+mysuff+'_wngal.txt'
 ;   if (ir eq 2 and iz eq 2) then t  =  dir + 'PS_G2_2fitErr'+nx[iz]+'_z'+namez[iz]+'_k0.06'+mysuff+'_wngal.txt'
    pcorr = read_ascii(t, template =  TEMP_2FIT)     
    print,t
@@ -104,17 +127,21 @@ for ir=0,n_elements(suff)-1 do begin
    kpt = string(pfit.(1)*1000.,format=myformat)+' +/-'+string(pfit.(3)*1000.,format=myformat)
    spt = string(2.*!pi/pfit.(1),format=myformat)+' +/-'+string(2.*!pi*pfit.(3)/pfit.(1)/pfit.(1),format=myformat)
 
-   if (ir eq 0 ) then kerr =lerr[ir] + '   k_a ='+kpt else kerr = [kerr,lerr[ir]+'   k_a ='+kpt]
-   if (ir eq 0 ) then serr =lerr[ir] + '   s_a ='+spt else serr = [serr,lerr[ir]+'   s_a ='+spt]
+   chi2fit = dir + 'fit_G2_Err'+skmax[iz]+nx[iz]+'_z'+namez[iz]+mysuff+'_chisq.txt'
+   c2fit = read_ascii(chi2fit, template =  TEMP_POW_SPEC_FITCHI2)     
+   if (ir eq 0 ) then kerr =lerr[ir] + '   k_a ='+kpt + ' chi2 = ' + strtrim(min(c2fit.(1)),2)  else $
+      kerr = [kerr,' ======== ' + lerr[ir]+'   k_a ='+kpt +' chi2 = ' +strtrim( min(c2fit.(1)),2) ]
+   if (ir eq 0 ) then serr =lerr[ir] + '   s_a ='+spt   else $
+      serr = [serr,' ======== ' + lerr[ir]+'   s_a ='+spt   ]
  ;  read,xx
 endfor
 legend,lerr,col=lcol,li=0,box=1,/fill,/right,/top,charsize=1.5
 legend,'z = '+namez[iz]+gsuff[iz],box=1,/fill,/right,/bottom,charsize=2
-print,"====================================================== "
+print,"========================================================= "
 print,serr
-print,"====================================================== "
+print,"========================================================= "
 print,kerr
-print,"====================================================== "
+print,"========================================================= "
 
 oplot,[0,2],[1,1],th=2
 

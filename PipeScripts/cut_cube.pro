@@ -10,7 +10,9 @@ n=70
 cell=8
 
 dir='/sps/lsst/data/rcecile/'
-if (strlen(suff) eq 0) then dir = dir+"TJP_BAO/" else  dir = dir+"TJP_noBAO/"
+;if (strlen(suff) eq 0) then dir = dir+"TJP_BAO/" else  dir = dir+"TJP_noBAO/"
+;if (strlen(suff) eq 0) then dir = dir+"Planck_BAO/" else  dir = dir+"Planck_noBAO/"
+if (strlen(suff) eq 0) then dir = dir+"toy_cube/" 
 print,dir
 
 if (do_cut eq 1) then begin
@@ -50,14 +52,15 @@ if do_cut eq 1 then begin
    for i=0,n-1 do begin
      print,'slice ',i,i*Nz,hdbl[i],zref[i],href[i]
      print,i*Nz , i*Nz + Nz-1
+     help,c
      my_c = c[i*Nz : i*Nz + Nz-1, *, *]
-     WRITEFITS,dir+"simu"+suff+"_Slice"+strtrim(i,2)+"_r.fits", my_c,hh
+     WRITEFITS,dir+"simu70"+suff+"_Slice"+strtrim(i,2)+"_r.fits", my_c,hh
      sxaddpar,hh,'NZ',Nz
      sxaddpar,hh,'ZREF',zref[i]
      sxaddpar,hh,'KZREF',1.*Nz/2.
      sxaddpar,hh,'HREF',href[i]
      sxaddpar,hh,'DREF',hdbl[i]
-     modfits,dir+"simu"+suff+"_Slice"+strtrim(i,2)+"_r.fits",0,hh    
+     modfits,dir+"simu70"+suff+"_Slice"+strtrim(i,2)+"_r.fits",0,hh    
    endfor
       
 endif

@@ -1,0 +1,4 @@
+
+m0=mrdfits("/sps/lsst/data/rcecile/Planck_BAO/cat_G1_Slice2.fits",1,hh)
+m1=mrdfits("/sps/lsst/data/rcecile/Planck_BAO/cat__Slice2.fits",1,hh)
+m2=mrdfits("/sps/lsst/data/rcecile/Planck_BAO/cat_G5TA__Slice2.fits",1,hh)

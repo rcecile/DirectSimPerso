@@ -6,7 +6,7 @@ PRO plot_histo_zs_zp,doplot
 dir='/sps/lsst/data/rcecile/TJP_BAO/'
    loadct,39
 
-; to do interactvely
+; to do interactively
 if (doplot eq 0) then begin
    restore,dir+'/histo_zs_zp_0.01_diag.sav'
    file='cat_G2_AllSlice_errP_cataLT10.fits'
@@ -27,10 +27,18 @@ if (doplot eq 0) then begin
    h = histogram( (m.(0)-m.(1))/(1.+m.(0)) ,bin=diff_bin,min=-1*diff_max,max=diff_max)
    hddiff = hddiff + h
 
-   print,'Save up to slices CATA',total(hp),total(hd)
-   save,hp,hd,hpdiff,hddiff,z,binz,zmax,diff_bin,diff_max,i,file=dir+'histo_zs_zp_0.01.sav'
+   file='cat_G2_AllSlice_errPBDT_cataLT10.fits'
+   print,file
+   m=mrdfits(dir+file,1,h,col=['ZS','ZP'])
+   h = hist_2d(m.(0),m.(1),bin1=binz,bin2=binz,max1=zmax,max2=zmax,min1=0,min2=0)
+   hb = hb + h
+   
+   h = histogram( (m.(0)-m.(1))/(1.+m.(0)) ,bin=diff_bin,min=-1*diff_max,max=diff_max)
+   hbdiff = hbdiff + h
+
+   print,'Save up to slices CATA',total(hp),total(hb)
+   save,hp,hd,hb,hpdiff,hddiff,hbdiff,z,binz,zmax,diff_bin,diff_max,i,file=dir+'histo_zs_zp_zb.sav'
 endif
-   s(z-z[i])/(1.+z[i]) gt 0.09),i])
  
 
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -38,8 +46,11 @@ endif
 if (doplot ge 1) then begin
 
    restore,dir+'/histo_zs_zp_0.01.sav'
-   lhp = alog10(double(hp))
-   lhd = alog10(double(hd))
+;   restore,dir+'/histo_zs_zp_allstat.sav'
+;   lhp = alog10(double(all_hist[*,*,0]))
+;   lhd = alog10(double(all_hist[*,*,4]))
+   lhp = alog10(double(hp[*,*]))
+   lhd = alog10(double(hd[*,*]))
    
    loadct,39
    
@@ -49,6 +60,7 @@ if (doplot ge 1) then begin
    
    myc = findgen(6)
    mycdiv = 50.
+   print,z
     
    im=contour(lhp,z,z,xtit='spectroZ',ytit='photoZ',tit='raw photoZ',/fill,POSITION=[0.12,0.2,0.97,0.93],FONT_SIZE=15,$
               RGB_INDICES=myc*mycdiv, C_VALUE=myc,RGB_TABLE=39, DIM=[ws,ws*1.225],xticklen=1,yticklen=1,xsubticklen=.025,ysubticklen=.025)
@@ -63,7 +75,6 @@ if (doplot ge 1) then begin
    
    if (doplot eq 2) then im.Save, "/sps/lsst/dev/rcecile/Fig/stat_zs_zd.pdf"
  
-
 endif
 
 END

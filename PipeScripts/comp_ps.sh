@@ -3,7 +3,7 @@
 #$ -o /sps/lsst/data/rcecile/TJP_BAO_PS/output_ps
 #$ -M rcecile@in2p3.fr
 #$ -m eas
-#$ -q huge
+#$ -q long
 #! /usr/local/bin/bash -l
 
  function do_big {
@@ -33,8 +33,10 @@
 
  function do_ps_perr {
      command="${code1}computepsfromarray -C ${dirg}grid_G2${sj}_${nx_i}_z${z_i}_errP.fits -S ${dirps}simu_ps_${nx_i}_z${z_i}_r.fits  -O ${dirps}PS_G2${sj}_${nx_i}_z${z_i}_errP"
-     $command
+#     $command
      command="${code1}computepsfromarray -C ${dirg}grid_G2${sj}_${nx_i}_z${z_i}_errPpodds.fits -S ${dirps}simu_ps_${nx_i}_z${z_i}_r.fits  -O ${dirps}PS_G2${sj}_${nx_i}_z${z_i}_errPpodds"
+#     $command
+     command="${code1}computepsfromarray -C ${dirg}grid_G2${sj}_${nx_i}_z${z_i}_errPBDT.fits -S ${dirps}simu_ps_${nx_i}_z${z_i}_r.fits  -O ${dirps}PS_G2${sj}_${nx_i}_z${z_i}_errPBDT"
      $command
  }
 
@@ -49,35 +51,28 @@ code0="/sps/lsst/dev/rcecile/BAOProgs/SimLSS/exe/"
 code1="/sps/lsst/dev/rcecile/BAOProgs/DirectSimPerso/exe/"     
 err2=0.03
 
-cell=8
-	
-z=('0.7' '1.4' '0.9' '1.3' '1.8')
-D=(2507 4176 3055 3975 4875)
-nz=(200 200 125 75 65)
-nx=(450 875 640 900 1024)
-nk=(-1 -1 -1 -1 0.03)
-
-z=('0.7' '1.4' '0.9' '1.3' '1.8')
-nz=(200 200 125 75 75)
-nx=(450 875 640 900 500)
-nk=(-1 -1 -1 -1 -1)
-cell=(8 8 8 8 16)
+z=('0.7' '1.4' '0.9' '1.3' '1.8' '1.8' '0.5')
+nz=(200 200 125 75 65 75 140)
+nx=(450 875 640 900 1024 500 350)
+nk=(0.12 0.12 0.12 0.12 0.12 0.12 0.12)
+#nk=(-1 -1 -1 -1 -1 -1 -1 -1)
+cell=(8 8 8 8 8 16 8)
 
 
 #########################################################################################################
 dirg="/sps/lsst/data/rcecile/TJP_BAO_grids/"
 dirps="/sps/lsst/data/rcecile/TJP_BAO_PS/"
 sj=""
-for i in 4
+for i in 2 3 4 6
 do
     nx_i=$((${nx[i]}))
     nz_i=$((${nz[i]}))
     z_i=${z[i]}
-    k_i=$((${nk[i]}))
+    k_i=${nk[i]}
     cell_i=$((${cell[i]}))
 #    do_big 
-    do_ps_base 
-    do_ps_err $err2
+#    do_ps_base 
+#    do_ps_err $err2
     if [ ${k_i} -lt 0 ]
     then 
 	do_ps_perr 
@@ -92,12 +87,12 @@ dirps="/sps/lsst/data/rcecile/TJP_noBAO_PS/"
 while [ ${j} -lt ${nCase} ]
 do
     sj=_$j
-    for i in 4
+    for i in 2 3 4 6
     do
 	nx_i=$((${nx[i]}))
 	nz_i=$((${nz[i]}))
 	z_i=${z[i]}
-	k_i=$((${nk[i]}))
+	k_i=${nk[i]}
 	cell_i=$((${cell[i]}))
 	
 	if [ ${j} -eq 0 ]
@@ -106,8 +101,8 @@ do
 #	    do_big_no
 	fi
 
-	do_ps_base
-	do_ps_err $err2
+#	do_ps_base
+#	do_ps_err $err2
 	if [ ${k_i} -lt 0 ]
 	then 
 	    do_ps_perr 

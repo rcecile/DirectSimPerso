@@ -12,6 +12,12 @@ zref=[0.9,1.3,1.8,1.8]
 thick = [125.,75,65,75] ;Nz du cube produit par cat_grid
 nxc=[640,900,1024,500]
 cellg=[8,8,8,16]
+
+
+zref=[0.5,0.9,1.3,1.8]
+thick = [140,125.,75,65] ;Nz du cube produit par cat_grid
+nxc=[350,640,900,1024]
+cellg=[8,8,8,8]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 err=[0., 0.03]

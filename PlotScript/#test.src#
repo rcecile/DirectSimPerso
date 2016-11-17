@@ -1,0 +1,141 @@
+
+restore,'temp_ascii.sav'
+!p.charsize=2.
+!p.multi=0
+!p.thick=3
+loadct,39
+
+
+!p.multi=0
+s1 = read_ascii('/sps/lsst/data/rcecile/Planck_BAO_grids/SelFunc__specz_nofz.txt', template =  TEMP_SEL_FUNC)
+s5 = read_ascii('/sps/lsst/data/rcecile/Planck_BAO_grids/SelFunc25__specz_nofz.txt', template =  TEMP_SEL_FUNC)
+s2 = read_ascii('/sps/lsst/data/rcecile/Planck_BAO_grids/SelFunc_G25TA_n15__specz_nofz.txt', template =  TEMP_SEL_FUNC)
+s3 = read_ascii('/sps/lsst/data/rcecile/Planck_BAO_grids/SelFunc_G40TA_n15__specz_nofz.txt', template =  TEMP_SEL_FUNC)
+what=['avant','hier (pas gold)','type25 gold','type40 gold']
+
+plot,s2.(0),s2.(1),/xs,/ys,xra=[0.1,.38],yra=[0.3,1.02]
+;oplot,s5.(0),s5.(1),col=200
+;oplot,s1.(0),s1.(1),col=123
+oplot,s3.(0),s3.(1),col=80,li=2
+
+legend,what,col=[0,123,80,200],line=[0,0,0,2],box=1,psym=0,/fill,/right,/top,charsize=1.5
+
+
+
+m=mrdfits("/sps/lsst/data/rcecile/Planck_BAO/cat_G1_Slice6.fits",1,hh)
+t0=m.(4)
+m=mrdfits("/sps/lsst/data/rcecile/Planck_BAO/cat__Slice6.fits",1,hh)
+t1=m.(4)
+m=mrdfits("/sps/lsst/data/rcecile/Planck_BAO/cat_G25TA__Slice6.fits",1,hh)
+t2=m.(4)
+m=mrdfits("/sps/lsst/data/rcecile/Planck_BAO/cat_G40TA__Slice6.fits",1,hh)
+t3=m.(4)
+
+h0=histogram(t0,min=0,max=3.6,bin=0.01)
+h1=histogram(t1,min=0,max=3.6,bin=0.01)
+h2=histogram(t2,min=0,max=3.6,bin=0.01)
+h3=histogram(t3,min=0,max=3.6,bin=0.01)
+
+plot,h2,/xs,/ys,psym=10
+oplot,h1,col=123
+oplot,h0,col=200
+oplot,h3,col=80,li=2
+
+help,where(t0 eq 2.26)
+help,where(t2 eq 3.26)
+print,total(h0)
+print,total(h1)
+print,total(h2)
+
+m=mrdfits("/sps/lsst/data/rcecile/Planck_BAO/cat_G1_Slice6.fits",1,hh)
+t0=m.(3)
+m=mrdfits("/sps/lsst/data/rcecile/Planck_BAO/cat__Slice6.fits",1,hh)
+t1=m.(3)
+m=mrdfits("/sps/lsst/data/rcecile/Planck_BAO/cat_G25TA__Slice6.fits",1,hh)
+t2=m.(3)
+
+h0=histogram(t0,min=0.2,max=.6,bin=0.001)
+h1=histogram(t1,min=0.2,max=.6,bin=0.001)
+h2=histogram(t2,min=0.2,max=.6,bin=0.001)
+
+
+m=mrdfits("/sps/lsst/data/rcecile/TJP_BAO/cat_G2_Slice59.fits",1,hh)
+t0=m.(4)
+m=mrdfits("/sps/lsst/data/rcecile/TJP_BAO/cat_test_G25TA__Slice59",1,hh)
+t1=m.(4)
+m=mrdfits("/sps/lsst/data/rcecile/TJP_BAO/cat_test_G40TA__Slice59.fits",1,hh)
+t2=m.(4)
+h0=histogram(t0,min=0.,max=4,bin=0.01)
+h1=histogram(t1,min=0.,max=4,bin=0.01)
+h2=histogram(t2,min=0.,max=4,bin=0.01)
+
+plot,h0/total(h0)*100.,/xs,/ys,psym=10
+oplot,h1/total(h1)*100.,col=123
+oplot,h2/total(h2)*100.,col=200
+
+===========================================================================
+
+!p.charsize=2.
+!p.multi=0
+!p.thick=3
+loadct,39
+restore,'temp_ascii.sav'
+
+m1=mrdfits("/sps/lsst/data/rcecile/toy_cube/cat70_t25_Gtype_Slice44.fits",1,hh)
+m2=mrdfits("/sps/lsst/data/rcecile/toy_cube/cat70_t25_Monly_Slice44.fits",1,hh)
+m3=mrdfits("/sps/lsst/data/rcecile/toy_cube/cat70_t25_g_Slice44.fits",1,hh)
+m4=mrdfits("/sps/lsst/data/rcecile/toy_cube/cat70_t40_Gtype_Slice44.fits",1,hh)
+m5=mrdfits("/sps/lsst/data/rcecile/toy_cube/cat70_t35_Gtype_Slice44.fits",1,hh)
+m6=mrdfits("/sps/lsst/data/rcecile/toy_cube/cat70_t40_g_Slice44.fits",1,hh)
+
+what=['t25_G new','t25_M', 't25_g','t40_G new','t35_G new', 't40_g']
+
+s1 = read_ascii('/sps/lsst/data/rcecile/toy_cube_grids/SelFunc70_t25_Gtype__specz_nofz.txt', template =  TEMP_SEL_FUNC)
+s2 = read_ascii('/sps/lsst/data/rcecile/toy_cube_grids/SelFunc70_t25_Monly__specz_nofz.txt', template =  TEMP_SEL_FUNC)
+s3 = read_ascii('/sps/lsst/data/rcecile/toy_cube_grids/SelFunc70_t25_g__specz_nofz.txt', template =  TEMP_SEL_FUNC)
+s4 = read_ascii('/sps/lsst/data/rcecile/toy_cube_grids/SelFunc70_t40_Gtype__specz_nofz.txt', template =  TEMP_SEL_FUNC)
+s5 = read_ascii('/sps/lsst/data/rcecile/toy_cube_grids/SelFunc70_t35_Gtype__specz_nofz.txt', template =  TEMP_SEL_FUNC)
+s6 = read_ascii('/sps/lsst/data/rcecile/toy_cube_grids/SelFunc70_t40_g__specz_nofz.txt', template =  TEMP_SEL_FUNC)
+
+h1=histogram(m1.(4),min=0.,max=4,bin=0.01)
+h2=histogram(m2.(4),min=0.,max=4,bin=0.01)
+h3=histogram(m3.(4),min=0.,max=4,bin=0.01)
+h4=histogram(m4.(4),min=0.,max=4,bin=0.01)
+h5=histogram(m5.(4),min=0.,max=4,bin=0.01)
+h6=histogram(m6.(4),min=0.,max=4,bin=0.01)
+
+!p.multi=[0,1,2]
+window,0
+plot,s1.(0),s1.(1),/xs,/ys,xra=[0.1,2.5],yra=[0.0003,1.02],/yl,xtit='redshift',ytit='Fct selection'
+oplot,s2.(0),s2.(1),col=50
+oplot,s3.(0),s3.(1),col=100
+oplot,s4.(0),s4.(1),col=150,li=2
+oplot,s5.(0),s5.(1),col=200,li=2
+oplot,s6.(0),s6.(1),col=250,li=2
+
+legend,what,col=[0,50,100,150,200,250],line=[0,0,0,2,2,2],box=1,psym=0,/fill,/left,/top,charsize=1.5
+
+plot,s1.(0),s1.(1),/xs,/ys,xra=[0.15,0.35],yra=[0.41,0.9],xtit='redshift',ytit='zoom'
+oplot,s2.(0),s2.(1),col=50
+oplot,s3.(0),s3.(1),col=100
+oplot,s4.(0),s4.(1),col=150,li=2
+oplot,s5.(0),s5.(1),col=200,li=2
+oplot,s6.(0),s6.(1),col=250,li=2
+write_jpeg,'/sps/lsst/dev/rcecile/BAO_InOut/toy.jpg' ,tvrd(true=3),true=3
+
+window,1
+plot,h1/total(h1)*100.,/xs,/ys,xtit='type',ytit='Fraction [%]',yra=[0,4],xra=[90,360]
+oplot,h3/total(h3)*100.,col=100,li=2
+oplot,h4/total(h4)*100.,col=150
+oplot,h5/total(h5)*100.,col=200
+oplot,h6/total(h6)*100.,col=250,li=2
+print,total(h1),total(h2),total(h3),total(h4),total(h5),total(h6)
+
+legend,[what[0],what[2],what[3],what[4],what[5]],col=indgen(6)*50,line=[0,2,0,2],box=1,psym=0,/fill,/left,/top,charsize=1.5
+
+plot,s1.(0),s1.(1)/s4.(1),/xs,/ys,xra=[0.1,2.5],yra=[0.,1.1],xtit='redshift',ytit='rapport FS'
+oplot,s1.(0),smooth(s1.(1)/s5.(1),15),col=120
+oplot,s1.(0),smooth(s3.(1)/s6.(1),15),col=240,li=2
+legend,['t25_G new/ t40_G new','t25_G new/ t35_G new','t25_g / t40_g'],col=[0,120,240],line=[0,0,2],box=1,psym=0,/fill,/left,/bottom,charsize=1.5
+write_jpeg,'/sps/lsst/dev/rcecile/BAO_InOut/toy2.jpg' ,tvrd(true=3),true=3
+

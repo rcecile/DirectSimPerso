@@ -1,0 +1,13 @@
+PRO bdt_head
+
+href=headfits("/sps/lsst/data/rcecile/TJP_BAO/cat_G2_Slice60.fits",ext=1)
+
+hjs=headfits("/sps/lsst/data/rcecile/TJP_BAO/file0.fits",ext=1)
+
+list=['H0','OMEGAM0','OMEGAB0','OMEGAR0','OMEGAT0','OMEGADE0','OMEGADK','DE_W0','DE_WA','SIGMA8','N_S','CELL','SEGMSIZE']
+
+for i=0,n_elements(list)-1 do sxaddpar,hjs,list[i], sxpar(href,list[i])
+modfits, "/sps/lsst/data/rcecile/TJP_BAO/file0.fits",0,hjs,EXTEN_NO =1
+
+
+end

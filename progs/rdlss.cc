@@ -205,7 +205,6 @@ int main(int narg, char* arg[]) {
       out_type = 3;
       break;
     case 'M' :
-      cout << "yo" << endl;
       doVeryFaintCut = true;
       break;
     case 'a' :

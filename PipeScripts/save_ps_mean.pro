@@ -1,14 +1,15 @@
-PRO save_ps_mean
+PRO save_ps_mean,saveplot
 
-namez = ['0.9','1.3','1.8','1.8']
+namez = ['0.5','0.9','1.3','1.8'];,'1.8']
 nsuff = ['', '', ' thin', ' thick']
-nx= ['_640', '_900', '_1024', '_500']
-nameerr = ['', '_err0.03', '_errPpodds']
+nx= ['_350','_640', '_900', '_1024'];, '_500']
+nameerr = ['', '_err0.03', '_errPpodds','_errPBDT']
 
 
+loadct,12
 
-lcol  = [50,90,250,150]
-lerr=['spectroZ','Gaussian 0.03','photoZ podds']
+lcol  = [105,35,  135,120,0]
+lerr=['spectroZ','Gaussian 0.03','photoZ odds','photoZ BDT','theoretical, no oscillation']
 lpsym=[0,-5,-4]
 llin = [0,3,2]
 
@@ -20,10 +21,20 @@ restore,'temp_ascii.sav'
 dir="/sps/lsst/data/rcecile/TJP_BAO_PS/"
 dirn="/sps/lsst/data/rcecile/TJP_noBAO_PS/"
 myformat = '(F9.7," ",G14.6," ",G14.6," ",G14.6," ",G14.6," ",G14.6," ",G14.6," ",G14.6," ",I6," ",I6," ",G14.6)'
-loadct,39
 !p.thick=3
 !p.charsize=2
-plot,[0.01,0.1],[1,1],/xs,/ys,xra=[0.005,0.15],/nodata,yra=[1000,.5e5],/yl,xtit='wavenumber [Mpc^-1]',ytit='Power spectrum'
+
+
+if (saveplot ) then begin
+; current plotting device.
+      mydevice = !D.NAME
+      SET_PLOT, 'PS'
+      DEVICE, FILENAME='/sps/lsst/dev/rcecile/Fig/ps_undamped.eps', /PORTRAIT,/COLOR,XSIZE=8.8,YSIZE=5.5,FONT_SIZE=5
+   endif
+
+
+;plot,[0.01,0.1],[1,1],/xs,/ys,xra=[0.005,0.15],/nodata,yra=[1100.,.5e5],/yl,xtit='wavenumber [Mpc^-1]',ytit='Power spectrum',xma=[8.5,0.5],yma=[3.5,.5]
+plot,[0.01,0.1],[1,1],/xs,/ys,xra=[0.005,0.15],/nodata,yra=[1100.,.5e5],/yl,xtit='wavenumber [Mpc^-1]',xma=[0.5,0.5],yma=[3.5,.5]
 
 err=dblarr(nz,nerr,nsim)
 for iz = 0,nz-1 do begin
@@ -65,9 +76,9 @@ for iz = 0,nz-1 do begin
 
       p2fit = (pobs.(1)-pobs.(6)) / (pnobao-pobs.(6)) *(ptheo.(2)[ok])
 
-      oplot,xs,p2fit,col=lcol[iz],thick=5-3*ir;psym=lpsym[ir]
+      oplot,xs,p2fit,col=lcol[ir]
  
-      fname = dir + 'PS_G2_2fitErr2'+nx[iz]+'_z'+namez[iz]+suff+'_wngal.txt' 
+      fname = dir + 'PS_G2_2fitErr'+nx[iz]+'_z'+namez[iz]+suff+'_wngal.txt' 
       print,fname
       openw,lun1, fname, /get_lun
  
@@ -91,8 +102,14 @@ for iz = 0,nz-1 do begin
    endfor
    oplot,xt,ptheo.(2),li=2
 endfor
-legend,'z = '+ namez+nsuff,col=lcol,box=1,line=0,/fill,/left,/bottom,charsize=1.5
-legend,lerr,li=0,box=1,/fill,/center,/bottom,charsize=1.5,thick=[5,3,1]
+;legend,'z = '+ namez+nsuff,col=lcol,box=1,line=0,/fill,/left,/bottom,charsize=1.5
+;legend,'z = '+ namez,col=lcol,box=1,line=0,/fill,/left,/bottom,charsize=1.5
+legend,lerr,li=[0,0,0,0,2],col=lcol,box=1,/fill,/right,/top,charsize=1.5
+
+   if (saveplot) then begin
+      DEVICE, /CLOSE
+      SET_PLOT, mydevice
+   endif
 
 for iz = 0,nz-1 do begin
    for ir = 0, nerr-1 do begin

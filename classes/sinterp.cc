@@ -145,12 +145,13 @@ void SInterp1D::DefinePoints(vector<double>& xs, vector<double>& ys,
         
     // check x is sorted
     for(size_t k=1; k<xs.size(); k++) {
-	    
+	
         if (xs[k-1]>=xs[k]) { 
             string emsg =  "SInterp1D::DefinePoints() unsorted xs";
             throw range_error(emsg);
             }
         }
+
 		
     xs_ = xs;
     ys_ = ys;

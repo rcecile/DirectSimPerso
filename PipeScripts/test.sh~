@@ -1,0 +1,31 @@
+#!/bin/bash 
+#$ -l sps=1
+#$ -o /sps/lsst/data/rcecile/TJP_BAO/output_self_err
+#$ -M rcecile@in2p3.fr
+#$ -q long
+#$ -m eas
+#! /usr/local/bin/bash -l
+
+# for noBAO case, just change the dir & dirg paths & nCase
+
+
+function do_sel {
+    echo "==========================================================================="
+    echo "===========================================================================%"
+
+    command="${code1}getsf -O $1 -o ${dirg}SelFunc_Test -F  $1 -z $2"
+    rm -f tmptmp
+    $command
+    command="${code1}getsf -O $1 -o ${dirg}SelFunc_TestBDT -F  $1 -z $2 -b 0."
+    rm -f tmptmp
+    $command
+    command="${code1}getsf -O $1 -o ${dirg}SelFunc_TestPODDS -F  $1 -z $2 -p 0.5"
+    rm -f tmptmp
+    $command
+}
+dirg="/sps/lsst/data/rcecile/TJP_BAO_grids/"
+
+code1="/sps/lsst/dev/rcecile/BAOProgs/DirectSimPerso/exe/"
+file="/sps/lsst/data/rcecile/TJP_BAO/file0.fits"
+
+do_sel $file ZP,ZS,ZS

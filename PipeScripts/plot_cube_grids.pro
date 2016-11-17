@@ -4,7 +4,7 @@ if (doplot) then begin
 ; current plotting device.
    mydevice = !D.NAME
    SET_PLOT, 'PS'
-   DEVICE, FILENAME='/sps/lsst/dev/rcecile/Fig/plot_cube_2grids.eps',/PORTRAIT,/COLOR,XSIZE=8.8,YSIZE=11.4,FONT_SIZE=4
+   DEVICE, FILENAME='/sps/lsst/dev/rcecile/Fig/plot_cube_2grids.eps',/PORTRAIT,/COLOR,XSIZE=8.8,YSIZE=9.9,FONT_SIZE=4
 endif 
 
 open_ang = !pi/3.
@@ -16,7 +16,7 @@ loadct,39
 cell_z=8.
 Nz=700.
 Nx=1600.
-;Nx=2200.
+Nx=1250.
 h0=3200.
 xc=findgen(Nx)*cell_z - Nx/2*cell_z
 y0=fltarr(Nx)
@@ -31,16 +31,23 @@ mxt = max(theta)
 
 na=1000
 
-plot,[0,0],[0,0],/xs,/ys,th=3,xra=[0,4100],yra=[0,6100],/nodata,xtit='Distance [comoving Mpc]',ytit='Distance [comoving Mpc]',xmar=[8,1]
+plot,[0,0],[0,0],/xs,/ys,th=3,xra=[0,5300],yra=[0,6100],/nodata,xtit='Distance [comoving Mpc]',ytit='Distance [comoving Mpc]',xmar=[8,1]
 
 nslice=70
 h= h0 + (findgen(nslice+1)-nslice/2)*Nz*cell_z/nslice
 ang=Nx*cell_z / h / sqrt(2.)
-;for i=0,nslice-1 do oplot,[xmin,xmax],[h[i],h[i]],th=2,col=190
+for i=0,nslice-1 do oplot,[xmin,xmax],[h[i],h[i]],th=2,col=190
 for i=0,nslice-1 do begin 
    x=findgen(na)/na*ang[i] -ang[i]/2.
 ;   oplot,x,y0+h[i],th=2,col=190
-   oplot,h[i]*sin(x),h[i]*cos(x),th=2,col=190
+;   oplot,h[i]*sin(x),h[i]*cos(x),th=2,col=190
+endfor
+ang=Nx*cell_z / h 
+for i=0,nslice-1 do oplot,[xmin,xmax],[h[i],h[i]],th=2,col=190
+for i=0,nslice-1 do begin 
+   x=findgen(na)/na*ang[i] -ang[i]/2.
+;   oplot,x,y0+h[i],th=2,col=190
+;   oplot,h[i]*sin(x),h[i]*cos(x),th=2,col=190,li=2
 endfor
 oplot,[0,cos(mnt+!pi/2.)*hmax*2],[0,sin(mnt+!pi/2.)*hmax*2],th=3
 oplot,[0,cos(mxt+!pi/2.)*hmax*2],[0.,sin(mxt+!pi/2.)*hmax*2],th=3
@@ -55,6 +62,10 @@ zc=[0.9,1.3,1.8,1.8]
 nzc = [125.,75.,65.,75.] ;Nz du cube produit par cat_grid
 cell_g=[8, 8, 8, 16]
 
+zc=[0.5,0.9,1.3,1.8]
+nzc = [140., 125.,75.,65.] ;Nz du cube produit par cat_grid
+cell_g=[8, 8, 8, 8]
+
 ng = n_elements(zc)
 hg=dloscom(zc)
 h1=(dloscom(zc)-nzc/2.*cell_g)
@@ -64,26 +75,27 @@ for i=0,ng-1 do print,'redshift min/max = ',zfrlos(h1[i],10),zfrlos(h2[i],10)
 Nx_parfait = h1* 2*open_ang/8.;/sqrt(2)
 print,'Nx_parfait =',Nx_parfait
 
-nxc=[450,875]
-nxc=[640,900,1024,500]
+nxc=[350,640,900,1024]
+nxc=[350,640,900,1200]
 print,'Nx used =',nxc
 print,'Hgrids = ',hg
 
 coeff=[1.,sqrt(2.)]
-mycol=[50,90,250,150]
+mycol=[50,95,210,250]
+
 for ia=0,1 do begin
    mynxc = nxc * coeff[ia]
    ang1=myNxc*cell_g / h1 / sqrt(2.)
    ang2=myNxc*cell_g / h2 / sqrt(2.)
    for i=0,ng-1 do begin
       x1=findgen(na)/na*ang1[i] -ang1[i]/2.
-      oplot,cos(x1+!pi/2.)*h1[i],sin(x1+!pi/2.)*h1[i],col=mycol[i],th=5,li=ia
+      oplot,cos(x1+!pi/2.)*h1[i],sin(x1+!pi/2.)*h1[i],col=mycol[i],th=5,li=ia*2
      
       x2=findgen(na)/na*ang2[i] -ang2[i]/2.
-      oplot,cos(x2+!pi/2.)*h2[i],sin(x2+!pi/2.)*h2[i],col=mycol[i],th=5,li=ia
+      oplot,cos(x2+!pi/2.)*h2[i],sin(x2+!pi/2.)*h2[i],col=mycol[i],th=5,li=ia*2
      
-      oplot,[cos(x1[0]+!pi/2.)*h1[i],cos(x2[0]+!pi/2.)*h2[i]],[sin(x1[0]+!pi/2.)*h1[i],sin(x2[0]+!pi/2.)*h2[i]],col=mycol[i],th=5,li=ia
-      oplot,[cos(x1[na-1]+!pi/2.)*h1[i],cos(x2[na-1]+!pi/2.)*h2[i]],[sin(x1[na-1]+!pi/2.)*h1[i],sin(x2[na-1]+!pi/2.)*h2[i]],col=mycol[i],th=5,li=ia
+      oplot,[cos(x1[0]+!pi/2.)*h1[i],cos(x2[0]+!pi/2.)*h2[i]],[sin(x1[0]+!pi/2.)*h1[i],sin(x2[0]+!pi/2.)*h2[i]],col=mycol[i],th=5,li=ia*2
+      oplot,[cos(x1[na-1]+!pi/2.)*h1[i],cos(x2[na-1]+!pi/2.)*h2[i]],[sin(x1[na-1]+!pi/2.)*h1[i],sin(x2[na-1]+!pi/2.)*h2[i]],col=mycol[i],th=5,li=ia*2
 
    endfor
 endfor

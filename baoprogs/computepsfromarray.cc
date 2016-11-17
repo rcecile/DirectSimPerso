@@ -512,9 +512,8 @@ int main(int narg, char* arg[]) {
 	      cout <<"     Mean and Sigma of density fluctuations BEFORE ..."<<endl;
 	      double meanm, sigm;
 	      MeanSigma(dens, meanm, sigm);
-	      cout <<"     Mean="<< meanm <<", Sigma="<< sigm <<", Variance="<< sigm*sigm <<endl;
+	      cout <<"    Mean="<< meanm <<", Sigma="<< sigm <<", Variance="<< sigm*sigm <<endl;
 	      m2g.CleanNegativeMassCells();	      
-	      
 	      if(isSameSub) {
 		
 		cout <<"     Select same sub-array as galaxy catalog, ";
