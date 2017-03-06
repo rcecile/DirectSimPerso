@@ -9,33 +9,47 @@
 # for noBAO case, just change the dir & dirg paths & nCase
 
 function do_err {
-     command="${code1}addGausszerr -C ${dir}cat_zOrd$3_$1.fits -E $2 -c ZS -d 0.09 -O ${dir}cat_zOrd$3_$1_err$2.fits"
+     command="${code1}addGausszerr -C ${dir}cat_zOrd$3_$1.fits -E $2 -c ZS -d 0.15 -O ${dir}cat_zOrd$3_$1_err$2.fits"
      $command
 
-     command="${code1}addGausszerr -C ${dir}cat_zOrd$3_$1.fits -c ZS -p $pdf  -d 0.09 -O ${dir}cat_zOrd$3_$1_errP.fits"
+     command="${code1}addGausszerr -C ${dir}cat_zOrd$3_$1.fits -c ZS -p $pdf  -d 0.15 -O ${dir}cat_zOrd$3_$1_errP.fits"
      $command
 
-     command="${code1}addGausszerr -C ${dir}cat_zOrd$3_$1.fits -c ZS -p $podds -d 0.09 -O ${dir}cat_zOrd$3_$1_errPpodds.fits"
+     command="${code1}addGausszerr -C ${dir}cat_zOrd$3_$1.fits -c ZS -p ${bdt9} -d 0.15 -O ${dir}cat_zOrd$3_$1_errPBDT9.fits"
      $command
 
-     command="${code1}addGausszerr -C ${dir}cat_zOrd$3_$1.fits -c ZS -p $bdt -d 0.09 -O ${dir}cat_zOrd$3_$1_errPBDT.fits"
+     command="${code1}addGausszerr -C ${dir}cat_zOrd$3_$1.fits -c ZS -p ${bdt8} -d 0.15 -O ${dir}cat_zOrd$3_$1_errPBDT8.fits"
      $command
 }
 
-dir="/sps/lsst/data/rcecile/Planck_BAO/"
-dirg="/sps/lsst/data/rcecile/Planck_BAO_grids/"
-nCase=1
+function do_err_noise {
+     command="${code1}addGausszerr -C ${dir}cat_zOrd$3_$1.fits -S -E $2 -c ZS -d 0.15 -O ${dir}cat_zOrdSN$3_$1_err$2.fits"
+     $command
 
-#dir="/sps/lsst/data/rcecile/Planck_noBAO/"
-#dirg="/sps/lsst/data/rcecile/Planck_noBAO_grids/"
-#nCase=10
+     command="${code1}addGausszerr -C ${dir}cat_zOrd$3_$1.fits -S -c ZS -p $pdf  -d 0.15 -O ${dir}cat_zOrdSN$3_$1_errP.fits"
+     $command
+
+     command="${code1}addGausszerr -C ${dir}cat_zOrd$3_$1.fits -S -c ZS -p ${bdt9} -d 0.15 -O ${dir}cat_zOrdSN$3_$1_errPBDT9.fits"
+     $command
+
+     command="${code1}addGausszerr -C ${dir}cat_zOrd$3_$1.fits -S -c ZS -p ${bdt8} -d 0.15 -O ${dir}cat_zOrdSN$3_$1_errPBDT8.fits"
+     $command
+}
+
+#dir="/sps/lsst/data/rcecile/Planck_BAO/"
+#dirg="/sps/lsst/data/rcecile/Planck_BAO_grids/"
+#nCase=1
+
+dir="/sps/lsst/data/rcecile/Planck_noBAO/"
+dirg="/sps/lsst/data/rcecile/Planck_noBAO_grids/"
+nCase=10
 
 code1="/sps/lsst/dev/rcecile/BAOProgs/DirectSimPerso/exe/"
-#pdf="/sps/lsst/PhotozBAO/ricol/SIMU50deg/newgrid_absmag/pdfz"
-#podds="/sps/lsst/PhotozBAO/ricol/SIMU50deg/newgrid_absmag/pdfz_podds"
+
 pdf="/sps/lsst/PhotozBAO/ricol/SIMU50deg/grid_absmag_atm/pdfz"
-podds="/sps/lsst/PhotozBAO/ricol/SIMU50deg/grid_absmag_atm/pdfz_podds"
-bdt="/sps/lsst/PhotozBAO/ricol/SIMU50deg/grid_absmag_atm/pdfz_bdt"
+bdt8="/sps/lsst/PhotozBAO/ricol/SIMU50deg/grid_absmag_atm/pdfz_bdt_0p8"
+bdt9="/sps/lsst/PhotozBAO/ricol/SIMU50deg/grid_absmag_atm/pdfz_bdt_0p9"
+
 
 Nslicez=100
  
@@ -50,7 +64,7 @@ do
 	then
 	    simu="do_err Slice$i0 0.03"	
 	else
-	    simu="do_err Slice$i0 0.03 _$j"	
+	    simu="do_err_noise Slice$i0 0.03 _$j"	
 	fi
 
 	echo "Simu lancee : " $simu

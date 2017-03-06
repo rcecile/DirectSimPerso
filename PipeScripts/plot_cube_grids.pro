@@ -31,7 +31,7 @@ mxt = max(theta)
 
 na=1000
 
-plot,[0,0],[0,0],/xs,/ys,th=3,xra=[0,5300],yra=[0,6100],/nodata,xtit='Distance [comoving Mpc]',ytit='Distance [comoving Mpc]',xmar=[8,1]
+plot,[0,0],[0,0],/xs,/ys,th=3,xra=[0,5300],yra=[0,6100],/nodata,xtit='Distance along the x Euclidian axis [comoving Mpc]',ytit='Distance along the z Euclidian axis [comoving Mpc]',xmar=[8,1],ymar=[3.5,.5]
 
 nslice=70
 h= h0 + (findgen(nslice+1)-nslice/2)*Nz*cell_z/nslice
@@ -52,18 +52,15 @@ endfor
 oplot,[0,cos(mnt+!pi/2.)*hmax*2],[0,sin(mnt+!pi/2.)*hmax*2],th=3
 oplot,[0,cos(mxt+!pi/2.)*hmax*2],[0.,sin(mxt+!pi/2.)*hmax*2],th=3
 
-zc=[0.7,1.4]
-nzc=[200,200]
 
-zc=[0.9,1.6]
-nzc = [125.,150.] ;Nz du cube produit par cat_grid
+;zc=[0.5,0.9,1.3,1.8]
+;nzc = [140., 125.,75.,65.] ;Nz du cube produit par cat_grid
+;cell_g=[8, 8, 8, 8]
 
-zc=[0.9,1.3,1.8,1.8]
-nzc = [125.,75.,65.,75.] ;Nz du cube produit par cat_grid
-cell_g=[8, 8, 8, 16]
-
-zc=[0.5,0.9,1.3,1.8]
-nzc = [140., 125.,75.,65.] ;Nz du cube produit par cat_grid
+zc=[0.5,0.9,1.5]
+nzc = [140., 125.,150.] ;Nz du cube produit par cat_grid
+nzc = [100., 125.,150.] ;Nz du cube produit par cat_grid
+nzc = [125., 125.,175.] ;Nz du cube produit par cat_grid
 cell_g=[8, 8, 8, 8]
 
 ng = n_elements(zc)
@@ -72,35 +69,60 @@ h1=(dloscom(zc)-nzc/2.*cell_g)
 h2=(dloscom(zc)+nzc/2.*cell_g)
 for i=0,ng-1 do print,'redshift min/max = ',zfrlos(h1[i],10),zfrlos(h2[i],10)
 
-Nx_parfait = h1* 2*open_ang/8.;/sqrt(2)
+Nx_parfait = h1* 2*open_ang/8.
+Nx_parfait = h1*open_ang / cell_z
 print,'Nx_parfait =',Nx_parfait
 
-nxc=[350,640,900,1024]
-nxc=[350,640,900,1200]
+nxc=[160,300,225]
+nxc=[120,225,320]
 print,'Nx used =',nxc
 print,'Hgrids = ',hg
 
-coeff=[1.,sqrt(2.)]
-mycol=[50,95,210,250]
+mycol=[80,205,240]
+xx=findgen(na)/na*open_ang*2 -open_ang
 
-for ia=0,1 do begin
-   mynxc = nxc * coeff[ia]
-   ang1=myNxc*cell_g / h1 / sqrt(2.)
-   ang2=myNxc*cell_g / h2 / sqrt(2.)
-   for i=0,ng-1 do begin
-      x1=findgen(na)/na*ang1[i] -ang1[i]/2.
-      oplot,cos(x1+!pi/2.)*h1[i],sin(x1+!pi/2.)*h1[i],col=mycol[i],th=5,li=ia*2
-     
-      x2=findgen(na)/na*ang2[i] -ang2[i]/2.
-      oplot,cos(x2+!pi/2.)*h2[i],sin(x2+!pi/2.)*h2[i],col=mycol[i],th=5,li=ia*2
-     
-      oplot,[cos(x1[0]+!pi/2.)*h1[i],cos(x2[0]+!pi/2.)*h2[i]],[sin(x1[0]+!pi/2.)*h1[i],sin(x2[0]+!pi/2.)*h2[i]],col=mycol[i],th=5,li=ia*2
-      oplot,[cos(x1[na-1]+!pi/2.)*h1[i],cos(x2[na-1]+!pi/2.)*h2[i]],[sin(x1[na-1]+!pi/2.)*h1[i],sin(x2[na-1]+!pi/2.)*h2[i]],col=mycol[i],th=5,li=ia*2
+ang1=Nxc/2.*cell_g / h1       
+ang2=Nxc/2.*cell_g / h2  
+ang_rot = 40. *!pi/180.
+cosT = cos(ang_rot)
+sinT = sin(ang_rot)
+      
+for i=0,ng-1 do begin
 
-   endfor
+   x = findgen(nxc[i]/2.)*cell_g[i]
+   xtot = findgen(nxc[i])*cell_g[i] - nxc[i]/2.*cell_g[i]
+   y1 = x*0. + h1[i]
+   y2 = x*0. + h2[i]
+   y1tot = xtot*0. + h1[i]
+   y2tot = xtot*0. + h2[i]
+
+   y = findgen(nzc[i])*cell_g[i] -nzc[i]/2.*cell_g[i] + dloscom(zc[i])
+   x1 = y*0. -nxc[i]/2.*cell_g[i]
+   x2 = y*0. +nxc[i]/2.*cell_g[i]
+
+   oplot,x,y1,th=5,col=mycol[i]
+   oplot,x,y2,th=5,col=mycol[i]
+   oplot,x2,y,th=5,col=mycol[i]
+
+; trace 2ieme grille tournée de 40 degrés
+   oplot,xtot*cosT+y1tot*sinT,-xtot*sinT + y1tot*cosT,th=5,col=mycol[i]
+   oplot,xtot*cosT+y2tot*sinT,-xtot*sinT + y2tot*cosT,th=5,col=mycol[i]
+   oplot,x1*cosT+y*sinT,-x1*sinT + y*cosT,th=5,col=mycol[i]
+   oplot,x2*cosT+y*sinT,-x2*sinT + y*cosT,th=5,col=mycol[i]
+   
+   oplot,cos(xx+!pi/2.)*dloscom(zc[i]),sin(xx+!pi/2.)*dloscom(zc[i]),li=2,col=mycol[i],th=2
+   xyouts,x2[0]*cosT+y[0]*sinT,-x2[0]*sinT + y[0]*cosT-150,'redshift='+string(zc[i],format='(f4.2)'),col=mycol[i],charth=2
+   xyouts,x2[0]*cosT+y[0]*sinT,-x2[0]*sinT + y[0]*cosT-150,'redshift='+string(zc[i],format='(f4.2)')
+
 endfor
-pos = intarr(ng)+300
-xyouts,pos,hg,'z='+string(zc,format='(f4.2)')
+
+oplot,cos(xx+!pi/2.)*dloscom(0.2),sin(xx+!pi/2.)*dloscom(0.2),li=2,th=2
+
+oplot,cos(xx+!pi/2.)*dloscom(2.45),sin(xx+!pi/2.)*dloscom(2.45),li=2,th=2
+   
+
+xyouts,700,300,'redshift=0.2'
+xyouts,4000,4200,'redshift=2.45'
 ;xyouts,1800,700,'Comoving radial distance',ori=28
 
 print,'Volume (Gpc^3) = ',1.d*cell_g^3*nxc*nxc*nzc/1.e9
@@ -138,6 +160,8 @@ print,nxc^2 /4./!pi/h1^2
 print,4.*!pi*h1^2
 print,nxc^2
 
+print,dloscom(0.2)
+print,dloscom(2.45)
 
 stop
 

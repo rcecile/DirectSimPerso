@@ -512,8 +512,9 @@ void PowerSpec::WritePS(string fname, HProf& Pdata, r_4 Voldata, HProf& PSimlss,
 			r_8 Pnoise = Pnoiseh.operator()(i) *Voldata*(1+meandens)*(1+meandens)*(Pslss/Pslssf);
 			//			r_8 Pnoise_z = Pnoiseh_z.operator()(i) *Voldata*(1+meandens)*(1+meandens)*(Pslss/Pslssf);
 			//			r_8 Pnoise_xy = Pnoiseh_xy.operator()(i) *Voldata*(1+meandens)*(1+meandens)*(Pslss/Pslssf);
-			r_8 sigmaP  = (Pnorm - Pnoise) / kvals * sigma_factor;
-		
+			// ca c'est ce qu'on avait : r_8 sigmaP  = (Pnorm - Pnoise) / kvals * sigma_factor;
+			r_8 sigmaP  = (Pnorm + Pnoise) / kvals * sigma_factor;
+ 
 			r_8 nmode = 0;
 			r_8 nKeepMode = 0;
 			r_8 fracmod = 0;

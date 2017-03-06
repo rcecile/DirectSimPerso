@@ -1454,7 +1454,7 @@ double Mass2Gal::DrawMagType(GalFlxTypDist& gfd, double& type)
   
   int a1=0,  b1=5;    //early (1)
   int a2=6,  b2=25;   //late  (2)
-  int a3=31, b3=50;   //starburst (3)
+  int a3=26, b3=50;   //starburst (3)
   // separation at 25 : irregular are considered as starburst galaxies. It is pessimist for the goldencut, optmist for the BDT efficiency. It can be balanced by a BDT at 90% to recover a similar nb of galaxies. JSR/CR 
 
   //

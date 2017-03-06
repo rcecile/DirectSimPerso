@@ -276,7 +276,7 @@ int main(int narg, char *arg[]) {
     cout << "     Creating new catalog called "<< OutCat <<endl;
     FitsInOutFile swf(OutCat, FitsInOutFile::Fits_Create);	
     SwFitsDataTable gals(swf, 2048);
-    // swf2 is created but remains empty if delta_z < 100
+    // swf2 is created but remains empty if delta_z >= 100
     FitsInOutFile swf2(OutCat2, FitsInOutFile::Fits_Create);	
     SwFitsDataTable gals2(swf2, 2048);
 

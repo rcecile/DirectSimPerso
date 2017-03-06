@@ -1,9 +1,10 @@
-PRO plot_stat_zs_zp,doplot,isuff
+PRO plot_stat_zs_zp,doplot
 
-dir='/sps/lsst/data/rcecile/TJP_BAO/'
-suff = ['_errP','_errPpodds','_errPBDT','_err0.03']
+dir='/sps/lsst/data/rcecile/Planck_BAO/'
+suff = ['_errP','_errPBDT9','_errPBDT8']
+
 loadct,12
-lcol  = [35,135,120]
+lcol  = [35,135, 120]
 !p.charsize=1.5
 !p.thick=4
 
@@ -18,6 +19,7 @@ endif
 
 restore,dir+'histo_zs_zp'+suff[0]+'.sav'
 hp = all_hist
+print,'ok'
 restore,dir+'histo_zs_zp'+suff[1]+'.sav'
 hd = all_hist
 restore,dir+'histo_zs_zp'+suff[2]+'.sav'
@@ -43,15 +45,33 @@ for i=0,n_elements(z)-1 do fbdt_5[i] = total(hb[where( abs(z-z[i])/(1.+z[i]) le 
 for i=0,n_elements(z)-1 do fbdt_15[i] = total(hb[where( abs(z-z[i])/(1.+z[i]) gt 0.15),i])
 
 !p.multi=0
-plot,z,[0,100],/xs,/ys,xtit='Redshift',ytit='Fraction of galaxies [%]',yra=[0,100],/nodata,xra=[0.1,2.6],xma=[7,1],yma=[3,1]
+;plot,z,[0,100],/xs,/ys,xtit='Redshift',ytit='Fraction of galaxies [%]',yra=[0.1,100],/nodata,xra=[0.2,2.45],xma=[7,1],yma=[3,1],/ylog
+;oplot,z,fp_5/htot*100,col=lcol[0],li=0
+;oplot,z,fp_15/htot*100,col=lcol[0],li=2
+;oplot,z,fpodds_5/htot*100,col=lcol[1],li=0
+;oplot,z,fpodds_15/htot*100,col=lcol[1],li=2
+;oplot,z,fbdt_5/htot*100,col=lcol[2],li=0
+;oplot,z,fbdt_15/htot*100,col=lcol[2],li=2
+;mtext=['"good" photoZ','"good" photoZ, BDT 90% cut','"good" photoZ, BDT 80% cut','"catastrophic" photoZ','"catastrophic" photoZ, BDT 90% cut','"catastrophic" photoZ, BDT 80% cut']
+;legend,mtext,lin=[0,0,0,2,2,2],col=[lcol,lcol],box=1,/fill,/left,/bottom
+mtext=['photoZ','photoZ, BDT 90% cut','photoZ, BDT 80% cut']
+;legend,mtext,col=[lcol],box=1,/fill,/left,/center
+
+!p.multi=[0,1,2]
+plot,z,[0,100],/xs,/ys,ytit='"good"/total [%]',yra=[10,100],/nodata,xra=[0.2,2.45],xma=[8.5,1],yma=[0,0.5],xtickname=replicate(" ",10)
 oplot,z,fp_5/htot*100,col=lcol[0],li=0
-oplot,z,fp_15/htot*100,col=lcol[0],li=2
 oplot,z,fpodds_5/htot*100,col=lcol[1],li=0
-oplot,z,fpodds_15/htot*100,col=lcol[1],li=2
 oplot,z,fbdt_5/htot*100,col=lcol[2],li=0
-oplot,z,fbdt_15/htot*100,col=lcol[2],li=2
-mtext=['"good" photoZ','"good" photoZ, ODDS cut','"good" photoZ, BDT cut','"catastrophic" photoZ','"catastrophic" photoZ, ODDS cut','"catastrophic" photoZ, BDT cut']
-legend,mtext,lin=[0,0,0,2,2,2],col=[lcol,lcol],box=1,/fill,/left,/bottom
+legend,mtext,lin=0,col=[lcol],box=1,/fill,/left,/bottom
+
+plot,z,[0,100],/xs,/ys,xtit='Redshift',ytit='"catastrophic"/total [%]',yra=[0.01,40],/nodata,xra=[0.2,2.45],xma=[8.5,1],yma=[3,0],/yl
+oplot,z,fp_15/htot*100,col=lcol[0];,li=2
+oplot,z,fpodds_15/htot*100,col=lcol[1];,li=2
+oplot,z,fbdt_15/htot*100,col=lcol[2];,li=2
+;mtext=['"good" photoZ','"good" photoZ, BDT 90% cut','"good" photoZ, BDT 80% cut','"catastrophic" photoZ','"catastrophic" photoZ, BDT 90% cut','"catastrophic" photoZ, BDT 80% cut']
+;legend,mtext,lin=[0,0,0,2,2,2],col=[lcol,lcol],box=1,/fill,/left,/bottom
+mtext=['photoZ','photoZ, BDT 90% cut','photoZ, BDT 80% cut']
+;legend,mtext,col=[lcol],box=1,/fill,/left,/center
 
 if (doplot eq 1) then begin
    DEVICE, /CLOSE

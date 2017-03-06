@@ -1,18 +1,16 @@
-
 PRO proj_z_all,z,tot,nd,nErr,nz,snx,ngrids
 
-suff='_G2sfmean'
-err=['','_G0.03','_errP','_errPpodds']
+suff='cube_'
+err=['','_G0.03','_errP','_errPBDT9','_errPBDT8']
 print,err
 
-dirn='/sps/lsst/data/rcecile/TJP_noBAO_grids/'
+dirn='/sps/lsst/data/rcecile/Planck_noBAO_grids/'
 ngrids=10
-dir='/sps/lsst/data/rcecile/TJP_BAO_grids/'
-suff='G2_'
+dir='/sps/lsst/data/rcecile/Planck_BAO_grids/'
 
-D=['0.5','0.9','1.3','1.8'];,'1.8']
-snx=['350','640','900','1024'];,'500']
-nz=[140,125,75,65];,75]
+D=['0.5','0.9','1.5']
+snx=['160','300','225']
+nz=[140,125,150]
 
 nD = n_elements(D)
 nErr = n_elements(err)
@@ -21,7 +19,7 @@ z = dblarr(nD,max(nz))
 for id = 0,nD-1 do begin
    grid=dir+'grid_'+suff+strtrim(snx[id],2)+'_z'+D[id]+'.fits'
    print,grid
-   c=mrdfits(grid,3,h)
+   c=mrdfits(grid,6,h)
    if (n_elements(c) gt 1) then begin
      ; print,h
       z[id,0:nz[id]-1]=c[0,0,*]

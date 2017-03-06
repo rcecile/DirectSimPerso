@@ -41,6 +41,8 @@
 #include "fitkbaoscale.h"
 #include "chisqstats.h"
 
+#define PI 3.14159265359
+
 
 void usage(void);
 void usage(void) {
@@ -127,9 +129,11 @@ void usage(void) {
   cout << " -S : Error : random seed, must be set for simulations     "<<endl;
   cout << " -P : Nx,Ny,Nz,zref,ResXY,ResZ : Number of pixels, redshift of    "<<endl;
   cout << "      central pixel OR comobile distance of central pixel, pixel size in X,Y and Z - to specify how to grid   "<<endl;
+  cout << " -A : list of grid axis                                     "<<endl;
   cout << " -z : ZOCol,ZSCol: read OBSERVED redshifts from column named"<<endl;
   cout << "      ZOCol, SPECTRO redshifts from column named ZSCol      "<<endl;
   cout << " -m : nc : Mean density of random grid                      "<<endl;
+  cout << " -b : correct for bias (optionnal)                          "<<endl;
   cout << " -R : do not write the HDU 3 (redshift)                     "<<endl;
   cout << " -s : sf_file_root,all_z_file: Do selection function        "<<endl;
   cout << "      correction. If both args are given sf is calculated   "<<endl;
@@ -159,8 +163,10 @@ int main(int narg, char* arg[]) {
 	string ZSCol = "z"; // by default SPECTRO redshift col labelled "z" read in
 	double SkyArea = 999;	// Catalog covers angle radius SkyArea [999==full sky]
 	// SELECTION FUNCTION CORRECTION PARAMETERS
-	string sffiles;			  // list of selection function files
+	string sffiles, bfile;			  // list of selection function files
 	bool doSFCorr = false;	  // if true, apply selection function correction
+	bool doBiasCorr = false;	  // if true, apply bias correction
+	bool isZRadial = false; // if true, catalog z-dimension IS radial direction
 	string sf_file_root;      // file name root of selection function (to write/to read)
 	string all_z_file;		  // file name of catalog of ALL redshifts in sim
 	bool doSFCompute = false; // if true, do selection function computation here
@@ -176,11 +182,17 @@ int main(int narg, char* arg[]) {
 	bool DoDebug = false;
 	bool RandomSeed = false;
 	bool Write_Redshift = true;
+
+	// define a vector for multiple grid definition
+	vector<GridCenter> vgc;
+	vector<ProjGrid> vprojgrids;
+
+        double theta0, phi0;
 	
 	//--- decoding command line arguments 
 	cout << " ==== decoding command line arguments ===="<<endl;
 	char c;
-	while((c = getopt(narg,arg,"hrSRC:O:a:e:p:g:r:P:z:m:s:d:h:")) != -1) {
+	while((c = getopt(narg,arg,"hrSRC:O:a:e:p:g:r:P:A:z:m:b:s:d:h:")) != -1) {
 	  switch (c) {
 	  case 'C' :
 	    input_catalog = optarg;
@@ -198,6 +210,9 @@ int main(int narg, char* arg[]) {
 	    RandomSeed = true;
 	    cout << "Montecarlo mode"<< endl;
 	    break;
+	  case 'r' :
+	    isZRadial = true;
+	    break;
 	  case 'R' :
 	    Write_Redshift = false;
 	    cout << "Grid of redshift not written (HDU 3 of the output FITS file)"<< endl;
@@ -205,12 +220,20 @@ int main(int narg, char* arg[]) {
 	  case 'P' :
 	    sscanf(optarg,"%ld,%ld,%ld,%lf,%lf,%lf",&Nx,&Ny,&Nz,&zref,&R_XY,&R_Z);
 	    break; 
+	  case 'A' :
+	    sscanf(optarg,"%lf,%lf",&theta0,&phi0);
+	    vgc.push_back(GridCenter(3000., theta0/180.*PI, phi0/180.*PI));
+	    break; 
 	  case 'z' :
 	    zcols = optarg; // list of z column names to read in
 	    isZColGiven = true;
 	    break;
 	  case 'm' :
 	    sscanf(optarg,"%lf",&nc);
+	    break;
+	  case 'b' :
+	    doBiasCorr = true;
+	    bfile = optarg;
 	    break;
 	  case 's' :
 	    sffiles = optarg;
@@ -247,7 +270,7 @@ int main(int narg, char* arg[]) {
 		i++;
 		if (i!=results.end())// if any string given for FORCESZ, sets isForceZspec to true
 			{ isForceZspec=true; }*/
-		}
+	}
 		
   	// get up to two z column names
 	if (isZColGiven) {
@@ -272,6 +295,9 @@ int main(int narg, char* arg[]) {
 	cout << "     Galaxy catalog read from file "<< input_catalog;
 	cout << "     Reading redshifts from columns named "<< ZOCol <<" and ";
 	cout << ZSCol << endl;
+	if (isZRadial)
+		cout << "     Z dimension IS the radial direction"<<endl;
+	cout << endl;
 		
 	// SF CORRECTION
 	cout << "     *SELECTION FUNCTION DETAILS*"<<endl;
@@ -290,18 +316,10 @@ int main(int narg, char* arg[]) {
 		cout << "     Not correcting for selection function ";
 	cout <<endl;
 		
-	// GRID STUFF
-	
-	cout << "     *GRID DETAILS*"<<endl;
-	cout << "     Full grid defined by ...."<<endl;
-	cout << "     pixels : Nx,Ny,Nz = "<< Nx <<","<< Ny <<","<< Nz;
-	cout << ", along x or y of size "<< R_XY << " and along z of size "<< R_Z <<" Mpc, centered at z (Mpc or redshift)="<< zref <<endl;
-	cout << "     Mean density of random grid = "<< nc <<endl;
-	cout << endl;
 	
 	// OUTPUT FILES
 	cout << "     *OUTPUT DETAILS*"<<endl;
-	cout << "     Saving full arrays to filename "<< out_grids_name <<endl;
+	cout << "     Saving full arrays to filename with root ="<< out_grids_name <<endl;
 	if (DoDebug)
 		cout << "     Output root filename for debugging is "<< debug_out <<endl;
 	cout << endl;
@@ -380,17 +398,40 @@ int main(int narg, char* arg[]) {
 	cout << "Spectral index=" << su.Ns() << endl;
 	cout << endl;
 
+	double radial_distance;
 	if (zref > 10.) {
+	  radial_distance = zref;
 	  cout << "Position of central provided in comoving distance, not in redshift: "<<zref;
 	  double dref = zref;
 	  zref = su.RedshiftFrLOS( dref, 6);
 	  cout << "Mpc converted to redshift of "<<  zref <<endl;
+
+	} else {
+	  su.SetEmissionRedShift(zref);
+	  radial_distance = su.RadialCoordinateMpc(); 
 	}
 
+	// GRID STUFF
+	
+	cout << "     *GRID DETAILS*"<<endl;
+	cout << "     Full grid defined by ...."<<endl;
+	cout << "     pixels : Nx,Ny,Nz = "<< Nx <<","<< Ny <<","<< Nz;
+	cout << ", along x or y of size "<< R_XY << " and along z of size "<< R_Z <<" Mpc, centered at redshift="<< zref 
+	     << " with radial distance = "<< radial_distance << endl;
+	cout << "     Mean density of random grid = "<< nc <<endl;
+
+	cout << " Multiple grid definition , NGrids="<<vgc.size()<<endl;
+	for(size_t igg=0; igg<vgc.size(); igg++) {
+	  vgc[igg].r_center=radial_distance;
+	  GridDef gdef(Nx, Ny, Nz, R_XY, R_XY, R_Z, vgc[igg].r_center, vgc[igg].theta0, vgc[igg].phi0);
+	  vprojgrids.push_back(ProjGrid(gdef));
+	  cout << " Grid["<<igg<<"] : "<<vgc[igg].theta0 << "," << vgc[igg].phi0<<endl;
+	}
+	
+	cout << endl;
 	
 	// Initialize grid data class
 	RandomGenerator rg; // need this for cat2grid
-	FitsInOutFile fos(out_grids_name, FitsInOutFile::Fits_Create);
 	if (RandomSeed) {
 	  rg.AutoInit(0);
 	  cout << "Seed automatically generated" << endl;
@@ -399,21 +440,22 @@ int main(int narg, char* arg[]) {
 	  rg.SetSeed(seed);
 	}
 
-	Cat2Grid cat(galaxy_catalog, su, rg, fos, ZOCol, ZSCol, 0, true, input_catalog);
+	string sigd = static_cast<ostringstream*>( &(ostringstream() << vprojgrids.size()) )->str();
+	FitsInOutFile fos(out_grids_name+"_"+sigd+"cubes.fits", FitsInOutFile::Fits_Create);
+	Cat2Grid cat(galaxy_catalog, su, rg, fos, ZOCol, ZSCol, isZRadial, 0, true, input_catalog);
+	if (vprojgrids.size()>0)  cat.SetGrids(vprojgrids);  // On travaille avec un ensemble de grilles
+	cout << "CAUTION: UP TO NOW, NO CHECK THAT GRIDS DO NOT OVERLAPP AND ARE FULLY FILLED"<< endl;
+
 	if (DoDebug)
 		cat.SetDebugOutroot(debug_out);
 	cout << "    The number of gals in whole simulation is "<< cat.ReturnNgAll() <<endl;
 	
 	if (PzerrReds > 0.)  cat.SetGaussErrRedshift(PzerrReds,zref,RandomSeed);
+	if (doBiasCorr) cat.SetBiasCorr(bfile);
 
 	// Compute min and max coordinates and min max redshift
 	// only actually really need to do this if correcting for selection function
 	cout <<"1/ Find minimum and maximum galaxy cartesian coordinates"<<endl;
-	double maxdL; // luminosity distance of largest z in catalog: spec-z 
-	if (Nx == 0)  {
-	  maxdL = cat.FindMinMaxCoords();
-	  cout << "    Maximum luminosity distance = "<< maxdL <<endl;
-	} else cout << "Nothing to do : grid provided"  <<endl;
 
 	res.Update();
 	cout << " Computed FindMinMaxCoords()"<<endl;
@@ -427,8 +469,9 @@ int main(int narg, char* arg[]) {
 	cout <<"2/ Lay grid over simulation"<<endl;
 	cout <<"    Input cell size in x,y is "<< R_XY <<endl;
 	cout <<"    Input cell size in z is "<< R_Z <<endl;
-	cat.SetGrid(Nx,Ny,Nz,R_XY, R_Z,zref);
+	cat.SetGrid(Nx,Ny,Nz,R_Z,zref);
 	
+	cout <<"No check that grids are embedded in the cone filled with galaxies: do it a posteriori"<<endl;
 	
 	// Selection function
 	cout <<"3/ Selection function .... ";
@@ -470,6 +513,22 @@ int main(int narg, char* arg[]) {
 	      cout <<"    Selection function file has already been computed";
 	      cout <<" and will be read from file " << sffile.c_str() <<endl;
 	    }
+
+	    if (doBiasCorr) {
+	      ifstream inpb;
+	      inpb.open(bfile.c_str(), ifstream::in);
+	      inpb.close();
+	      if(inpb.fail()) { 
+		// bfile does NOT exist
+		string emsg = "ERROR! Bias function in file " + bfile;
+	      emsg += " does not exist";
+	      throw ParmError(emsg);
+	    }
+	    else {
+	      // bfile DOES exist
+	      cout <<"    Bias file will be read from file " << bfile.c_str() <<endl;
+	    }
+	    }
 	  }
 	  
 	  // 3) set selection function in Cat2Grid
@@ -482,12 +541,19 @@ int main(int narg, char* arg[]) {
 	else 
 	  cout <<"    .... not being correcting for "<<endl;
 	cout<<endl<<endl;
+
+
+	// Set bias if needed
+	if (doBiasCorr) {
+	  ComputedSelFunc* bp = new ComputedSelFunc(bfile); // similar construction selection fonction / bias function
+	  cat.SetBiasFunction(*bp);
+
+	}
 	
 	// Project galaxies onto the grid
 	cout << "4/ Project galaxies onto grid & write to the file ..."<<endl;
 	cat.GalGrid(SkyArea);
 	cout <<"    - zero size the arrays to save space"<<endl;
-	cat.ZeroGalArrays();
 	cout << endl;
 	
 	  
@@ -500,7 +566,7 @@ int main(int narg, char* arg[]) {
 	// Make random galaxy grid with mean density 
 	cout << "5/ Make random catalog galaxy grid ..."<<endl;
 	cout <<"    Mean density of random grid = "<< nc <<endl;
-	cat.RandomGrid(nc, Write_Redshift);
+	cat.RandomGrid(nc, Write_Redshift,RandomSeed);
 	res.Update();
 	cout << "    Memory size increase (KB):" << res.getDeltaMemorySize() << endl;
 	cout << "    Resource usage info : \n" << res << endl;

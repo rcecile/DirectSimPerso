@@ -38,7 +38,7 @@ LIBH := $(MYCL)/cosmocalcs.h $(MYCL)/geneutils.h $(MYCL)/gftdist.h \
 $(MYCL)/schechter.h $(MYCL)/sinterp.h $(MYCL)/simdata.h $(MYCL)/reddening.h \
 $(MYCL)/sedfilter.h $(MYCL)/sedpca.h $(MYCL)/genefluct3d.h  $(MYCL)/pkspectrum.h \
 $(MYCL)/mass2gal.h $(MYCL)/powerspec.h $(MYCL)/matrix.h $(MYCL)/igm.h \
-$(MYCL)/hpoly.h $(MYCL)/shapelets.h $(MYCL)/em.h $(MYCL)/cat2grid.h \
+$(MYCL)/hpoly.h $(MYCL)/shapelets.h $(MYCL)/em.h $(MYCL)/cat2grid.h  $(MYCL)/projgrid.h \
 $(MYCL)/fitkbaoscale.h $(MYCL)/chisqstats.h \
 $(MYCL)/TAM.h $(MYCL)/TApparentMagnitude.h $(MYCL)/TDataCard.h $(MYCL)/TFilter.h $(MYCL)/TIGM.h \
 $(MYCL)/TReddening.h $(MYCL)/TBFilter.h $(MYCL)/TDistance.h $(MYCL)/TFlux.h \
@@ -71,12 +71,13 @@ all : progs tests bao
 progs : addIGMToSED analyzeBPZ baseSimulation calculateKcorrections cfhtColors \
 colorDistributions convertSEDS fitLSSTspectra lineOfSightLymanAlpha lineOfSightMagnitude \
 lsstPicklesLibrary lymanAlphaToDensity pcaTemplates photoZdist priorFitter \
-projectTemplates rdlss sdssElColors sdssPicklesLibrary simdensity  \
+rdlss sdssElColors sdssPicklesLibrary simdensity  \
 simulateAbsorberLinesOfSight simulateLSSTobs simulateLSSTobsFromTruth 
 
 tests : test2Dinterp testbasesim testEMalgorithm testErrors testgoodsmagsim \
 testKcorrColors testKcorrMethod testLF testLymanAlphaAbs testMadau testMeiksin \
-testSimReadKcorr testsimulateIGM testSimulation testTemplateFitting testGoldenInterp2D
+testSimReadKcorr testsimulateIGM testSimulation testTemplateFitting 
+# testGoldenInterp2D
 # testsimdensity 
 
 #bao : addGausszerr computepsfromarray fitkbao getpzconvf getsf grid_data \
@@ -134,8 +135,8 @@ photoZdist : $(EXE)/photoZdist
 priorFitter : $(EXE)/priorFitter
 	@echo 'makefile : priorFitter made'
 
-projectTemplates : $(EXE)/projectTemplates
-	@echo 'makefile : projectTemplates made'
+#projectTemplates : $(EXE)/projectTemplates
+#	@echo 'makefile : projectTemplates made'
 
 rdlss : $(EXE)/rdlss
 	@echo 'makefile : rdlss made'
@@ -192,8 +193,8 @@ subfromfull : $(EXE)/subfromfull
 test2Dinterp : $(EXE)/test2Dinterp 
 	@echo 'makefile :test2Dinterp made'
 
-testGoldenInterp2D : $(EXE)/testGoldenInterp2D 
-	@echo 'makefile :testGoldenInterp2D made'
+#testGoldenInterp2D : $(EXE)/testGoldenInterp2D 
+#	@echo 'makefile :testGoldenInterp2D made'
 	
 testbasesim : $(EXE)/testbasesim 
 	@echo 'makefile :testbasesim made'
@@ -412,15 +413,15 @@ $(OBJ)/priorFitter.o : $(PROGS)/priorFitter.cc $(LIBH)
 	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/priorFitter.o $(PROGS)/priorFitter.cc 
 	
 # PROJECT TEMPLATES
-$(EXE)/projectTemplates : $(OBJ)/projectTemplates.o $(LIBO) 
-	mkdir -p $(EXE)
-	mkdir -p $(ROOTOUT)
-	$(CXXLINK) -o $(EXE)/projectTemplates $(OBJ)/projectTemplates.o $(LIBO) \
-	$(SOPHYAEXTSLBLIST) $(MYLIB) $(ROOTLIB)
+#$(EXE)/projectTemplates : $(OBJ)/projectTemplates.o $(LIBO) 
+#	mkdir -p $(EXE)
+#	mkdir -p $(ROOTOUT)
+#	$(CXXLINK) -o $(EXE)/projectTemplates $(OBJ)/projectTemplates.o $(LIBO) \
+#	$(SOPHYAEXTSLBLIST) $(MYLIB) $(ROOTLIB)
 
-$(OBJ)/projectTemplates.o : $(PROGS)/projectTemplates.cc $(LIBH)  
-	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/projectTemplates.o $(PROGS)/projectTemplates.cc 
+#$(OBJ)/projectTemplates.o : $(PROGS)/projectTemplates.cc $(LIBH)  
+#	mkdir -p $(OBJ)
+#	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/projectTemplates.o $(PROGS)/projectTemplates.cc 
 
 # SIMULATE CATALOG OF BASIC GALAXY PROPERTIES FROM OVER-DENSITY GRID
 $(EXE)/rdlss : $(OBJ)/rdlss.o $(LIBO)
@@ -617,15 +618,15 @@ $(OBJ)/subfromfull.o : $(BAOPROGS)/subfromfull.cc $(LIBH)
 
 
 # TEST GOLDENCUT 2D INTERPOLATION
-$(EXE)/testGoldenInterp2D : $(OBJ)/testGoldenInterp2D.o $(LIBO) 
-	mkdir -p $(EXE)
-	mkdir -p $(TESTS)
-	$(CXXLINK) -o $(EXE)/testGoldenInterp2D $(OBJ)/testGoldenInterp2D.o $(LIBO) \
-	$(SOPHYAEXTSLBLIST) $(MYLIB) $(ROOTLIB)
+#$(EXE)/testGoldenInterp2D : $(OBJ)/testGoldenInterp2D.o $(LIBO) 
+#	mkdir -p $(EXE)
+#	mkdir -p $(TESTS)
+#	$(CXXLINK) -o $(EXE)/testGoldenInterp2D $(OBJ)/testGoldenInterp2D.o $(LIBO) \
+#	$(SOPHYAEXTSLBLIST) $(MYLIB) $(ROOTLIB)
 
-$(OBJ)/testGoldenInterp2D.o : $(PROGS)/testGoldenInterp2D.cc $(LIBH)  
-	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testGoldenInterp2D.o $(PROGS)/testGoldenInterp2D.cc
+#$(OBJ)/testGoldenInterp2D.o : $(PROGS)/testGoldenInterp2D.cc $(LIBH)  
+#	mkdir -p $(OBJ)
+#	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testGoldenInterp2D.o $(PROGS)/testGoldenInterp2D.cc
 
 
 # TEST 2D INTERPOLATION
@@ -829,7 +830,7 @@ $(EXE)/testsimdensity : $(OBJ)/testsimdensity.o $(LIBO)
 	$(SOPHYAEXTSLBLIST) $(MYLIB) $(ROOTLIB)
 
 $(OBJ)/testsimdensity.o : $(PROGS)/testsimdensity.cc $(LIBH)  
-	mkdir -p $(OBJ)/usr/include/c++/4.6/bits/stl_vector.h:142:9: error: invalid use of incomplete type ‘struct SOPHYA::FunRan’
+	mkdir -p $(OBJ)/usr/include/c++/4.6/bits/stl_vector.h:142:9: error: invalid use of incomplete type ???struct SOPHYA::FunRan???
 
 	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testsimdensity.o $(PROGS)/testsimdensity.cc 
 

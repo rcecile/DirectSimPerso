@@ -1,6 +1,6 @@
 #!/bin/bash 
 #$ -l sps=1
-#$ -o /sps/lsst/data/rcecile/TJP_BAO_grids/output_grid
+#$ -o /sps/lsst/data/rcecile/Planck_BAO_grids/output_grid_5cubes_SN
 #$ -M rcecile@in2p3.fr
 #$ -m eas
 #$ -q long
@@ -8,64 +8,56 @@
 
 # for noBAO case, just change the dir & dirg paths & nCase
 
-
  function do_big_base {
      echo "==========================================================================="
-     echo "==========================================================================="
-     command="${code1}grid_data -C $4 -s ${dirsf}SelFunc_speczmean -P $1,$1,$3,$2,$cell,$cell -z ZS,ZS -O ${dirg}grid_G2$5_$1_z$2.fits"
-
-     echo "I launch " $command
+     command="${code1}grid_data -C $4 -s ${dirsf}SelFunc_speczmean -P $1,$1,$3,$2,$cell,$cell -S -A 0.,0. -A 40.,0. -A 40.,90. -A 40.,180. -A 40.,270. -z ZS,ZS -O ${dirg}grids_SN$5_$1_z$2"
      $command
  }
 
  function do_big_err {
      echo "==========================================================================="
-     echo "==========================================================================="
-     command="${code1}grid_data -C $4 -s ${dirsf}SelFunc_gaussmean -R -P $1,$1,$3,$2,$cell,$cell -z ZG,ZS -O ${dirg}grid_G2$6_$1_z$2_G$5.fits"
-     echo "I launch " $command
+     command="${code1}grid_data -C $4 -s ${dirsf}SelFunc_gaussmean -R -P $1,$1,$3,$2,$cell,$cell -S -A 0.,0. -A 40.,0. -A 40.,90. -A 40.,180. -A 40.,270. -z ZG,ZS -O ${dirg}grids_SN$6_$1_z$2_err$5"
      $command
 }
 
  function do_big_perr {
      echo "==========================================================================="
-     echo "==========================================================================="
-     command="${code1}grid_data -C $4 -s ${dirsf}SelFunc_photzmean -R -P $1,$1,$3,$2,$cell,$cell -z ZP,ZS -O ${dirg}grid_G2$7_$1_z$2_errP.fits"
- #    $command
+     command="${code1}grid_data -C $4 -s ${dirsf}SelFunc_photzmean -R -P $1,$1,$3,$2,$cell,$cell -S -A 0.,0. -A 40.,0. -A 40.,90. -A 40.,180. -A 40.,270. -z ZP,ZS -O ${dirg}grids_SN$7_$1_z$2_errP"
+     $command
 
-     command="${code1}grid_data -C $5 -s ${dirsf}SelFunc_poddsmean -R -P $1,$1,$3,$2,$cell,$cell -z ZP,ZS -O ${dirg}grid_G2$7_$1_z$2_errPpodds.fits"
-  #   $command
+     command="${code1}grid_data -C $5 -s ${dirsf}SelFunc_pbdt9mean -R -P $1,$1,$3,$2,$cell,$cell -S -A 0.,0. -A 40.,0. -A 40.,90. -A 40.,180. -A 40.,270. -z ZP,ZS -O ${dirg}grids_SN$7_$1_z$2_errPBDT9"
+     $command
 
-
-     command="${code1}grid_data -C $6 -s ${dirsf}SelFunc_pbdtmean -R -P $1,$1,$3,$2,$cell,$cell -z ZP,ZS -O ${dirg}grid_G2$7_$1_z$2_errPBDT.fits"
+     command="${code1}grid_data -C $6 -s ${dirsf}SelFunc_pbdt8mean -R -P $1,$1,$3,$2,$cell,$cell -S -A 0.,0. -A 40.,0. -A 40.,90. -A 40.,180. -A 40.,270. -z ZP,ZS -O ${dirg}grids_SN$7_$1_z$2_errPBDT8"
      $command
 
 }
- 
-#dir="/sps/lsst/data/rcecile/TJP_BAO/"
-#dirg="/sps/lsst/data/rcecile/TJP_BAO_grids/"
+
+#dir="/sps/lsst/data/rcecile/Planck_BAO/"
+#dirg="/sps/lsst/data/rcecile/Planck_BAO_grids/"
 #nCase=1
  
-dir="/sps/lsst/data/rcecile/TJP_noBAO/"
-dirg="/sps/lsst/data/rcecile/TJP_noBAO_grids/"
+dir="/sps/lsst/data/rcecile/Planck_noBAO/"
+dirg="/sps/lsst/data/rcecile/Planck_noBAO_grids/"
 nCase=10
 
-dirsf="/sps/lsst/data/rcecile/TJP_BAO_grids/"
+dirsf="/sps/lsst/data/rcecile/Planck_BAO_grids/"
 code1="/sps/lsst/dev/rcecile/BAOProgs/DirectSimPerso/exe/"     
-dirgref="/sps/lsst/data/rcecile/PaperBAO_cell8_grids/"
 
-z0=(0.5 0.9 1.3 1.8 1.8)
-Nx_tot_err=(350 640 900 1024 500)
-Nz_tot=(140 125 75 65 75)
-cell_tot=(8 8 8 8 16)
+z0=(0.5 0.9 1.5)
+Nx_tot_err=(120 225 320)
+Nz_tot=(125 125 175)
 
-i_mid=(18 33 44 55 55)
+cell_tot=(8 8 8 8)
 
+i_mid=(16 29 49)
 
 ########## without error
-i_min=(11 26 40 52 48)
-i_max=(26 40 49 60 64)
 
-j=90
+i_min=(5 16 29)
+i_max=(37 65 99)
+
+j=0
 while [ ${j} -lt  ${nCase} ]
 do
     if [ ${nCase} -le  1 ]
@@ -75,17 +67,17 @@ do
 	sj=_$j
     fi
     ################ grid choice ###########
-    for i in 0 1 2 3
+    for i in 0 1 2
     ########################################
     do
 	cell=$((${cell_tot[i]}))
 
 	i0=$((${i_mid[i]}))
-	obs_list=${dir}cat_G2${sj}_Slice${i0}.fits
+	obs_list=${dir}cat_zOrd${sj}_Slice${i0}.fits
 	i1=$(($i0 -1 ))
 	while [ ${i1} -ge  ${i_min[i]} ]
 	do
-	    obs=${dir}cat_G2${sj}_Slice${i1}.fits
+	    obs=${dir}cat_zOrd${sj}_Slice${i1}.fits
 	    obs_list=${obs_list},$obs
 	    (( i1-- ))
 	done
@@ -93,7 +85,7 @@ do
 	i1=$(($i0 +1 ))
 	while [ ${i1} -le  ${i_max[i]} ]
 	do
-	    obs=${dir}cat_G2${sj}_Slice${i1}.fits
+	    obs=${dir}cat_zOrd${sj}_Slice${i1}.fits
 	    obs_list=${obs_list},$obs
 	    (( i1++ ))
 	done
@@ -108,8 +100,8 @@ done
 ########## with error 0.03
 err=0.03
 
-i_min=(6 21 35 47 42)
-i_max=(31 45 54 64 69)
+i_min=(3 8 19)
+i_max=(48 80 99)
 
 j=0
 while [ ${j} -lt  ${nCase} ]
@@ -121,25 +113,25 @@ do
 	sj=_$j
     fi
     ################ grid choice ###########
-    for i in 0 1 2 3
+    for i in 0 1 2
     ########################################
     do
 	cell=$((${cell_tot[i]}))
 	i0=$((${i_mid[i]}))
-	obs_list=${dir}cat_G2${sj}_Slice${i0}_err${err}.fits
-	obs_list1=${dir}cat_G2${sj}_Slice${i0}_errP.fits
-	obs_list2=${dir}cat_G2${sj}_Slice${i0}_errPpodds.fits
-	obs_list3=${dir}cat_G2${sj}_Slice${i0}_errPBDT.fits
+	obs_list=${dir}cat_zOrd${sj}_Slice${i0}_err${err}.fits
+	obs_list1=${dir}cat_zOrd${sj}_Slice${i0}_errP.fits
+	obs_list2=${dir}cat_zOrd${sj}_Slice${i0}_errPBDT9.fits
+	obs_list3=${dir}cat_zOrd${sj}_Slice${i0}_errPBDT8.fits
 	i1=$(($i0 -1 ))
 	while [ ${i1} -ge  ${i_min[i]} ]
 	do
-	    obs=${dir}cat_G2${sj}_Slice${i1}_err${err}.fits
+	    obs=${dir}cat_zOrd${sj}_Slice${i1}_err${err}.fits
 	    obs_list=${obs_list},$obs
-	    obs=${dir}cat_G2${sj}_Slice${i1}_errP.fits
+	    obs=${dir}cat_zOrd${sj}_Slice${i1}_errP.fits
 	    obs_list1=${obs_list1},$obs
-	    obs=${dir}cat_G2${sj}_Slice${i1}_errPpodds.fits
+	    obs=${dir}cat_zOrd${sj}_Slice${i1}_errPBDT9.fits
 	    obs_list2=${obs_list2},$obs
-	    obs=${dir}cat_G2${sj}_Slice${i1}_errPBDT.fits
+	    obs=${dir}cat_zOrd${sj}_Slice${i1}_errPBDT8.fits
 	    obs_list3=${obs_list3},$obs
 	    (( i1-- ))
 	done
@@ -147,20 +139,20 @@ do
 	i1=$(($i0 +1 ))
 	while [ ${i1} -le  ${i_max[i]} ]
 	do
-	    obs=${dir}cat_G2${sj}_Slice${i1}_err${err}.fits
+	    obs=${dir}cat_zOrd${sj}_Slice${i1}_err${err}.fits
 	    obs_list=${obs_list},$obs
-	    obs=${dir}cat_G2${sj}_Slice${i1}_errP.fits
+	    obs=${dir}cat_zOrd${sj}_Slice${i1}_errP.fits
 	    obs_list1=${obs_list1},$obs
-	    obs=${dir}cat_G2${sj}_Slice${i1}_errPpodds.fits
+	    obs=${dir}cat_zOrd${sj}_Slice${i1}_errPBDT9.fits
 	    obs_list2=${obs_list2},$obs
-	    obs=${dir}cat_G2${sj}_Slice${i1}_errPBDT.fits
+	    obs=${dir}cat_zOrd${sj}_Slice${i1}_errPBDT8.fits
 	    obs_list3=${obs_list3},$obs
 	    (( i1++ ))
 	done
-	obs_list=${obs_list},${dir}cat_G2${sj}_AllSlice_err${err}_cataLT10.fits
-	obs_list1=${obs_list1},${dir}cat_G2${sj}_AllSlice_errP_cataLT10.fits
-	obs_list2=${obs_list2},${dir}cat_G2${sj}_AllSlice_errPpodds_cataLT10.fits
-	obs_list3=${obs_list3},${dir}cat_G2${sj}_AllSlice_errPBDT_cataLT10.fits
+	obs_list=${obs_list},${dir}cat_gold${sj}_AllSlice_err${err}_cataLT10.fits
+	obs_list1=${obs_list1},${dir}cat_gold${sj}_AllSlice_errP_cataLT10.fits
+	obs_list2=${obs_list2},${dir}cat_gold${sj}_AllSlice_errPBDT9_cataLT10.fits
+	obs_list3=${obs_list3},${dir}cat_gold${sj}_AllSlice_errPBDT8_cataLT10.fits
 	
 	simu="do_big_err ${Nx_tot_err[i]}  ${z0[i]} ${Nz_tot[i]} $obs_list $err ${sj}"
 	$simu

@@ -6,13 +6,12 @@ PRO cut_cube,do_cut,suff
 
 Nz_tot = 700 
 dlref = 3200
-n=70
+n=100
 cell=8
 
 dir='/sps/lsst/data/rcecile/'
 ;if (strlen(suff) eq 0) then dir = dir+"TJP_BAO/" else  dir = dir+"TJP_noBAO/"
-;if (strlen(suff) eq 0) then dir = dir+"Planck_BAO/" else  dir = dir+"Planck_noBAO/"
-if (strlen(suff) eq 0) then dir = dir+"toy_cube/" 
+if (strlen(suff) eq 0) then dir = dir+"Planck_BAO/" else  dir = dir+"Planck_noBAO/"
 print,dir
 
 if (do_cut eq 1) then begin

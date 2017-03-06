@@ -236,7 +236,8 @@ int main(int narg, char *arg[])	{
 		RandomGenerator rg;
 		string tmp="tmptmp";
 		FitsInOutFile fos(tmp,FitsInOutFile::Fits_Create);
-		Cat2Grid cat(dt, su, rg, fos, ZOCol, ZSCol, 0., true, ObsCat);
+		bool RadialZ=false;
+		Cat2Grid cat(dt, su, rg, fos, ZOCol, ZSCol,RadialZ, 0., true, ObsCat);
 
 		string OutRoot = "tmp";
 		if (DoDebug)

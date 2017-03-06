@@ -6,6 +6,7 @@ Mode d'emploi : des parametres cosmo a l'echelle BAO
 
 2/ le couper en tranche (cut_cube.pro)
 3/ faire le catalogue simple + sel func (cat_simple.sh)
+3bis/ ordonner en redshift les galaxies (rangez.pro)
 4/ faire les erreurs (cat_err.sh)
 5/ concatener les redshifts cata (cata_concat.pro, mode qlogin)
 6/ calculer les fonctions de selection avec erreur (self_err.sh) 

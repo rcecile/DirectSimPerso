@@ -45,6 +45,8 @@
 #include "schechter.h"
 #include "selectfunc.h"
 #include "mass2gal.h"
+// add new class to loop over grids with rotation
+#include "projgrid.h"
 
 //Root
 #include "TFile.h"
@@ -168,6 +170,11 @@ class Cat2Grid
       @param zref  redshift of central pixel                                */
   void SetGrid(int_8 Nx, int_8 Ny, int_8 Nz, double R, double zref); 
 
+  /** Define a set of grids to which galaxies would be projected */
+  inline void SetGrids(vector<ProjGrid>& vgrids) { 
+    vgrids_=vgrids; 
+  }   
+
   /** Create a histogram of observed redshifts divided by true redshifts 
       and save it to a text file 
       @param SFTextFile    selection function is saved to file called [SFTextFile]_nofz.txt 
@@ -175,20 +182,24 @@ class Cat2Grid
       if >1 file to read files are named FullCat_#ofn.fits
       @param ZCol          name of column in FullCat containing true z
       @param Nfiles        number of files n to read in  */
-  void SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, string ZFCol="zs", string  ZSCol="zs",  string ZOCol="zp");
+  void SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, string ZFCol="zs", string  ZSCol="zs",  string ZOCol="zp", bool MakeFullHist=true);
         
   /** Set selection function                                                */
   inline void SetSelectionFunction(SelectionFunctionInterface& sf) { 
     selfuncp_=&sf; sfcompute_=true; 
     cout <<"    Set selection function"<<endl;};
+        
+  /** Set bias function                                                */
+  inline void SetBiasFunction(SelectionFunctionInterface& b) { 
+    biasp_=&b; 
+    cout <<"    Set bias function"<<endl;};
             
   /** Project the galaxy distribution into the grid, fill grid arrays
       @param SkyArea    angle covered by observation cone                   */
   void GalGrid(double SkyArea = 999);
         
-  /** Count up number of grid pixels that are within observed sky area as
-      defined by SkyArea variable                                           */
-  sa_size_t ObsPixels();
+  /** Check if all pixels are seen. Error if not                         */
+  void ObsPixels();
         
   /** Convert row from catalog data table into a GalRecord                  */
   void Row2Record(DataTableRow& rowin, GalRecord& rec);
@@ -196,6 +207,15 @@ class Cat2Grid
   /** Return true if galaxy accepted to be used in analysis. All galaxies are
       currently accepted                                                    */
   bool Filter(GalRecord& rec); 
+        
+  /** Convert galaxy position in GalRecord (phi,theta,z) into Shell 
+      coordinates
+      @param rec        galaxy record
+      @param x          Shell x coordinate
+      @param y          Shell y coordinate
+      @param z          Shell z coordinate
+      @param redshift   redshift of galaxy                                  */
+  void Rec2ShellCoord(GalRecord& rec, double& x, double& y, double& z, double& redshift);
         
   /** Convert galaxy position in GalRecord (phi,theta,z) into Euclidean 
       coordinates
@@ -221,7 +241,17 @@ class Cat2Grid
       @param x    pixel coordinate in x-dimension
       @param y    pixel coordinate in y-dimension
       @param z    pixel coordinate in z-dimension                           */
-  void GetCellCoord(sa_size_t i, sa_size_t j, sa_size_t k, double& x, double& y, double& z);
+
+   void AddToCellMultiGrids(double x, double y, double z,double phi=1);
+        
+  /** Return cartesian coord (x,y,z) of pixel cell given pixel cell index (i,j,k) 
+      @param i    pixel index in x-dimension
+      @param j    pixel index in y-dimension
+      @param k    pixel index in z-dimension
+      @param x    pixel coordinate in x-dimension
+      @param y    pixel coordinate in y-dimension
+      @param z    pixel coordinate in z-dimension                           */
+ void GetCellCoord(sa_size_t i, sa_size_t j, sa_size_t k, double& x, double& y, double& z);
         
   /** Return cartesian coord of pixel cell in the x-dimenstion given a pixel 
       cell index 
@@ -244,7 +274,7 @@ class Cat2Grid
   /** Compute random weighted grid with same selection function as data 
       @param nc         mean density of random grid
       @param SaveArr    if true fill an array of pixel center redshifts     */
-  void RandomGrid(double nc, bool SaveArr=true);
+  void RandomGrid(double nc, bool SaveArr=true, bool seed=false);
         
   /** Normalise the galaxy number and weighted galaxy number grids          */
   void NormNArrays();
@@ -252,15 +282,14 @@ class Cat2Grid
   /** Normalise galaxy random grid                                          */
   void NormRArray();
 
-  /** Add Gaussian errors to z coordinate   */
-  void SetGaussErrAxis(double Err, double zref, bool randomseed);
-
-
   /** Add Gaussian errors to redshifts  (Cecile)
       @param Err   redshift error size (Err*(1+z))                          */
   void SetGaussErrRedshift(double Err, double zref, bool seed);
                 
-                
+  /** Add bias to redshifts  (Cecile)
+      @param file with col 1 : redsfift, col2 : bias                        */
+  void SetBiasCorr(string biasFileName);
+              
   /** Add photo-z errors to redshifts compute from pdf (Adeline)
       @param Err   pdf File Name (root file)                          */        
   void SetPhotozErrRedshift(string pdfFileName, bool seed, double zcat_min, double zcat_max);
@@ -279,37 +308,6 @@ class Cat2Grid
   /** Compute variance of random grid                                       */
   void VarianceRandomGrid();
 
-  /** Extract a subset from full sized grid                                 
-      @param nsub    sub-grid extracted from full grid
-      @param dNp     width of sub-grid in z-dimension
-      @param Np      start sub-grid extraction at this pixel number (z-dim)
-      @param theta   maximum angle the sub-grid should extend over
-      @param af      array flag <0 return ngals, ==0 wngals, >0 wrgals      */
-  vector<double> XtractSubArray(TArray<r_8>& nsub, sa_size_t dNp, sa_size_t Np, 
-                                double theta, int af=-1);
-        
-  /** Extract a subset from full sized grid  
-      @param nsub    sub-grid extracted from full grid
-      @param x1      start sub-grid extraction at this x-dim pixel number
-      @param x2      end sub-grid extraction at this x-dim pixel number
-      @param y1      start sub-grid extraction at this y-dim pixel number
-      @param y2      end sub-grid extraction at this y-dim pixel number
-      @param z1      start sub-grid extraction at this z-dim pixel number
-      @param z2      end sub-grid extraction at this z-dim pixel number
-      @param af      array flag <0 return ngals, ==0 wngals, >0 wrgals      */
-  
-  vector<double> XtractSubArray(TArray<r_8>& nsub, long x1, long x2, 
-                                long y1, long y2, long z1, long z2, int af=-1);
-                                      
-  /** Return number of pixels in x or y dimension that cover an angle of size 
-      theta at Np pixels along the grid's z-dimension
-      @param Np     number of pixels along grid's z-dimension
-      @param theta  angle                                                   */        
-  sa_size_t GetNTransPix(sa_size_t Np, double theta);
-
-  /** Output catalog in Euclidean coords (for debugging)                    */
-  void OutputEuclidCat(double SkyArea);
-
   /** Write FITS header */
   void WriteHeader(string IncatName);
         
@@ -319,29 +317,7 @@ class Cat2Grid
   /** Write the galaxy grids to a FITS file                                 */
   void WriteGalArrays();
 
-  /** Save galaxy number grid to a FITS file (for debugging)                */
-  void SaveNgArray(string outfileroot, string IncatName="unknown.fits");
-
-        
-  //---- SHOULD BE MOVED OUT TO SELECTION FUNCTION CLASS ----//
-  /*
-    void ComputeSF(string,bool MCut=false); // computes selection function and sets sfcompute_=true
-    void ComputeSFfromFile(string nzfile); // computes selection function from n(z) Histo read in from file
-    void ComputeSFfromLF(double phistar,double Mstar,double alpha,double mlim, double Mc); 
-    // computes SF look up table and sets sfcompute_=true
-    void ApplyConstantSF2ngals(double sf)
-    { 
-    ngals_*=sf; 
-    cout <<"    Number of galaxies left after applying selection function = "<<ngals_.Sum()<<endl;
-    cout <<"    Total number of galaxies = "<<ng_<<endl;
-    cout <<"    Selection function = "<<sf<<endl;
-    }
-    void ApplyVaryingSF();
-    void ApplyConstantSF2wngals(double sf){ wngals_*=sf;};
-    void ApplyVaryingSF2wngals();
-    void SetConstantSF(double sf);
-    void SetVaryingSF(); */
-        
+       
   /* MINOR FUNCTIONS */
         
   /** Convert comoving distance to redshift                                 */
@@ -354,32 +330,26 @@ class Cat2Grid
   r_4 ReturnGridVolume(){return volgrid_;};
         
   /** Return number of galaxies in galaxy number grid                       */
-  sa_size_t ReturnNg(){return ng_;}; 
+  sa_size_t ReturnNg(sa_size_t i){return ng_[i];}; 
         
   /** Return number of galaxies in WEIGHTED galaxy number grid              */
-  r_8 ReturnWg(){return ngw_;}; 
+  r_8 ReturnWg(sa_size_t i){return ngw_[i];}; 
         
   /** Return number of galaxies in WEIGHTED random grid                     */
   r_8 ReturnRg(){return nrand_;}; 
         
   /** Return total number of galaxies in the simulation                     */
   sa_size_t ReturnNgAll(){return ngall_;};
-        
-  /** Return galaxy number grid (may or may not be normalised)              */  
-  void ReturnNgals(TArray<r_8>& ngals) { ngals = ngals_; };
-        
-  /** Return weighted galaxy number grid (may or may not be normalised)     */
-  void ReturnWngals(TArray<r_8>& wngals) { wngals = wngals_; };
-        
+                
   /** Return weighted random grid (may or may not be normalised)            */
   void ReturnWrgals(TArray<r_8>& wrgals) { wrgals = wrgals_; };
+                
+  /** Return redshift grid            */
+  void ReturnZc(TArray<r_8>& zc) { zc = zc_; };
         
   /** Return alpha, number of galaxies in weighted galaxy number grid divided
       by weighted random number grid                                        */
   double ReturnAlpha(){ return alph_;};
-        
-  /** Return z-dimension length of galaxy number grid                       */
-  sa_size_t ReturnSizeZNgals(){ return ngals_.SizeZ();};
         
   /** Return photometric redshift error in comoving distance units          */ 
   double ReturnPZDerr(){return PZDerr_;};
@@ -395,17 +365,6 @@ class Cat2Grid
   void SetDebugOutroot(string debugoutroot)
   { debugoutroot_=debugoutroot; DoDebug_=true; };
         
-  /** Print grids to screen for checking                                    */
-  void CheckArrays() {
-    cout << "    CHECK NGALS"<<endl;
-    cout << ngals_<<endl;       
-    cout << "    CHECK WNGALS"<<endl;
-    cout << wngals_<<endl;
-    cout << "    CHECK WRNGALS"<<endl;
-    cout << wrgals_<<endl;      
-    cout << endl;               
-  };
-        
                 
  protected:
         
@@ -414,16 +373,17 @@ class Cat2Grid
   SimpleUniverse& su_;                    /**< cosmology                            */
   RandomGenerator& rg_;                   /**< random number generator              */
   SelectionFunctionInterface* selfuncp_;    /**< selection function           */
+  SelectionFunctionInterface* biasp_;      /**< bias function          */
   SInterp1D z2dist_;                /**< redshift to distance look up table   */
   SInterp1D dist2z_;                      /**< distance to redshift look up table   */
         
   bool DoDebug_;                  /**< true if debugging                              */
   bool AddGaussErr_;        /**< true if adding Gaussian error  */
-  bool AddGaussErrAxis_;    /**< true if adding Gaussian error to  z-coordinate axis  */
   bool AddGaussErrReds_;    /**< true if adding Gaussian error to redshifts (Cecile)   */
   bool AddPhotoErrReds_;          /**< true if adding photo-z error on redshift (Adeline)   */
   bool ErrRandomSeed_ ;     /**< true if the seed for the error generation is new at each execution */
   bool sfcompute_;        /**< true if selection function has been set        */
+  bool doBiasCorr_;        /** add a correction on the redshift corresponding to the bias */
   bool RadialZ_;                  /**< if true z-dimension IS radial direction        */
 
   FitsInOutFile& fos_;  /**< FITS file containing gridded galaxy data     */
@@ -475,28 +435,23 @@ class Cat2Grid
   sa_size_t Ny_;      /**< number of pixels of grid in y-dimension          */ 
   sa_size_t Nz_;      /**< number of pixels of grid in z-dimension          */ 
   sa_size_t Npix_;    /**< total number of pixels in grid                   */ 
-  double ratio_cell_;  /** cell size grid / cell size initial simulation     */
+  double ratio_cell_;  /** cell size grid / cell size initial simulation    */
   sa_size_t ngo_;     /**< observed number of gals in sim                   */
   sa_size_t ngall_;   /**< total number of gals in sim                      */
-  sa_size_t ng_;      /**< number of gals inside grid                       */
-  sa_size_t ngout_;     /**< number of gals outside grid                  */ 
-  sa_size_t ngout2_;  /**< number of gals outside weighted grid             */
-
-  int_4 nz_0_;         /** for PDF proba, where to start the table filling    */
-  sa_size_t n_obs_pixels_; /**< number of pixels inside survey obs cone     */
-  r_8 ngw_;           /**< number of gals inside weighted grid              */
+  sa_size_t *ng_;      /**< number of gals inside grid               */
+  sa_size_t *ngout_;   /**< number of gals outside grid              */ 
+  r_8 *ngw_;           /**< number of gals inside weighted grid      */
+  r_8 *meanz_;         /**< mean redshift of a grid      */
+  sa_size_t nrand_;    /**< number of gals in random grid                    */
   r_8 wnrand_;        /**< number of gals in weighted random grid           */
-  sa_size_t nrand_;         /**< number of gals in random grid                    */
+
+  int_4 nz_0_;        /** for PDF proba, where to start the table filling    */
   int_8 idx_;         /**< index of center pixel in x-dimension             */
   int_8 idy_;         /**< index of center pixel in y-dimension             */
-  int_8 idz_;           /**< index of center pixel in z-dimension         */              
+  int_8 idz_;         /**< index of center pixel in z-dimension         */              
   double DCref_;      /**< comoving distance to center pixel                */
   double zref_;     /**< redshift of center pixel                         */  
-  vector<double> zs_; /**< selection function look up table                 */
-  vector<double> dL_; /**< selection function look up table                 */
-  vector<double> phi_;/**< selection function look up table                 */
-  vector<double> dc_; /**< selection function look up table                 */
-  double alph_;         /**< number of gals in weighted galaxy number grid/by weighted random number grid */
+  double alph_;       /**< number of gals in weighted galaxy number grid/by weighted random number grid */
   sa_size_t Ic1_;     /**< index of phi or x column in data table           */
   sa_size_t Ic2_;     /**< index of theta or y column in data table         */
   sa_size_t Izs_;     /**< index of spec-z column in data table             */
@@ -513,13 +468,13 @@ class Cat2Grid
   double mean_overdensity_; /**< mean over-density of simlss grid AFTER setting cells with <-1 to =-1 */
   string ObsCat_;     /**< optionnal, list of catalog files, useful if more than 1 catalog must be read */
         
-  TArray<r_8> ngals_;     /**< number of gals in each grid pixel, not corrected for SF */
-  TArray<r_8> wngals_;  /**< weighted number of gals in each grid pixel    */
+  vector<ProjGrid> vgrids_;   /**< Vector of grids filled with weighted number of galaxies */
+  
   TArray<r_8> randomcat_;       /**< random galaxy number grid                     */
   TArray<r_8> wrgals_;  /**< weighted random number grid                   */
-  TArray<r_8> weights_; /**< weight value at grid pixel centers            */
   TArray<r_8> zc_;          /**< redshift value at grid pixel centers          */
         
   SelectionFunctionInterface defselfunc_;   // Default selection function 
+  SelectionFunctionInterface defbiasfunc_;   // Default bias function 
   FitsInOutFile fosdefault_;
 };

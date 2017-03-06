@@ -14,6 +14,71 @@ double ChisqStats::BestFit()
 
 };
 
+double ChisqStats::BestFit_Avar(double& bestamp)
+{
+    double minchisq, maxchisq;
+    chisq_.MinMax(minchisq, maxchisq);
+    int indexmin = findClosestElement(chisq_, minchisq);
+    
+    
+    cout <<"    chisq min = "<<  minchisq  <<endl;
+    cout <<"    Minimum chisq per d.o.f. (d.o.f="<< dof_ <<") = "<< minchisq/dof_ <<endl;
+    cout <<"    Value of ka at min(chisq) = "<< kavals_(indexmin) <<endl;
+    cout <<"    Value of amp at min(chisq) = "<< ampvals_(indexmin) <<endl;
+    bestamp = ampvals_(indexmin);
+    
+    return kavals_(indexmin);
+};
+
+void ChisqStats::GetMarg(double *step_, TArray<r_8> MargChisq)
+{ 
+    cout << "  marginalize chisq" << endl;
+    int nka = chisq_avar_.SizeY();
+    int nA = chisq_avar_.SizeX();
+    
+    cout << "   "<< nA << " x "<< nka <<" val in chisq "<< endl; 
+    cout << "  dka "<< step_[0] << " dA "<<step_[1] << endl; 
+    
+    int nVar = int(dof_);
+    if(dof_>2)
+    	cout << "ERROR dof > 2" <<endl;
+    int dim[nVar];
+    double step;
+
+    //chisq_Margka.SetSize(nka); 
+    
+    for(int ivar=0; ivar<nVar; ivar ++){
+       if(ivar == 0){	//marginalization over A => chi(ka)
+	 dim[0] = chisq_avar_.SizeY();
+	 dim[1] = chisq_avar_.SizeX();
+		step = step_[1]; //dA
+	}if(ivar == 1){	//marginalization over ka => chi(A)
+	 dim[0] = chisq_avar_.SizeX();
+	 dim[1] = chisq_avar_.SizeY();
+		step = step_[0]; //dka
+	}
+      
+    	double content = 0;
+    	for(int i=0; i<dim[0]; i++){ 
+    	   content = 0;
+	   for(int j=0; j<dim[1]; j++){ 
+    		if(ivar == 0)
+		   content += (chisq_avar_(j,i) * step);	 
+		if(ivar == 1){
+		   content += (chisq_avar_(i,j) * step);
+		}
+	   }
+       	   MargChisq(ivar, i) = content;
+	  
+	   //if(ivar == 1)
+	   //	cout << i << "  "<< MargChisq(ivar, i) << endl;
+	   //if(ivar == 0)
+	   // chisq_Margka(i) = MargChisq(ivar, i);
+	}
+    }
+    //chisq_Margka= MargChisq(0);
+}
+
 void ChisqStats::ErrSig(double& siglow, double& sighigh, double clevel, int npt)
 {
 // xvals_= abscissa for logP (must be evenly spaced)
@@ -25,6 +90,7 @@ void ChisqStats::ErrSig(double& siglow, double& sighigh, double clevel, int npt)
     int ylevelstep=100;
 
     TVector<r_8> logPraw = -0.5*chisq_;
+    //TVector<r_8> logPraw = -0.5*chisq_Margka;
 
     // REMOVE ANY XVALUES WHERE LOGP=INF
     
@@ -44,10 +110,10 @@ void ChisqStats::ErrSig(double& siglow, double& sighigh, double clevel, int npt)
     
 	    if(!isinf(logPraw(i))) {
 	        xv(ii)=xvals_(i);
-		    logP(ii)=logPraw(i); 
-		    ii++;
+		logP(ii)=logPraw(i); 
+		ii++;
             }
-	    }
+    }
 	    
     // CHECK LOGP IS NOT FLAT OR NAN AND RENORMALISE
     double logPmax, logPmin;

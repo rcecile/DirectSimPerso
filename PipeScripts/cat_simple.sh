@@ -12,7 +12,7 @@ function do_rdlss {
     echo "==========================================================================="
     echo "==========================================================================="
     # R = randomize in cell; G = goldencut; a = opening angle cut ( 1.04720 = 60 deg)
-    command="${code1}rdlss -C ${dir}simu$2_$1_r.fits -O ${dir}cat${suff}_$3_$1.fits -i 1 -R -G -a 1.04720 "
+    command="${code1}rdlss -C ${dir}simu$2_$1_r.fits -O ${dir}cat${suff}$3_$1.fits -i 1 -R -G -a 1.04720 "
     $command
 }
 
@@ -27,20 +27,19 @@ function do_sel_simple {
 
 }
 suff="_gold"
-
-dir="/sps/lsst/data/rcecile/Planck_BAO/"
-dirg="/sps/lsst/data/rcecile/Planck_BAO_grids/"
-nCase=1
-
-#dir="/sps/lsst/data/rcecile/Planck_noBAO/"
-#dirg="/sps/lsst/data/rcecile/Planck_noBAO_grids/"
-#nCase=10
-
 code1="/sps/lsst/dev/rcecile/BAOProgs/DirectSimPerso/exe/"
-
 Nslice=70
 
-j=0
+#dir="/sps/lsst/data/rcecile/Planck_BAO/"
+#dirg="/sps/lsst/data/rcecile/Planck_BAO_grids/"
+#nCase=1
+
+dir="/sps/lsst/data/rcecile/Planck_noBAO/"
+dirg="/sps/lsst/data/rcecile/Planck_noBAO_grids/"
+nCase=10
+
+
+j=8
 while [ ${j} -lt  ${nCase} ]
 do
     if [ ${nCase} -le  1 ]
@@ -77,15 +76,15 @@ do
 
     i0=0
     i_max=$((${Nslice} -1 ))
-    obs_list5=${dir}cat${suff}_${sj}_Slice${i0}.fits
-    full_list=${dir}/cat${suff}_${sj}_Slice${i0}_ZONLY.fits
+    obs_list5=${dir}cat${suff}${sj}_Slice${i0}.fits
+    full_list=${dir}/cat${suff}${sj}_Slice${i0}_ZONLY.fits
    
     i1=$((${i0} + 1))
     
     while [ ${i1} -le  ${i_max} ]
     do
-	obs=${dir}cat${suff}_${sj}_Slice${i1}.fits    
-	full=${dir}/cat${suff}_${sj}_Slice${i1}_ZONLY.fits
+	obs=${dir}cat${suff}${sj}_Slice${i1}.fits    
+	full=${dir}/cat${suff}${sj}_Slice${i1}_ZONLY.fits
 	
 	obs_list5=${obs_list5},$obs
 	full_list=${full_list},$full
@@ -93,6 +92,6 @@ do
 	(( i1++ ))
     done
     
-#    do_sel_simple $obs_list5 $full_list ZS,ZS,zs ${sj}
+    do_sel_simple $obs_list5 $full_list ZS,ZS,zs ${sj}
     ((j++ ))
 done

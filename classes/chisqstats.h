@@ -40,11 +40,36 @@ public:
         @param chisq     chi-square value for each parameter
         @param dof       degree of freedom                                    */
 	ChisqStats(TVector<r_8> xvals, TVector<r_8> chisq, double dof=1)
-	  : xvals_(xvals), chisq_(chisq) {};
+	  : xvals_(xvals), chisq_(chisq), dof_(dof) { };
+	
+	/** Constructor  Adeline modif : find best fit when ka AND A are variable
+        @param kavals     parameter values of chi-square (must be evenly spaced)
+        @param ampvals     parameter values of chi-square (must be evenly spaced)
+	@param chisq     chi-square value for each parameter
+        @param dof       degree of freedom                                    */
+	ChisqStats(TVector<r_8> kavals, TVector<r_8> ampvals,  TVector<r_8> chisq, TArray<r_8> chisq_avar, double dof=1)
+	  : kavals_(kavals), ampvals_(ampvals), chisq_(chisq), chisq_avar_(chisq_avar), dof_(dof) {
+	  	dof_ = dof;
+		cout << "init chisq " << chisq_avar_.SizeX() << " " << chisq_avar_.SizeY()<<endl;
+		/*for (int i=0; i<=10; i++){
+
+		  for (int j=0; j<=10; j++){
+		    cout << "chisqavar " << chisq_avar_(i,j) << endl;
+		  }
+		}
+		*/
+		cout << "dim chisqavar : " << chisq_avar_.SizeX() << " " << chisq_avar_.SizeY() << endl;
+
+
+
+
+};
+	
 	
 	/** Find the best fit parameter value ie parameter value at the minimum 
 	    chi-square                                                            */
 	double BestFit();
+	double BestFit_Avar(double& bestamp); /*(Adeline)*/
 	
 	/** Estimate the parameter error 
 	    @param siglow    lower error range
@@ -66,9 +91,18 @@ public:
 	/** Return upper error range                                              */
 	double ReturnPlus(){return plus_;};
 	
+	/** Marginalize chisq over Amp and ka (Adeline) 	 		  */
+	void GetMarg(double *step_, TArray<r_8> MargChisq);
+	
+	
 protected:
 	TVector<r_8> xvals_;     /**< parameter values of chi-square              */
+	TVector<r_8> kavals_;    /**< parameter values of chi-square              */
+	TVector<r_8> ampvals_;   /**< parameter values of chi-square              */
 	TVector<r_8> chisq_;     /**< chi-square value for each parameter         */
+	TArray<r_8> chisq_avar_; /**< chi-square value for each parameter         */
+	TVector<r_8> chisq_Margka;
+	
 	double dof_;             /**< degree of freedom                           */
 	double minus_;           /**< lower error range                           */
 	double plus_;            /**< upper error range                           */

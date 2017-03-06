@@ -3,7 +3,6 @@
 FitBAOScale::FitBAOScale(TArray<r_8> pspectrum, SimpleUniverse& su, double zref, string ref_file, bool simu_mode)
   :su_(su),  zref_(zref), simu_mode_(simu_mode)
 {
-
 	// fill power spectrum vectors
 	InitVect(pspectrum);
 
@@ -38,13 +37,14 @@ FitBAOScale::FitBAOScale(TArray<r_8> pspectrum, SimpleUniverse& su, double zref,
 	for (int i=0; i<kobs_.Size(); i++) Pref_(i) = interpYR(kobs_(i));
 
 	// Compute Pobs/Pref
+	cout << "compute Pratio" << endl;
 	Pratio();
 	
 	// set default ka range
-	minka_=0.03; maxka_=0.07; nka_=1000;
-	//	minka_=0.03; maxka_=0.10; nka_=1000; // Cecile
-
+	minka_=0.03; maxka_=0.05; nka_=100;
+	
 	bestfit_=-10; // uninitialised
+	cout << " end" << endl;
 };
 
 
@@ -65,10 +65,10 @@ void FitBAOScale::InitVect(TArray<r_8> pspectrum)
 	    Pobs_(i) = pspectrum(1,i);
 	    sig_(i)  = 1.;
 	  } else {
-	    Pobs_(i) = pspectrum(1,i) - pspectrum(6,i);
-	    sig_(i)  = pspectrum(7,i);
+	    Pobs_(i) = pspectrum(1,i) - pspectrum(6,i); //pspectrum(1,i);
+	    sig_(i)  = pspectrum(7,i);//pspectrum(2,i)
 	  }
-	  //	  if (i<100) cout <<	kobs_(i) << "    "<<Pobs_(i) << "    "<< sig_(i) <<endl;
+	  	  //if (i<100) cout <<	kobs_(i) << "    "<<Pobs_(i) << "    "<< sig_(i) <<endl;
 	}
 };
 
@@ -140,15 +140,16 @@ void FitBAOScale::ComputeChisq(double maxk)
 {
 
 	double dka = (maxka_-minka_)/(nka_-1);
-	double amp=2.5;// amplitude is fixed
+	double amp = 2.5;	// amplitude is fixed. Modif 27.04.2016 1 -> 2.5
 	kavals_.SetSize(nka_);
 	Chisq_.SetSize(nka_);
 	cout << "    Computing chisq from ka = "<< minka_ <<" to ka = ";
 	cout << maxka_ <<" in steps of "<< dka <<endl;
 	
 
-	DecaySineFunc decs(amp, h_);
-	cout << "    Check decaying sine function"<<endl;
+	//DecaySineFunc decs(amp, h_);
+	DecaySineFunc decs(amp, 1);
+	cout << "    Check decaying sine function "<<h_ <<endl;
 	//double ka =0.04;
 	//for (int ik=0; ik<kobs_.Size(); ik++)
 	//		{
@@ -160,60 +161,197 @@ void FitBAOScale::ComputeChisq(double maxk)
 	for (int ika=0; ika<nka_; ika++) {
 	  double chisq=0;
 	  kavals_(ika) = minka_ + ika*dka;
+	  //kavals_(ika) /= h_;  	//k unit should be h/Mpc
+	  //cout << " ka = "<< kavals_(ika) << endl;
 	  
+	  int indx = 0;
 	  for (int ik=0; ik<kobs_.Size(); ik++) {
 	    
 	    // decaying sinusoid at ka 
 	    double pred = decs(kobs_(ik),kavals_(ika));
 	    double diff= Pratio_(ik)-pred;
 	    
-	    if (sig_(ik)==0)
-	      throw ParmError("Error is zero!");
 	    
             // only use power spectra values below some max k
-	    if (kobs_(ik)<maxk)
+	    
+	    if (kobs_(ik)<maxk && kobs_(ik)>0.02){
+	      if (sig_(ik)==0)
+		throw ParmError("Error is zero!");
+
 	      chisq += diff*diff/(sig_(ik)*sig_(ik));
 	    
-	    //if (isnan(pow(diff,2.)/(sig_(ik)*sig_(ik))))
-	    //cout << "sig_(ik)="<<sig_(ik)<<", Pref^o="<<Pratio_(ika)<<", Pref^p="<<pred<<endl;
+	      //if (isnan(pow(diff,2.)/(sig_(ik)*sig_(ik))))
+	      /*if( kavals_(ika)>= 0.0350 &&  kavals_(ika)< 0.0351){
+	       	  // cout << kavals_(ika) << " k " << kobs_(ik) << " sig_(ik)="<<sig_(ik)<<", Pratio="<<Pratio_(ik)<<", Pred "<<pred;
+		  // cout << ", diff "<< diff << endl;
+		   cout << ik << " " << kobs_(ik) << " " << pred << " " << Pratio_(ik) << "  "<< sig_(ik) << " " << chisq << endl;
+	      }*/
+	      indx ++;
+	    }
 	  }
 	  
-	  Chisq_(ika) = chisq;
-	  //  cout << chisq << endl;
+	  Chisq_(ika) = chisq/(indx-1);
+	  //if( kavals_(ika)> 0.0350 &&  kavals_(ika)< 0.0351)
+	   //cout << "ka = " <<  kavals_(ika) << " chisq = "<< chisq  << endl;
 	}
+};
+
+// Compute the chi-square as a function of ka and A (Adeline modif)
+void FitBAOScale::ComputeChisq_Avar(double maxk)
+{
+   double dka = (maxka_-minka_)/(nka_-1);
+   double kaVals_temp = minka_;
+   		
+   Amin_ = 0;
+   Amax_ = 3;
+   nA_ = 1000;
+   //nA_ = 100; //modif Marion
+   double dA = (Amax_ - Amin_)/nA_;
+   double amp=Amin_;	
+   
+   double vecSize = nka_ * nA_;
+   
+   kavals_.SetSize(vecSize);
+   kavals_short_.SetSize(nka_);
+   ampvals_.SetSize(vecSize);
+   ampvals_short_.SetSize(nA_);
+   Chisq_.SetSize(vecSize);
+   cout << "    Computing chisq from ka = "<< minka_ <<" to ka = ";
+   cout << maxka_ <<" in steps of "<< dka << " (nka="<< nka_ <<")" <<endl;
+   cout << "    A is variable : min = " << Amin_ << " to max = " << Amax_ << " in step of "<< dA << endl;
+   cout << "    Total :  compute "<< vecSize << " values of chisq "<< endl;  
+
+   int ndim = 2;
+   sa_size_t dim[ndim];
+   dim[0] = nA_;
+   dim[1] = nka_;
+   chisq_avar_.SetSize(ndim, dim);
+
+   int indx = 0;
+   for(int iA=0; iA<nA_; iA ++){
+        amp = Amin_ + iA*dA;
+	ampvals_short_(iA) = amp;
+	
+	//DecaySineFunc decs(amp, h_);
+	DecaySineFunc decs(amp, 1);
+	//cout << indx << "    Check decaying sine function "<<h_ << " amp = "<< amp <<endl;
+	
+	//double ka =0.04;
+	//for (int ik=0; ik<kobs_.Size(); ik++)
+	//		{
+	//		double pred=decs(kobs_(ik),ka);
+	//		cout << kobs_(ik) <<"   "<< pred<<endl;
+	//		}
+	
+
+//decs.PrintParas();
+
+	for (int ika=0; ika<nka_; ika++) {
+	  kaVals_temp = minka_ + ika*dka;
+	 // if(iA==0)
+	     kavals_short_(ika) = kaVals_temp;
+	  kavals_(indx) = kaVals_temp;
+	  ampvals_(indx) = amp;
+	  
+	  double chisq=0;
+	  int kindx = 0;
+
+	  for (int ik=0; ik<kobs_.Size(); ik++) {
+	    
+	    // decaying sinusoid at ka 
+	    double pred = decs(kobs_(ik),kaVals_temp);
+	    double diff= Pratio_(ik)-pred;
+	    
+            // only use power spectra values below some max k
+	    if (kobs_(ik)<maxk && kobs_(ik)>0.02){
+	    
+	      if (sig_(ik)==0)
+		throw ParmError("Error is zero!");
+	      
+	      chisq += diff*diff/(sig_(ik)*sig_(ik));
+	    
+	      //if (isnan(pow(diff,2.)/(sig_(ik)*sig_(ik))))
+	      /*if( kavals_(ika)> 0.0449 &&  kavals_(ika)< 0.0451 && kobs_(ik)>0.06 && kobs_(ik)<0.07){
+	       	   cout << kavals_(ika) << " k " << kobs_(ik) << " sig_(ik)="<<sig_(ik)<<", Pratio="<<Pratio_(ik)<<", Pred "<<pred;
+		   cout << ", diff "<< diff << endl;
+	      }*/
+	      kindx ++;
+	    }
+	  }
+	  
+	  Chisq_(indx) = chisq/(kindx-2);
+	  chisq_avar_(iA, ika) = chisq/(kindx-2);
+	  //cout << " dans computechisq_avar : " << chisq_avar_(iA, ika) << endl;
+
+	  //if( kavals_(ika)> 0.041 &&  kavals_(ika)< 0.042)
+	 //    cout << "ka = " <<  kavals_(ika) << " chisq = "<< chisq  << endl;
+	  indx ++;
+	}
+   }
+   cout << endl << " test amp "<< endl;
+   indx = 0;
+   for(int i=0; i<nA_; i++){
+     	for(int j=0; j<nka_; j++) {
+   	    //cout <<"  A "<< ampvals_short_(i) << "  ka "<< kavals_short_(j) <<" chi "<< chisq_avar_(i,j) <<endl;
+	    //cout <<"  A "<< ampvals_(indx) << "  ka "<< kavals_(indx) <<" chi "<< chisq_avar_(i,j) <<endl;
+	    indx ++;
+	}
+   }
+   cout << "   check compute chisq :   indx = "<< indx << " Avals.size = "<< ampvals_.Size() << " ka.size = "<< kavals_.Size();
+   cout << " chisq.size = " << Chisq_.Size() << endl;
+   cout << "   chisq_avar_: x length="<<chisq_avar_.SizeX() << " y length="<< chisq_avar_.SizeY() << " shoulb be equal to (";
+   cout << nA_ << ", "<< nka_ <<")"<<endl;
+ 
 };
 
 
 // write chi-square to a file
 void FitBAOScale::WriteChisq(string outfile)
 {
+   if (bestfit_<0)
+	throw ParmError("Have not calculated best fit ka yet!");
 
-	if (bestfit_<0)
-		throw ParmError("Have not calculated best fit ka yet!");
-
-	ifstream inp;
-	ofstream outp;
-	inp.open(outfile.c_str(), ifstream::in);
-	inp.close();
-	if(inp.fail()) {
-		inp.clear(ios::failbit);
-		cout << "    Writing chisq to file ..." << outfile.c_str() << endl;
-		outp.open(outfile.c_str(), ofstream::out);
+   ifstream inp;
+   ofstream outp;
+   inp.open(outfile.c_str(), ifstream::in);
+   inp.close();
+   if(inp.fail()) {
+	inp.clear(ios::failbit);
+	cout << "    Writing chisq to file ..." << outfile.c_str() << endl;
+	outp.open(outfile.c_str(), ofstream::out);
 		
-		outp << "Redshift of power spectrum = "<< zref_ <<", best fit ka = ";
-		outp << bestfit_ <<", "<< nsig_ <<"-sigma errors: + "<< errup_;
-		outp <<" - "<< errdown_ << " with h = " << h_ << endl;
+	outp << "Redshift of power spectrum = "<< zref_ <<", best fit ka = ";
+	outp << bestfit_ <<", "<< nsig_ <<"-sigma errors: + "<< errup_;
+	outp <<" - "<< errdown_ << " with h = " << h_ << endl;
 		
+	if(ampvals_.Size() != 0){ //Adeline modif
+		outp << "amplitude is variable, best fit A = "<< bestfit_amp_ <<endl;
+		outp << "first column : ka(nka = "<<chisq_avar_.SizeY()<<"); first line : amp(nA = "<<chisq_avar_.SizeX()<<")" <<endl;
+			
+		//wirte first line (A values)
+		outp << "0 \t ";
+		for(int j=0; j<ampvals_short_.Size(); j++)
+		 	outp << ampvals_short_(j) << " \t" ;
+		outp << endl;
+			
+		for(int j=0; j<chisq_avar_.SizeY(); j++){// loop over ka values
+			outp << kavals_short_(j) << " \t";
+			for (int i=0;i<chisq_avar_.SizeX();i++){// loop over A values
+				outp << chisq_avar_(i,j) << "\t ";
+			}
+			outp << endl;
+		}	
+	}
+	else{	
 		for (int i=0;i<Chisq_.Size();i++)// loop over ka values
 			outp << kavals_(i) << "   "<< Chisq_(i)<< endl;
-		
-		outp.close();
-		} // end of write
-		else
-			cout << "Error...file """ << outfile.c_str() << """ exists" << endl;
+	}
+	outp.close();
+   } // end of write
+   else
+	cout << "Error...file """ << outfile.c_str() << """ exists" << endl;
 
 };
-
 
 // calculate best-fit and errors
 void FitBAOScale::BestfitStdDev(double& bestfit, double& siglow, double& sighigh, int nsig)
@@ -230,10 +368,114 @@ void FitBAOScale::BestfitStdDev(double& bestfit, double& siglow, double& sighigh
 	ChisqStats chisqstat(kavals_, Chisq_);
 	bestfit = chisqstat.BestFit();
 	chisqstat.ErrSig(siglow,sighigh,clevel,100);
-
+	
 	bestfit_ = bestfit;
 	errup_   = sighigh - bestfit_;
 	errdown_ = bestfit_ - siglow;
+	
+	bestfit_amp_ = bestfit;
+};
+
+// calculate best-fit and errors
+void FitBAOScale::BestfitStdDev_Avar(double& bestfit_ka, double& bestfit_A, double& siglow, double& sighigh, int nsig)
+{
+   nsig_ = nsig;
+   if (nsig_>3)
+	throw ParmError("Can't compute above 3-sigma");
+
+   vector<double> clevels;
+   clevels.push_back(0.683); clevels.push_back(0.954); clevels.push_back(0.997);
+
+   double clevel = clevels[nsig_-1];
+   cout <<"    Confidence level = "<< clevel <<endl;
+   ChisqStats chisqstat(kavals_, ampvals_, Chisq_, chisq_avar_, 2);
+   bestfit_ka = chisqstat.BestFit_Avar(bestfit_A);
+  
+   cout << endl << " marginalize chisq "<< endl;
+   double dA = (Amax_ - Amin_)/nA_;
+   double dka =  (maxka_ - minka_)/nA_;
+   
+   ChisqStats chisqstat_forMarg(kavals_short_, ampvals_short_, Chisq_, chisq_avar_, 2);
+
+   double step[] = {dka, dA};
+   cout <<" step "<< dka << "  "<< dA << "  "<< step[0] << "  "<< step[1] << endl;
+   //TArray<r_8> margChisq_;
+
+    int ndim = 2;
+   sa_size_t dim[ndim];
+   dim[0] = 2;
+   if(nka_>=nA_)
+   	dim[1] = nka_;
+   else
+   	dim[1] = nA_;
+
+   //dim[0] = dim[1] = nA_*nka_; //modif Marion
+
+   margChisq_.SetSize(ndim, dim);
+   cout << " margChisq_ dim:  X "<< margChisq_.SizeX() << " Y: "<< margChisq_.SizeY() << endl;
+   
+   chisqstat.GetMarg(step, margChisq_);
+   
+   //Computing Errors
+   //chisqstat.ErrSig(siglow,sighigh,clevel,100);
+   bestfit_ = bestfit_ka;
+   errup_   = sighigh - bestfit_;
+   errdown_ = bestfit_ - siglow;
+
+   //added by Marion
+   bestfit_amp_ = bestfit_A;
+
+   cout << "bestfit_amp_ : " << bestfit_amp_ << endl;
+};
+
+void FitBAOScale::WriteChisqMarg(string outfile)
+{ 
+   if (bestfit_<0)
+	throw ParmError("Have not calculated best fit ka yet!");
+   if(margChisq_.SizeX()<=0 || margChisq_.SizeY()<=0 )
+   	throw ParmError("Have not marginalized chisq yet!");
+   
+   ifstream inp;
+   ofstream outp;
+   inp.open(outfile.c_str(), ifstream::in);
+   inp.close();
+   double temp_ka, temp_amp;
+   if(inp.fail()) {
+	inp.clear(ios::failbit);
+	cout << "    Writing chisq to file ..." << outfile.c_str() << endl;
+	outp.open(outfile.c_str(), ofstream::out);
+		
+	outp << "Redshift of power spectrum = "<< zref_ <<", best fit ka = ";
+	outp << bestfit_ <<", "<< nsig_ <<"-sigma errors: + "<< errup_;
+	outp <<" - "<< errdown_ << " with h = " << h_ << endl;
+		
+	if(ampvals_.Size() != 0){ //Adeline modif
+	  outp << "amplitude is variable, best fit A = "<< bestfit_amp_ <<endl;
+	 
+		outp << "ka, A, chisq(ka), chisq(A)" <<endl;
+			
+		for(int j=0; j<margChisq_.SizeY(); j++){
+			temp_ka = kavals_short_(j);
+			temp_amp = ampvals_short_(j);
+			if(j>kavals_short_.Size() )
+				temp_ka = 0;
+			if(j>ampvals_short_.Size() )
+				temp_amp = 0;
+	
+			outp <<temp_ka << "\t"<< temp_amp <<" \t";
+			for(int i=0; i<margChisq_.SizeX(); i++){
+				outp << margChisq_(i,j) << " \t";
+			}
+			outp << endl;
+		}	
+	}
+	else
+		cout << " ERRORS "<< endl;
+	
+	outp.close();
+   } // end of write
+   else
+	cout << "Error...file """ << outfile.c_str() << """ exists" << endl;   
 };
 
 
@@ -277,7 +519,26 @@ void FitBAOScale::WriteResults(string outfile)
 		outp <<"   "<< errdown_ << "   " << h_ << endl;
 		
 		outp.close();
-		} // end of write
+
+		if(ampvals_.Size() != 0){ //Adeline modif
+		outp << "amplitude is variable, best fit A = "<< bestfit_amp_ <<endl;
+		outp << "first column : ka(nka = "<<chisq_avar_.SizeY()<<"); first line : amp(nA = "<<chisq_avar_.SizeX()<<")" <<endl;
+			
+		//wirte first line (A values)
+		outp << "0 \t ";
+		for(int j=0; j<ampvals_short_.Size(); j++)
+		 	outp << ampvals_short_(j) << " \t" ;
+		outp << endl;
+			
+		for(int j=0; j<chisq_avar_.SizeY(); j++){// loop over ka values
+			outp << kavals_short_(j) << " \t";
+			for (int i=0;i<chisq_avar_.SizeX();i++){// loop over A values
+				outp << chisq_avar_(i,j) << "\t ";
+			}
+			outp << endl;
+		   }	
+		}
+	} // end of write
     else
 	    cout << "Error...file """ << outfile.c_str() << """ exists" << endl;
 
@@ -338,4 +599,34 @@ void FitBAOScale::WriteAncillaryInfo(string outfile)
         cout << "Error...file """ << outfile.c_str() << """ exists" << endl;
 
 };
+
+void FitBAOScale::WriteWiggle(string outfile)
+{
+
+	ifstream inp;
+	ofstream outp;
+	inp.open(outfile.c_str(), ifstream::in);
+	inp.close();
+	if(inp.fail()) {
+		
+		inp.clear(ios::failbit);
+		cout << "    Writing wiggle power spectrum p(k)/psmooth(k) and sigma(Pwiggle)";
+		cout << " to file ..." << outfile.c_str() << endl;
+		
+		outp.open(outfile.c_str(), ofstream::out);
+		
+		for (int i=0; i<kobs_.Size(); i++){
+		    //Pratio_(i) = Pobs_(i)/Pref_(i); 
+		    //sig_(i) = sig_(i) / Pref_(i); 
+		    outp << kobs_(i) << "   "<< Pratio_(i)<< "   "<< sig_(i) <<endl;
+		}
+		
+		outp.close();
+		} // end of write
+    else
+        cout << "Error...file """ << outfile.c_str() << """ exists" << endl;
+
+};
+
+
 

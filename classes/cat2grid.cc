@@ -9,7 +9,7 @@
 Cat2Grid::Cat2Grid(SwFitsDataTable& dt, SimpleUniverse& su, RandomGenerator& rg,
                    FitsInOutFile& fos, string ZOCol, string ZSCol,
                    bool RadialZ, double PZerr, bool Print, string ObsCat, double ratio_cell) 
-  : dt_(dt) , su_(su) , rg_(rg) , fos_(fos) , defselfunc_(1.), selfuncp_(&defselfunc_), ratio_cell_(ratio_cell)
+  : dt_(dt) , su_(su) , rg_(rg) , fos_(fos) , defselfunc_(1.), selfuncp_(&defselfunc_), defbiasfunc_(0.), biasp_(&defbiasfunc_), ratio_cell_(ratio_cell)
   , ZOCol_(ZOCol) , ZSCol_(ZSCol) , RadialZ_(RadialZ) , PZerr_(PZerr), ObsCat_(ObsCat)
                   // Constructor for this class reads in the phi, theta, redshift of all galaxies in the catalog
                   // from data table dt
@@ -35,27 +35,19 @@ Cat2Grid::Cat2Grid(SwFitsDataTable& dt, SimpleUniverse& su, RandomGenerator& rg,
   DoDebug_ = false; // flag to do debug
   debugoutroot_ = "tmp"; // if want to debug, files are written to filenames with this root
   sfcompute_ = false; // flag becomes true after selection function is set
+  doBiasCorr_ = false; // flag becomes true after selection function is set
   PZDerr_=0;// set photoz error in Mpc equal to zero to start with
   AddGaussErr_     = false; // flag to add Gaussian photo-z err
-  AddGaussErrAxis_ = false; // flag to add Gaussian photo-z err on z-axis
   AddGaussErrReds_ = false; // flag to add Gaussian photo-z err on redshift
   AddPhotoErrReds_ = false; // flag to add photo-z photo-z err on redshift
 
   // Set counting galaxies to ZERO
-  ng_=0,ngo_=0; // num gals INSIDE grid, num gals OBSERVED
-  ngw_=0;// num "gals" INSIDE WEIGHTED grid
-  ngout_=0; // number of galaxies OUTSIDE grid
   wnrand_=0,nrand_=0; // weighted/unweighted number of "galaxies" in random grid
 
+// num "gals" INSIDE WEIGHTED grid
   // Data table column names
-  if (RadialZ_) {
-    Ic1_ = dt_.IndexNom("x");
-    Ic2_ = dt_.IndexNom("y");
-  }
-  else {
-    Ic1_ = dt_.IndexNom("phi");
-    Ic2_ = dt_.IndexNom("theta");
-  }
+  Ic1_ = dt_.IndexNom("PHI");
+  Ic2_ = dt_.IndexNom("THETA");
   Izs_ = dt_.IndexNom(ZSCol_); // the SPEC-Z column
         
   if (Print) {
@@ -63,9 +55,9 @@ Cat2Grid::Cat2Grid(SwFitsDataTable& dt, SimpleUniverse& su, RandomGenerator& rg,
     cout << "    Reading OBSERVED redshifts from column name "<< ZOCol_ <<endl;
   }
   Iz_ = dt_.IndexNom(ZOCol_);
-  Iid_= dt_.IndexNom("GalID");
+  Iid_= dt_.IndexNom("GALID");
         
-  Itype_= dt_.IndexNom("type"); 
+  Itype_= dt_.IndexNom("TYPE"); 
   Imag_ = dt_.IndexNom("MB"); 
 
   ngall_= 0;
@@ -85,10 +77,7 @@ Cat2Grid::Cat2Grid(SwFitsDataTable& dt, SimpleUniverse& su, RandomGenerator& rg,
   if (Print) {
     cout <<endl <<"    TOTAL number of galaxies in catalog ="<< ngall_ <<endl;
     cout <<"    Number of columns in catalog = "<< dt_.NCols() <<endl;
-    if (RadialZ_)
-      cout <<"    Coord x = column "<< Ic1_ <<", coord y = column "<< Ic2_ <<endl;
-    else
-      cout <<"    Angle phi = column "<< Ic1_ <<", angle theta = column "<< Ic2_ <<endl;
+    cout <<"    Angle phi = column "<< Ic1_ <<", angle theta = column "<< Ic2_ <<endl;
     cout <<"    Spec-z = column "<< Izs_ <<", z used in analysis = column "<< Iz_ <<endl;
     cout <<"    (the above will be the same column when reading in spec-z)"<<endl;
   }
@@ -132,21 +121,15 @@ Cat2Grid::Cat2Grid(SwFitsDataTable& dt,SimpleUniverse& su,RandomGenerator& rg,
   sfcompute_ = false; // flag becomes true after selection function is set
   PZDerr_=0;// set photoz error in Mpc equal to zero to start with
   AddGaussErr_     = false; // flag to add Gaussian photo-z err
-  AddGaussErrAxis_ = false; // flag to add Gaussian photo-z err on z-axis
   AddGaussErrReds_ = false; // flag to add Gaussian photo-z err on redshift
         
   // Data table column names
-  if (RadialZ_) {
-    Ic1_ = dt_.IndexNom("x");
-    Ic2_ = dt_.IndexNom("y");
-  }
-  else {
-    Ic1_ = dt_.IndexNom("phi");
-    Ic2_ = dt_.IndexNom("theta");
-  }
+  Ic1_ = dt_.IndexNom("PHI");
+  Ic2_ = dt_.IndexNom("THETA");
+  
   Izs_ = dt_.IndexNom(ZSCol_); // the SPEC-Z column
   Iz_ = dt_.IndexNom(ZOCol_);
-  Itype_= dt_.IndexNom("type"); 
+  Itype_= dt_.IndexNom("TYPE"); 
   Imag_ = dt_.IndexNom("MB"); 
 
   if (Print)
@@ -159,10 +142,7 @@ Cat2Grid::Cat2Grid(SwFitsDataTable& dt,SimpleUniverse& su,RandomGenerator& rg,
   if (Print) {
     cout <<"    TOTAL number of galaxies in catalog ="<< ngall_ <<endl;
     cout <<"    Number of columns in catalog = "<< dt_.NCols() <<endl;
-    if (RadialZ_)
-      cout <<"    Coord x = column "<< Ic1_ <<", coord y = column "<< Ic2_ <<endl;
-    else
-      cout <<"    Angle phi = column "<< Ic1_ <<", angle theta = column "<< Ic2_ <<endl;
+    cout <<"    Angle phi = column "<< Ic1_ <<", angle theta = column "<< Ic2_ <<endl;
     cout <<"    Spec-z = column "<< Izs_ <<", z used in analysis = column "<< Iz_ <<endl;
     cout <<"    (the above will be the same column when reading in spec-z)"<<endl;
   }
@@ -191,13 +171,12 @@ Cat2Grid& Cat2Grid::Set(const Cat2Grid& a)
   debugoutroot_=a.debugoutroot_;        
   PZDerr_=a.PZDerr_;    
   AddGaussErr_    =a.AddGaussErr_;
-  AddGaussErrAxis_=a.AddGaussErrAxis_;
   AddGaussErrReds_=a.AddGaussErrReds_;
+  doBiasCorr_=a.doBiasCorr_;
   selfuncp_=a.selfuncp_;
   ZSCol_=a.ZSCol_;
   ZOCol_=a.ZOCol_;
 
-  //Initialised in FindMinMaxCoords 
   zsmin_=a.zsmin_;
   zsmax_=a.zsmax_;      
   xmin_=a.xmin_;
@@ -207,27 +186,21 @@ Cat2Grid& Cat2Grid::Set(const Cat2Grid& a)
   zmin_=a.zmin_;
   zmax_=a.zmax_;
                  
+  ngo_=a.ngo_;            
+  ngall_=a.ngall_;            
   ng_=a.ng_;            
-        
+  ngout_=a.ngout_;            
+  ngw_=a.ngw_;            
+  nrand_=a.nrand_;            
+  wnrand_=a.wnrand_;            
+
   //Initialised in ComputeSFfromLF
   /*phistar_=a.phistar_;
     Mstar_=a.Mstar_;
     alpha_=a.alpha_;
     mlim_=a.mlim_;
     Mc_=a.Mc_;*/
-        
-  //Initialised in ComputeSFfromLF or ComputeSF
-  if (a.dL_.size()>0)
-    {
-      dL_=a.dL_;
-      phi_=a.phi_;
-      dc_=a.dc_;
-    }
-        
-  //Initialised in ComputeSF
-  if (a.zs_.size()>0)
-    zs_=a.zs_;
-        
+                        
   //Initialised in ConstructGrid
   Vol_=a.Vol_;  
   Nx_=a.Nx_;
@@ -237,126 +210,14 @@ Cat2Grid& Cat2Grid::Set(const Cat2Grid& a)
   cellsize_=a.cellsize_;
         
   Npix_=a.Npix_;
-  if (a.ngals_.Size()>0)
-    ngals_=a.ngals_;
   if (a.randomcat_.Size()>0)
     {
       randomcat_=a.randomcat_;
-      wngals_=a.wngals_;
-      weights_=a.weights_;
       wrgals_=a.wrgals_;
     }
+  zc_ = a.zc_;
   alph_=a.alph_;
          
-};
-
-
-double Cat2Grid::FindMinMaxCoords()
-// Finds min and max of cartesian x,y,z coords
-// of all galaxies in simulation
-// Find min/max redshift
-{
-  cout <<endl<<"    Cat2Grid::FindMinMaxCoords()"<<endl;
-        
-  if (AddGaussErr_)  {
-    cout <<"    Remember: adding Gaussian errors, equivalent distance error = ";
-    cout << PZDerr_ <<" Mpc"<<endl;
-  }
-                
-  long seed=1; 
-  rg_.SetSeed(seed);
-        
-  sa_size_t ng=0; // reset to zero to count up all OBSERVED galaxies
-        
-  // artificially set to very large min, very small max
-  double minx=1e10,miny=1e10,minz=1e10;
-  double maxx=0,maxy=0,maxz=0;
-  double minzs=20,maxzs=0;
-        
-  DataTableRow rowin = dt_.EmptyRow();
-  GalRecord grec;
-  double x=1e8,y=1e8,z=-1e8,redshift=-10;
-        
-  ProgressBar pgb(ngall_, ProgBarM_Percent);
-  for(long ig=0; ig<ngall_; ig++) {
-                
-    dt_.GetRow(ig, rowin);
-    Row2Record(rowin,grec);
-    if (!Filter(grec)) continue;
-    Rec2EuclidCoord(grec,x,y,z,redshift);
-    // the redshift returned here is the redshift to be used
-    // in the analysis, could be spec-z, phot-z, gauss-z
-        
-    // print out first 10 gals
-    if(ig<10)   
-      {
-        cout <<"    galid test="<<ig<<": ";
-        grec.Print();
-        cout <<", x="<<x<<", y="<<y<<", z="<<z;
-        if (AddGaussErr_)
-          cout <<", zpG="<<redshift<<endl;
-        else
-          cout <<endl;
-      } 
-    ng++; 
-                
-    // perform check to find minimums/maximums  
-    if(x<minx)
-      minx = x;
-    if(y<miny)
-      miny = y;
-    if(z<minz)
-      minz = z;
-                        
-    if(x>maxx)
-      maxx = x;
-    if(y>maxy)
-      maxy = y;
-    if(z>maxz)
-      maxz = z;
-                        
-    if (redshift<minzs)
-      minzs = redshift;
-    if (redshift>maxzs)
-      maxzs = redshift;
-
-    pgb.update(ig);
-  }
-                
-  cout <<"    Number of observed galaxies = "<< ng;
-  cout <<", Total number of galaxies = "<< ngall_ <<endl;
-        
-  if (ng>ngall_)
-    throw ParmError("ERROR! galaxy number discrepancy");
-        
-  // set min and max to class variables
-  xmin_ = minx;
-  xmax_ = maxx;
-  ymin_ = miny;
-  ymax_ = maxy;
-  zmin_ = minz;
-  zmax_ = maxz;
-  zsmin_ = minzs;
-  zsmax_= maxzs;
-                
-  // find maximum (obs) luminosity distance in survey
-  su_.SetEmissionRedShift(zsmax_);
-  double maxdL=su_.LuminosityDistanceMpc();
-                
-  cout <<"    compute approx SURVEY volume .... "<<endl;
-  cout <<"    xmin="<< xmin_ <<", xmax="<< xmax_ <<endl;
-  cout <<"    ymin="<< ymin_ <<", ymax="<< ymax_ <<endl;
-  cout <<"    zmin="<< zmin_ <<", zmax="<< zmax_ <<endl;
-  Vol_ = (xmax_-xmin_)*(ymax_-ymin_)*(zmax_-zmin_);
-  cout <<"    -> Volume = "<< Vol_ <<" Mpc"<<endl;
-  cout <<"    OBSERVED redshift range (from column "<< ZOCol_ <<"): ";
-  cout << zsmin_ <<"<z<"<< zsmax_ <<endl;
-  cout <<"    Maximum dL="<< maxdL <<endl;
-        
-  cout <<"    EXIT Cat2Grid::FindMinMaxCoords()"<<endl<<endl;
-        
-  return maxdL;
-        
 };
 
 
@@ -452,12 +313,10 @@ void Cat2Grid::SetGrid(double Theta, double zl, double zh,double R)
   int ndim=3;
   sa_size_t mydim[ndim];
   mydim[0]=Nx_; mydim[1]=Ny_; mydim[2]=Nz_;
-  ngals_.SetSize(ndim, mydim);  // number of galaxies in each cell: data
-  wngals_.SetSize(ndim, mydim); // weighted galaxy density field: data
   if (sfcompute_) {
     randomcat_.SetSize(ndim, mydim);// number of galaxies in each cell: random catalog
-    weights_.SetSize(ndim, mydim);      // weights of galaxy density field (per cell)
     wrgals_.SetSize(ndim, mydim);       // weighted galaxy density field: random catalog
+    zc_.SetSize(ndim, mydim);       // weighted galaxy density field: random catalog
   }
         
   cout <<"    EXIT Cat2Grid::SetGrid()"<<endl<<endl<<endl;
@@ -545,11 +404,8 @@ void Cat2Grid::SetGrid(int_8 Nx, int_8 Ny, int_8 Nz, double R, double zref)
   int ndim=3;
   sa_size_t mydim[ndim];
   mydim[0]=Nx_; mydim[1]=Ny_; mydim[2]=Nz_;
-  ngals_.SetSize(ndim, mydim);  // number of galaxies in each cell: data
-  wngals_.SetSize(ndim, mydim); // weighted galaxy density field: data (same as ngal if no SF)
   if (sfcompute_) {
     randomcat_.SetSize(ndim, mydim);// number of galaxies in each cell: random catalog
-    weights_.SetSize(ndim, mydim);      // weights of galaxy density field (per cell)
     wrgals_.SetSize(ndim, mydim);       // weighted galaxy density field: random catalog
   }
                 
@@ -557,7 +413,7 @@ void Cat2Grid::SetGrid(int_8 Nx, int_8 Ny, int_8 Nz, double R, double zref)
 };
 
 
-void Cat2Grid::SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, string ZFCol, string  ZSCol,  string ZOCol)
+void Cat2Grid::SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, string ZFCol, string  ZSCol,  string ZOCol, bool MakeFullHist)
 // Create Histo of observed redshifts/true redshifts and save to
 // a text file called [SFTextFile]_nofz.txt
 // Reads in a Fits file containing ALL the true redshifts in the
@@ -595,36 +451,102 @@ void Cat2Grid::SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, s
   // (will be same as above if spec-z used in analysis)
   Histo nzOCsz(minz, maxz, nbin); // obs catalog Histo (using spec-z) 
   
-  // Read in Fits file containing column with all true redshifts
-  // FULL CATALOG               
   double minzt, maxzt;
+
   
-  for (int ic=0; ic<Nfiles; ic++) {
+  if (MakeFullHist) {
+    // Get full catalog file name(s)
+    string delim=",";
+    vector<string> fnames;
+    stringSplit(FullCat,delim,fnames);
+    int Nfiles = fnames.size();
     
-    string FullCatFile = fnames[ic];
-    cout <<"    Read in full catalog redshifts from "<< FullCatFile;
-    cout <<" from column labelled "<< ZFCol <<endl;
-    FitsInOutFile fin(FullCatFile,FitsInOutFile::Fits_RO);
-    fin.MoveAbsToHDU(2);
-    SwFitsDataTable dt(fin,512,false);
-    cout <<endl;
+    /*// Set name of catalog containing the "full" set of z's
+      string FullCatFile;
+      if(Nfiles>1)
+      cout <<"    Reading in "<< Nfiles <<" full catalog files"<<endl; 
+      else
+      FullCatFile = FullCat;*/
+    // Read in Fits file containing column with all true redshifts
+    // FULL CATALOG               
     
-    sa_size_t ncat = dt.NEntry();
-    sa_size_t Izf = dt.IndexNom(ZFCol);
-    dt.GetMinMax(Izf,minzt,maxzt); 
-    DataTableRow rowin = dt.EmptyRow();
-    cout <<"    Number of galaxies in this FULL catalog = "<< ncat <<endl;
-    cout <<"    Min z of this FULL catalog = "<<minzt;
-    cout <<", max z of this FULL catalog = "<<maxzt<<endl;
-    
-    cout <<"    Add to Histogram ... "<<endl;
-    for(sa_size_t i=0; i<ncat; i++) { 
-      dt.GetRow(i, rowin);
-      double zs=rowin[Izf];
-      nzFC.Add(zs);
+    for (int ic=0; ic<Nfiles; ic++) {
+      
+      string FullCatFile = fnames[ic];
+      cout <<"    Read in full catalog redshifts from "<< FullCatFile;
+      cout <<" from column labelled "<< ZFCol <<endl;
+     FitsInOutFile fin(FullCatFile,FitsInOutFile::Fits_RO);
+      fin.MoveAbsToHDU(2);
+      SwFitsDataTable dt(fin,512,false);
+      cout <<endl;
+      
+      sa_size_t ncat = dt.NEntry();
+      sa_size_t Izf = dt.IndexNom(ZFCol);
+      dt.GetMinMax(Izf,minzt,maxzt); 
+      DataTableRow rowin = dt.EmptyRow();
+      cout <<"    Number of galaxies in this FULL catalog = "<< ncat <<endl;
+      cout <<"    Min z of this FULL catalog = "<<minzt;
+      cout <<", max z of this FULL catalog = "<<maxzt<<endl;
+      
+      cout <<"    Add to Histogram ... "<<endl;
+      for(sa_size_t i=0; i<ncat; i++) { 
+	dt.GetRow(i, rowin);
+	double zs=rowin[Izf];
+	nzFC.Add(zs);
+      }
+    }
+    sa_size_t ngFC = nzFC.NEntries();
+  }
+  else {
+    string sffile = FullCat + "_ZONLY.txt";
+    ifstream inp;
+    inp.open(sffile.c_str(), ifstream::in);
+    inp.close();
+    if(inp.fail()) { 
+      // sffile does NOT exist
+      string emsg = "ERROR! Selection function in file " + sffile;
+      emsg += " does not exist";
+      throw ParmError(emsg);
+    }
+    else {
+      // sffile DOES exist
+      cout <<" Histogram from all galaxies will be read from file " << sffile.c_str() <<endl;
+      SInterp1D histo_full;
+      vector<double> xsv, ysv;// the two columns to be read in
+      
+      size_t cnt=0; // count number of lines
+      double cola, colb;
+      inp.open(sffile.c_str(), ifstream::in);
+      while(!inp.eof()) {  
+        inp.clear();
+        inp >> cola >> colb; // read each line into cola and colb
+        cout <<" histo ZONLY = "<< cola <<", "<< colb << endl;
+        
+	//       if ( (!inp.good()) || inp.eof() ) {   
+        if ( inp.eof() ) {   
+	  break; // read until end of file
+	}
+	nzFC.Add(cola,colb); 
+	if (cnt == 0) 
+	  if (cola != minz + (maxz-minz)/nbin/2.) {
+	    // sffile does NOT exist
+	    string emsg = "ERROR! Histogram in file " + sffile;
+	    emsg += " does not have the right minimum redshift";
+	    throw ParmError(emsg);	
+	  }
+	
+        cnt++;
+      }
+      inp.close();
+      
+      if (cola != maxz - (maxz-minz)/nbin/2.) {
+	// sffile does NOT exist
+	string emsg = "ERROR! Histogram in file " + sffile;
+	emsg += " does not have the right maximum redshift";
+	throw ParmError(emsg);	
+      }
     }
   }
-  sa_size_t ngFC = nzFC.NEntries();
     
   // OBS CATALOG - loop over and add to Histo
   cout <<"    Histogram up OBSERVED catalog"<<endl;
@@ -659,7 +581,10 @@ void Cat2Grid::SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, s
       Row2Record(rowino,grec);
       if (!Filter(grec)) continue; 
       // not significantly slower than reading the redshifts and allow more possibilities
-      Rec2EuclidCoord(grec,x,y,z,redshift);
+      if (RadialZ_ == true) 
+	Rec2ShellCoord(grec,x,y,z,redshift);
+      else 
+	Rec2EuclidCoord(grec,x,y,z,redshift);
       
       nzOC.Add(redshift); // histo up OBSERVED -z
       nzOCsz.Add(grec.zs);// histogram up spec-z no matter what
@@ -693,6 +618,9 @@ void Cat2Grid::SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, s
   //READ HISTOGRAM VALUES INTO A FILE
   string outfile = SFTextFile+"_nofz.txt";
   string outfile2 = SFTextFile+"_specz_nofz.txt";
+  string outfile0;
+  if (MakeFullHist)
+    outfile0 = SFTextFile+"_ZONLY.txt";
     
   cout <<"    Write n^o(z)/n^t(z) histograms to text files "<<endl;
   ifstream inp;
@@ -780,21 +708,12 @@ void Cat2Grid::GalGrid(double SkyArea)
   SkyArea_ = SkyArea;
         
   // Check grid has been set
-  if (!ngals_.IsAllocated())
-    throw ParmError("ERROR! Grid has not been set");
         
   Npix_ = Nx_*Ny_*Nz_;
   volgrid_ = Npix_*pow(cellsize_,3);
   cout <<"    Volume of grid="<< volgrid_ <<endl;
-
-  // Find total number of observed pixels
-  cout <<"    Finding number of observed pixels ... "<<endl;
-  n_obs_pixels_ = ObsPixels();
-  cout <<"    ... "<< n_obs_pixels_ <<" are observed out of "<< Npix_ <<" total pixels"<<endl;
                 
   // NUMBER OF GALAXIES IN EACH CELL
-  // first set array to zero
-  ngals_=0.;
 
   cout <<"    Cells in each direction: Nx="<< Nx_ <<", Ny="<< Ny_ <<", Nz=";
   cout << Nz_ <<endl;
@@ -825,8 +744,19 @@ void Cat2Grid::GalGrid(double SkyArea)
   // Take each galaxy and find which cell it lies in
   GalRecord grec;
   double x=1e8,y=1e8,z=-1e8,redshift=-10;
-  double selphi=1.;
-
+  double invselfunc=1.;
+  double bias=0.;
+  ngo_ = 0;
+  ng_ = new sa_size_t[vgrids_.size()];
+  ngout_ = new sa_size_t[vgrids_.size()];
+  ngw_ = new r_8[vgrids_.size()];
+  meanz_ = new r_8[vgrids_.size()];
+  for (int igd=0; igd < vgrids_.size(); igd ++) {
+    ng_[igd] = 0;
+    ngout_[igd] = 0;
+    ngw_[igd] = 0.;
+    meanz_[igd] = 0.;
+ }
   for (int ic=0; ic<Nobsfiles; ic++) {
     string ObsCatFile = fobsnames[ic];
     cout << "Read file #" <<  ic <<": "<< ObsCatFile << endl;
@@ -856,21 +786,24 @@ void Cat2Grid::GalGrid(double SkyArea)
         ngo_++; 
 
       // convert galaxy position into Euclid coord - it is here that z error really matters
-      Rec2EuclidCoord(grec,x,y,z,redshift);
+      if (RadialZ_ == true) 
+	Rec2ShellCoord(grec,x,y,z,redshift);
+      else 
+	Rec2EuclidCoord(grec,x,y,z,redshift);
             
       // return selection function value at gal redshift
-      selphi = (*selfuncp_)(redshift);
+      invselfunc = 1./(*selfuncp_)(redshift);
             
       // basic check that selection function value isn't crazy
-      if (selphi<0)
-        cout <<"phi<0, phi="<< selphi <<", z="<< redshift <<endl;
+      if (invselfunc<0)
+        cout <<"phi<0, invselfunc ="<< invselfunc <<", z="<< redshift <<endl;
             
       // print out first 10 observed gals, just as a basic check
       if(ig<10) {
         cout <<"    galid="<< ig <<": ";
         grec.Print();
         if (AddGaussErr_)
-          cout <<", zpG="<< redshift <<", phi="<< selphi <<endl;
+          cout <<", zpG="<< redshift <<", 1/selfunc="<< invselfunc <<endl;
         else if(AddPhotoErrReds_)
           cout <<", type="<<grec.type<<", MA="<<grec.MB <<", redshift="<< redshift <<endl;
         else
@@ -878,30 +811,41 @@ void Cat2Grid::GalGrid(double SkyArea)
       }
             
       // add galaxy to correct grid pixel 
-      // ng_ and ngout_ are summed up in here:
-      AddToCell(x,y,z,selphi); 
+      int Ngrid_per_gal = 0;
+      for (size_t igd=0; igd<vgrids_.size(); igd++) {
+	if (vgrids_[igd].AddGal(x,y,z,invselfunc)) {
+	  ngw_[igd] += invselfunc; 
+	  ng_[igd] ++;
+	  Ngrid_per_gal ++;
+	  meanz_[igd] += redshift;
+	} else ngout_[igd] ++;
+
+      }
       pgb.update(ig); 
+      if (Ngrid_per_gal > 1) {
+	cout <<"    galid="<< ig <<": ";
+        grec.Print();
+	cout << "falls in " << Ngrid_per_gal << "grids."<< endl;
+	throw ParmError("ERROR! this galaxy falls in more than 1 grid");
+      }
     }
+
 
     cout <<"    Number of galaxies actually observed = "<< ngo_;
     cout <<", TOTAL number of galaxies in catalog = "<< n_gal <<endl;
-    cout <<"    Number of galaxies inside grid = "<< ng_ <<endl;
-          
-    cout <<"    Number of 'galaxies' inside WEIGHTED grid = "<< ngw_ <<endl;
-    cout <<"    .... (should be about equal to the number of galaxies in FULL";
-    cout <<" catalog - not printed here)"<<endl;
-          
-    cout <<"    Number of galaxies outside grid = "<< ngout_ <<endl;
+    for (size_t igd=0; igd<vgrids_.size(); igd++) {
+      cout <<  " GRID n." << igd << endl;
+      cout <<"    Mean redshift of the galaxies in the grid = " << meanz_[igd] / ng_[igd] << endl;
+      cout <<"    Number of galaxies inside = "<< ng_[igd] <<endl;
+      cout <<"    Number of 'galaxies' inside WEIGHTED = "<< ngw_[igd] <<endl;
+      cout <<"    Number of galaxies outside  = "<< ngout_[igd] <<endl;
+    }
+      
     cout <<"============== Analysis of catalog #" << ic << " done  ================================="<< endl << endl;
   }
 
   if (ngo_>ngall_)
     throw ParmError("ERROR! galaxy number discrepancy: ngo_!=ngall_");
-  if (ng_!=ngals_.Sum())
-    throw ParmError("ERROR! galaxy number discrepancy: ng_!=ngals_.Sum()");
-  if (ngo_!=ngals_.Sum())
-    cout <<"    Number of galaxies outside grid = "<< ngout_ <<endl;
-
   // normalise the arrays
   NormNArrays();
 
@@ -911,46 +855,15 @@ void Cat2Grid::GalGrid(double SkyArea)
   tm.Split();
   cout <<"    Elapsed time "<< tm.TotalElapsedTime() <<endl;
   cout <<"    EXIT Cat2Grid::GalGrid()"<<endl<<endl; 
-
-};
-
-
-sa_size_t Cat2Grid::ObsPixels()
-{
-
-  sa_size_t nobspix = 0;
-  double thetac;
-  for(int i=0; i<Nx_;i++)
-    for(int j=0; j<Ny_;j++)
-      for(int k=0; k<Nz_;k++) {
-                                
-        double xc,yc,zc;
-        GetCellCoord(i,j,k,xc,yc,zc);
-        double dcell= ((RadialZ_) ? zc : sqrt(xc*xc+yc*yc+zc*zc));
-        if (RadialZ_)  { // Cecile - to allow cut in Skyarea even in radial case - Wrong, to improve
-          thetac = fabs(xc/zc);
-          // if (thetac >  1.57080) cout << "!!!!!!!!!!!!!!!!!!!!!! width of the grid too large !!!!!!!!!!!!!!!!!!!!!! "<< endl;
-        }
-        else 
-          thetac = acos(zc/dcell);
-        if (thetac<=SkyArea_)
-          nobspix++;
-      }
-  return nobspix;
-};
-
+  
+}
 
 void Cat2Grid::Row2Record(DataTableRow& rowin, GalRecord& rec)
 {
   
-  if (RadialZ_) {
-    rec.xcoo = rowin[Ic1_]; rec.ycoo= rowin[Ic2_];
-    rec.alpha = -9999;   rec.delta=-9999;
-  }
-  else {
-    rec.xcoo = -9999 ; rec.ycoo= -9999;
-    rec.alpha = rowin[Ic1_];   rec.delta=rowin[Ic2_];
-  }
+  rec.xcoo = -9999 ; rec.ycoo= -9999;
+  rec.alpha = rowin[Ic1_];   rec.delta=rowin[Ic2_];
+  
   rec.zs = rowin[Izs_];  
   rec.zo = rowin[Iz_];
   rec.type = rowin[Itype_];
@@ -1041,66 +954,77 @@ void Cat2Grid::Rec2EuclidCoord(GalRecord& rec, double& x, double& y, double& z, 
 {
 
   redshift = rec.zo;// zo is redshift to be used in analysis (could be spec-z,phot-z,gauss-z)
+  
+  // error in redshift will be translated in change in x,y,z. So to do first.
   if (AddGaussErrReds_) {
     redshift += PZerr_ * (1.+redshift) * rg_.Gaussian();
   }
-  //Photo-z error (Adeline)
-  //redshift = 10 means galaxies don't pass the quality cut 
+
   if(AddPhotoErrReds_){
     redshift = ComputeErrorFromPhotoz(rec);
   }
 
+  if (doBiasCorr_) 
+    redshift += (*biasp_)(redshift) * (1.+redshift);
+
+
   double dc = z2dist_(redshift);
   double zref;
 
-  if (RadialZ_) {
-    // ratio_cell needed to deal with different resolutions for input simulated cube and this grid
-    x = rec.xcoo*ratio_cell_;
-    y = rec.ycoo*ratio_cell_;           
-    z = dc;
+  double ph=rec.alpha;
+  double th=rec.delta;
+  if(isnan(th)) {
+    cout <<"    Cat2Grid::Rec2EuclidCoord/PB theta=nan -> set theta=0"<<endl;
+    th=0;
   }
-  else {
-    double ph=rec.alpha;
-    double th=rec.delta;
-    if(isnan(th)) {
-      cout <<"    Cat2Grid::Rec2EuclidCoord/PB theta=nan -> set theta=0"<<endl;
-      th=0;
-    }
-          
-    x=dc*cos(ph)*sin(th);
-    y=dc*sin(ph)*sin(th);
-    z=dc*cos(th);
-  }
-        
-  zref = z;
-  if (AddGaussErrAxis_) {
-    z += ZErr2CoDistErr(su_,PZerr_,redshift)*rg_.Gaussian();
-    // We have to compute back the redshift 
-    redshift = ((RadialZ_) ?  dist2z_(z) : dist2z_(sqrt(x*x+y*y+z*z)) );
-  }
+  
+  x=dc*cos(ph)*sin(th);
+  y=dc*sin(ph)*sin(th);
+  z=dc*cos(th);  
+  //Photo-z error (Adeline)
+  //redshift = 10 means galaxies don't pass the quality cut 
 };
 
 
-void Cat2Grid::AddToCell(double x, double y, double z,double phi)
-// Find which index galaxy with (x,y,z) coordinates lies in
-// Fill ngals and wngals arrays accordingly
+void Cat2Grid::Rec2ShellCoord(GalRecord& rec, double& x, double& y, double& z, double& redshift)
+// From GalRecord object which contains:
+// double alpha,delta,glong,glat,xcoo,ycoo,zcoo;
+// double zs,zo;
+// int type;
+// double u,g,r,i,z,y;
+// Calculates: x,y,z comoving coordinates, and returns which redshift is being analysed
+// Choice of 3 redshifts: photometric, spectroscopic and spectroscopic + Gaussian error
 {
 
-  sa_size_t indexx=(sa_size_t)floor((x-Xmin_)/cellsize_);
-  sa_size_t indexy=(sa_size_t)floor((y-Ymin_)/cellsize_);
-  sa_size_t indexz=(sa_size_t)floor((z-Zmin_)/cellsize_);
-  if (indexx<Nx_&&indexy<Ny_&&indexz<Nz_&&indexx>=0&&indexy>=0&&indexz>=0) {
-        
-    ngals_(indexx,indexy,indexz)++;
-    if (sfcompute_) { // NOTE weight does not have to be 1/SF
-      wngals_(indexx,indexy,indexz)+=1/phi;
-      ngw_+=1/phi; }
-    else                // AND if cat has no SF, wngals_=ngals_
-      wngals_(indexx,indexy,indexz)++;
-    ng_++;
+  // x,y must computed with the spectroZ : not affected by the redshift error (Cecile)
+  redshift = rec.zs;
+  double dc = z2dist_(redshift);
+  double ph=rec.alpha;
+  double th=rec.delta;
+  if(isnan(th)) {
+    cout <<"    Cat2Grid::Rec2ShellCoord/PB theta=nan -> set theta=0"<<endl;
+    th=0;
   }
-  else
-    ngout_++;
+  double r = dc*tan(th);
+  r = th * dc;
+  x = r*cos(ph);
+  y = r*sin(ph);
+  
+  // zo is redshift to be used in analysis (could be spec-z,phot-z,gauss-z). It can be spectro or already with error or with error computed bellow
+  redshift = rec.zo;
+  z = z2dist_(redshift);
+
+  // error in redshift won't change angles. So to do after x,y computation.
+  if (AddGaussErrReds_) {
+    redshift += PZerr_ * (1.+redshift) * rg_.Gaussian();
+  }
+
+  if(AddPhotoErrReds_){
+    redshift = ComputeErrorFromPhotoz(rec);
+  }
+
+  if (doBiasCorr_) 
+    redshift += (*biasp_)(redshift) * (1.+redshift);
 };
 
 
@@ -1115,9 +1039,10 @@ void Cat2Grid::GetCellCoord(sa_size_t i, sa_size_t j, sa_size_t k, double& x, do
 };
 
 
-void Cat2Grid::RandomGrid(double nc, bool SaveArr)
+void Cat2Grid::RandomGrid(double nc, bool SaveArr, bool seed)
 // Compute random weighted grid with same selection function as data
 {
+  ErrRandomSeed_  = seed;
   cout <<endl<<"    Cat2Grid::RandomGrid()"<<endl;
   Timer tm("RandomGrid");
         
@@ -1128,7 +1053,15 @@ void Cat2Grid::RandomGrid(double nc, bool SaveArr)
     cout <<"    Check selection function .... "<<endl;
   cout <<"    Only filling pixels with theta <= "<< SkyArea_ <<endl;
         
-                
+                    
+  if (ErrRandomSeed_) {
+    rg_.AutoInit(0);
+    cout << "Seed automatically generated for random grid" << endl;
+  } else {
+    long seed=1;
+    rg_.SetSeed(seed);
+  }
+    
   //    throw ParmError("ERROR! selection function has NOT been computed");
                 
   if (wrgals_.NbDimensions()<2) {
@@ -1136,7 +1069,6 @@ void Cat2Grid::RandomGrid(double nc, bool SaveArr)
     sa_size_t mydim[ndim];
     mydim[0]=Nx_; mydim[1]=Ny_; mydim[2]=Nz_;
     randomcat_.SetSize(ndim, mydim);// number of galaxies in each cell: random catalog
-    weights_.SetSize(ndim, mydim);      // weights of galaxy density field (per cell)
     wrgals_.SetSize(ndim, mydim);       // weighted galaxy density field: random catalog
   }
   if (SaveArr) {
@@ -1146,7 +1078,6 @@ void Cat2Grid::RandomGrid(double nc, bool SaveArr)
     zc_.SetSize(ndim, mydim); // redshifts of pixel centers
   }
   cout <<"    Compute weights and random catalog ..."<<endl;
-        
   ProgressBar pgb(Nx_*Ny_, ProgBarM_Time);  // ProgBarM_None, ProgBarM_Percent, ProgBarM_Time
   size_t ccnt=0;
   for(int i=0; i<Nx_; i++) {
@@ -1163,21 +1094,11 @@ void Cat2Grid::RandomGrid(double nc, bool SaveArr)
         double redshift = dist2z_(dcell);
         double phi = (*selfuncp_)(redshift);
               
-        if (thetac<=SkyArea_)   {
-                
-          weights_(i,j,k) = 1/phi; // NOTE weight does not have to be 1/SF
-          // Average number of gals expected in cell
-          double mu = phi*nc; // just Poisson phi
-          uint_8 npoiss = rg_.PoissonAhrens(mu); // Poisson fluctuate
-          randomcat_(i,j,k) = (double)npoiss;
-                
-          wrgals_(i,j,k)=weights_(i,j,k)*randomcat_(i,j,k); // deleted alpha
-        }
-        else {
-          randomcat_(i,j,k) = 0;
-          weights_(i,j,k) = 0;
-          wrgals_(i,j,k) = 0;
-        }
+	// Average number of gals expected in cell
+	double mu = phi*nc; // just Poisson phi
+	uint_8 npoiss = rg_.PoissonAhrens(mu); // Poisson fluctuate
+	randomcat_(i,j,k) = (double)npoiss;
+	wrgals_(i,j,k)= randomcat_(i,j,k) / phi; // deleted alpha
               
         if (SaveArr)
           zc_(i,j,k) = redshift;
@@ -1188,69 +1109,57 @@ void Cat2Grid::RandomGrid(double nc, bool SaveArr)
   } // end of loop over  (x-direction)
   nrand_=randomcat_.Sum(); 
   wnrand_=wrgals_.Sum();
-  cout <<"    number of gals in in grid = "<< ng_;
   cout <<", number of gals in random grid = "<< nrand_ <<endl;
   cout <<"    Number of galaxies in RANDOM weighted grid = "<< wnrand_;
-  cout <<", should be approximately input density*npixels = "<< nc*n_obs_pixels_ <<endl;
-  cout <<"    Calculated weighted random grid density = "<< wnrand_/n_obs_pixels_;
+  cout <<", should be approximately input density*npixels = "<< nc*Npix_ <<endl;
+  cout <<"    Calculated weighted random grid density = "<< wnrand_/Npix_;
   cout <<", input density = "<< nc <<" (should be approximately the same)"<<endl;
         
   // Ratio of number of observed WEIGHTED gals to WEIGHTED gals in random catalog
-  if (ngw_>0)
-    alph_=(double)(ngw_/wnrand_); 
-  else
-    alph_=(double)(ng_/wnrand_); 
-  cout <<"    alpha=ngw/nsw="<< alph_ <<endl; // alpha should be ntrue/nsyn
+  for(size_t i=0; i<vgrids_.size(); i++) {
+    if (ngw_[i]>0)
+      alph_=(double)(ngw_[i]/wnrand_); 
+    else
+      alph_=(double)(ng_[i]/wnrand_); 
+    cout <<" grid n."<< i << "    alpha=ngw/nsw="<< alph_ <<endl; // alpha should be ntrue/nsyn
+  }
   VarianceRandomGrid();
-  cout <<"    Mean of weighted random grid should be roughly "<< nc;
-  cout <<" if all pixels are observed, "<< nc*n_obs_pixels_/Npix_ <<" if not"<<endl;
+  cout <<"    Mean of weighted random grid should be roughly "<< nc << endl;
   double minv,maxv;
-  randomcat_.MinMax(minv,maxv);
-  cout <<"    Minimum value in random cat grid = "<< minv <<endl;
-  cout <<"    Maximum value in random cat grid = "<< maxv <<endl;
-  weights_.MinMax(minv,maxv);
-  cout <<"    Minimum value in weights grid = "<< minv <<endl;
-  cout <<"    Maximum value in weights grid = "<< maxv <<endl;
-
+  if (DoDebug_) {
+    randomcat_.MinMax(minv,maxv);
+    cout <<"    Minimum value in random cat grid = "<< minv <<endl;
+    cout <<"    Maximum value in random cat grid = "<< maxv <<endl;
+  }
   // normalise the array
   NormRArray();
 
   // write the arrays here!
   fos_ << wrgals_;
-  if (SaveArr)
+  if (SaveArr) {
     fos_ << zc_;
-
+    cout << "WRITE Z array" << endl;
+  }
   tm.Split();
   cout <<"    Elapsed time "<< tm.TotalElapsedTime()<<endl;
   cout <<"    EXIT Cat2Grid::RandomGrid()"<<endl<<endl; 
 
 };
 
-void Cat2Grid::NormNArrays(){           
-  double normm=(double)n_obs_pixels_/ng_;
-  ngals_ *= normm;
-  double normw = (double)n_obs_pixels_/ngw_;
-  wngals_*= normw;
-  cout <<"     Normalising n-gals array by "<< normm <<endl;
-  cout <<"     Normalising weighted n-gals array by "<< normw <<endl;
+void Cat2Grid::NormNArrays(){    
+
+  for(size_t i=0; i<vgrids_.size(); i++) {
+    double normw = (double)Npix_/ngw_[i];
+    cout <<"Grid n."<< i<< ":     Normalising weighted n-gals array by "<< normw <<endl;
+    vgrids_[i].getGrid() *= normw;
+  }
 }
 
 void Cat2Grid::NormRArray(){            
-  double normr = (double)(n_obs_pixels_/wnrand_)*( 1/sqrt(alph_));
+  double normr = (double)(Npix_/wnrand_)*( 1/sqrt(alph_));
   cout <<"     Normalising weighted random array by "<< normr <<endl;
   wrgals_*= normr; 
   VarianceRandomGrid();
-}
-
-void Cat2Grid::SetGaussErrAxis(double Err, double zref, bool randomseed) {
-  AddGaussErr_    = true;
-  AddGaussErrAxis_= true;
-  ErrRandomSeed_  = randomseed;
-  PZerr_ = Err; 
-  PZDerr_ = ZErr2CoDistErr(su_,Err,zref);
-  cout <<"    Gaussian errors WILL be added to z-coordinate from a reshift error of "<< PZerr_ ; 
-  if (ErrRandomSeed_) cout << " in Montecarlo mode" << endl<<endl; 
-  else cout << endl<<endl; 
 }
 
 void Cat2Grid::SetGaussErrRedshift(double Err, double zref, bool seed) {
@@ -1262,6 +1171,11 @@ void Cat2Grid::SetGaussErrRedshift(double Err, double zref, bool seed) {
   cout <<"    Gaussian errors WILL be added to redshift "<< PZerr_   ; 
   if (ErrRandomSeed_) cout << " in Montecarlo mode" << endl<<endl; 
   else cout << endl<<endl; 
+}
+
+void Cat2Grid::SetBiasCorr(string biasFileName) {
+  doBiasCorr_    = true;
+  cout <<"    Bias correction on redshift using " << biasFileName << endl<<endl; 
 }
         
 void Cat2Grid::SetPhotozErrRedshift(string pdfFileName, bool seed, double zcat_min, double zcat_max){
@@ -1386,269 +1300,6 @@ void Cat2Grid::VarianceRandomGrid() {
 }
 
 
-
-vector<double> Cat2Grid::XtractSubArray(TArray<r_8>& nsub, sa_size_t dNp, 
-                                        sa_size_t Np, double theta, int arrayflag)
-// Np    : the starting pixel number of sub-array
-// dNp   : width of sub-array in z-direction
-// theta : MAX angle grid should cover, if want whole grid just make sure theta
-//                 is any value greater than angular extent of whole grid
-// arrayflag : specifies which array: ngals,wngals,wrgals to return in nsub
-{
-  cout <<"    Cat2Grid::XtractSubArray() Z-axis split version"<<endl;
-        
-  cout <<"    Sub-array beginning at array pixel index "<< Np <<endl;
-  sa_size_t Nx = GetNTransPix(Np,theta);
-        
-  // min and max pixel indices
-  sa_size_t minxi = idx_-Nx;
-  sa_size_t minyi = idy_-Nx;
-  sa_size_t maxxi = idx_+Nx;
-  sa_size_t maxyi = idy_+Nx;
-  sa_size_t minzi = Np;
-  sa_size_t maxzi = Np+dNp-1;
-        
-  // check min,max pixel indices
-  if (maxxi>ngals_.SizeX()-1) {
-    cout <<"    maxx="<< maxxi <<", so setting maxx="<< ngals_.SizeX()-1 <<endl;
-    maxxi = ngals_.SizeX()-1;
-  }
-  if (maxyi>ngals_.SizeY()-1) {
-    cout <<"    maxy="<< maxyi <<", so setting maxy="<< ngals_.SizeY()-1 <<endl;
-    maxyi = ngals_.SizeY()-1;
-  }
-  if (maxzi>ngals_.SizeZ()-1) {
-    cout <<"    maxz="<< maxzi <<", so setting maxz="<< ngals_.SizeZ()-1 <<endl;
-    maxzi = ngals_.SizeZ()-1;
-  }
-  if (minxi<0) {
-    cout <<"    minx="<< minxi <<", so setting minx=0"<<endl;
-    minxi = 0;
-  }
-  if (minyi<0) {
-    cout <<"    miny="<< minyi <<", so setting miny=0"<<endl;
-    minyi=0;
-  }
-  if (minzi<0) {
-    cout <<"    minz="<< minzi <<", so setting minz=0"<<endl;
-    minzi=0;
-  }
-                
-  if (minxi<0||minyi<0||minzi<0)
-    throw ParmError("ERROR! either minx<0||miny<0||minz<0");
-  if (maxxi>ngals_.SizeX()-1||maxyi>ngals_.SizeY()-1||maxzi>ngals_.SizeZ()-1)
-    throw ParmError("ERROR! either maxx>ngals_.SizeX()-1||maxy>ngals_.SizeY()-1||maxz>ngals_.SizeZ()-1");
-
-  cout <<"    Ranges of sub array: (xmin,xmax) = ("<< minxi <<","<< maxxi <<"),";
-  cout <<" (ymin,ymax) = ("<< minyi <<","<< maxyi <<"), (zmin,zmax) = (";
-  cout << minzi <<","<< maxzi <<")"<<endl;
-        
-  if(arrayflag<0)
-    nsub = ngals_(Range(minxi,maxxi), Range(minyi,maxyi), Range(minzi,maxzi)).PackElements();
-  else if (arrayflag==0)
-    nsub = wngals_(Range(minxi,maxxi), Range(minyi,maxyi), Range(minzi,maxzi)).PackElements();
-  else if (arrayflag>0)
-    nsub = wrgals_(Range(minxi,maxxi), Range(minyi,maxyi), Range(minzi,maxzi)).PackElements();
-                
-  // need to return min and max redshifts of this sub grid
-  // min redshift is redshift corresponding to: Zmin_+Np*cellsize_;
-  // max redshift is redshift corresponding to:  = Nx*cellsize_/sin(theta)
-  double mind = Zmin_+Np*cellsize_;
-  double maxd = mind + (maxzi-minzi)*cellsize_;//(Nx*cellsize_)/sin(theta);
-  double centerd = (mind + maxd)/2;
-        
-  // We have to initialize the distance to redshift conversion interpolator
-  int_8 nz=1000;
-  vector<double> zrs, codist;
-  double minz=0, maxz=10;
-  double dz = (maxz-minz)/(nz-1);
-  for(int kk=0; kk<nz; kk++) 
-    {
-      double zs=minz+kk*dz;
-      su_.SetEmissionRedShift(zs);
-      double cod =su_.RadialCoordinateMpc(); // radial distance 
-      zrs.push_back(zs);
-      codist.push_back(cod); 
-    }
-  SInterp1D dist2z(codist,zrs,codist[0],codist[codist.size()-1],2*nz);
-        
-  double minza = dist2z(mind);
-  double maxza = dist2z(maxd);
-  double cenza = dist2z(centerd);
-  vector<double> zedge;
-  zedge.push_back(minza);
-  zedge.push_back(cenza);
-  zedge.push_back(maxza);
-  cout << "    min,center,max redshifts of array = "<< minza <<","<< cenza;
-  cout <<","<< maxza <<endl;
-        
-  cout <<"    EXIT Cat2Grid::XtractSubArray()"<<endl<<endl;
-
-  return zedge;
-};
-
-
-vector<double> Cat2Grid::XtractSubArray(TArray<r_8>& nsub, long x1, long x2,
-                                        long y1, long y2, long z1, long z2, int arrayflag)
-// Extract sub array uses pixel ranges in each dimension
-{
-
-  cout <<"    Cat2Grid::XtractSubArray() Sub-array range version"<<endl;
-        
-  if(arrayflag<0)
-    nsub = ngals_(Range(x1,x2), Range(y1,y2), Range(z1,z2)).PackElements();
-  else if (arrayflag==0)
-    nsub = wngals_(Range(x1,x2), Range(y1,y2), Range(z1,z2)).PackElements();
-  else if (arrayflag>0)
-    nsub = wrgals_(Range(x1,x2), Range(y1,y2), Range(z1,z2)).PackElements();
-        
-  // need to return min and max redshifts of this sub grid
-  // min redshift is redshift corresponds to distance to first pixel in z-dim
-  // max redshift is redshift corresponds to distance to last pixel in z-dim
-  double mind = Zmin_+z1*cellsize_;
-  double maxd = mind + (z2-z1)*cellsize_;
-  double centerd = (mind + maxd)/2;
-        
-  // We have to initialize the distance to redshift conversion interpolator
-  int_8 nz=1000;
-  vector<double> zrs, codist;
-  double minz=0, maxz=10;
-  double dz = (maxz-minz)/(nz-1);
-  for(int kk=0; kk<nz; kk++) 
-    {
-      double zs=minz+kk*dz;
-      su_.SetEmissionRedShift(zs);
-      double cod =su_.RadialCoordinateMpc(); // radial distance 
-      zrs.push_back(zs);
-      codist.push_back(cod); 
-    }
-  SInterp1D dist2z(codist,zrs,codist[0],codist[codist.size()-1],2*nz);
-        
-  double minza = dist2z(mind);
-  double maxza = dist2z(maxd);
-  double cenza = dist2z(centerd);
-  vector<double> zedge;
-  zedge.push_back(minza);
-  zedge.push_back(cenza);
-  zedge.push_back(maxza);
-  cout << "    min,center,max redshifts of array = "<< minza <<","<< cenza;
-  cout <<","<< maxza <<endl;
-        
-  cout <<"    EXIT Cat2Grid::XtractSubArray()"<<endl<<endl;
-
-  return zedge;
-};
-
-
-sa_size_t Cat2Grid::GetNTransPix(sa_size_t Np, double theta)
-// return number of pixels in x or y dimension that cover
-// an angle of size theta at distance Dp
-{
-
-  double Dp = Zmin_ + Np*cellsize_; // min distance to center pixel on x-y plane
-  double xw = Dp*tan(theta)-cellsize_/2;
-  sa_size_t Nx=(sa_size_t)floor(xw/cellsize_);
-        
-  cout <<"    Distance to sub array = "<< Dp <<" Mpc"<<endl;
-  cout <<"    Number of pixels which cover "<< theta <<" radians";
-  cout <<" at distance "<< Dp <<" Mpc, = "<< Nx <<endl;
-        
-  return Nx;
-};
-
-
-void Cat2Grid::OutputEuclidCat(double SkyArea)
-// Outputs catalog in Euclidean coords
-{
-  cout <<endl<<"    Cat2Grid::OutputEuclidCat()"<<endl; 
-
-  string outfile = debugoutroot_+"_euclidcat.fits";
-  // We create first a datatable with the fits file as the swap space 
-  FitsInOutFile swf(outfile, FitsInOutFile::Fits_Create);       
-  SwFitsDataTable gals(swf, 2048);
-  //gals.AddLongColumn("GalID");
-  gals.AddFloatColumn("phi");
-  gals.AddFloatColumn("theta");
-  gals.AddFloatColumn("z");
-  gals.AddFloatColumn("rg");
-  gals.AddFloatColumn("xg");
-  gals.AddFloatColumn("yg");
-  gals.AddFloatColumn("zg");
-  DataTableRow row = gals.EmptyRow();
-
-  // Set sky area
-  SkyArea_ = SkyArea;
-        
-  Npix_= Nx_*Ny_*Nz_;
-  volgrid_= Npix_*pow(cellsize_,3);
-  cout <<"    Volume of grid="<< volgrid_ <<endl;
-
-  cout <<"    Start loop over galaxies..."<<endl;
-  cout <<"    applying filters ..."<<endl;
-  cout <<"    Reading in OBSERVED redshifts from column "<< ZOCol_ <<endl;
-  if (AddGaussErr_)
-    cout <<"    Adding Gaussian photo-z error of typical size "<< PZDerr_ <<" Mpc to these"<<endl;
-        
-        
-  // Set counting galaxies to ZERO
-  ngo_=0; // num gals OBSERVED
-
-  // Take each galaxy and find which cell it lies in
-  DataTableRow rowin = dt_.EmptyRow();
-  GalRecord grec;
-  double x=1e8,y=1e8,z=-1e8,redshift=-10;
-  double selphi=1.;
-  for(long ig=0; ig<ngall_; ig++) {
-                
-    dt_.GetRow(ig, rowin); // get row values from data table
-    Row2Record(rowin,grec);// add row values to GalRecord class
-    if (!Filter(grec)) continue; // add possible filtering on e.g. magnitude here
-          
-    ngo_++; // count galaxy
-    Rec2EuclidCoord(grec,x,y,z,redshift);// convert galaxy position into Euclid coord
-                        
-    // print out first 10 gals
-    if(ig<10) {
-                        
-      cout <<"    galid="<< ig <<": ";
-      grec.Print();
-      if (AddGaussErr_)
-        cout <<", zpG="<< redshift <<", phi="<< selphi <<endl;
-      else
-        cout <<endl;
-    }
-
-    //su_.SetEmissionRedShift(redshift);
-    double dc = z2dist_(redshift);//su_.RadialCoordinateMpc();
-    double ph = grec.alpha;
-    double th = grec.delta;
-    uint_8 gid = rowin[Iid_];
-
-    // write to file
-    /*row[0] = gid;
-      row[1] = ph;
-      row[2] = th;
-      row[3] = redshift; 
-      row[4] = dc; 
-      row[5] = x; 
-      row[6] = y; 
-      row[7] = z;*/
-    row[0] = ph;
-    row[1] = th;
-    row[2] = redshift; 
-    row[3] = dc; 
-    row[4] = x; 
-    row[5] = y; 
-    row[6] = z;
-    gals.AddRow(row);
-
-  }
-
-  cout <<"    Number of galaxies actually observed = "<< ngo_ <<endl;
-  cout <<"    EXIT Cat2Grid::OutputEuclidCat()"<<endl<<endl; 
-
-};
-
 void  Cat2Grid::WriteHeader(string IncatName) {
   // Commented by Cecile: we can write the header in any case
   // if ( ngo_<1||nrand_<1 )
@@ -1665,10 +1316,13 @@ void  Cat2Grid::WriteHeader(string IncatName) {
   fos_.WriteKey("MeanOverDensity",mean_overdensity_," mean dens SimLSS delta-fudge");
   fos_.WriteKey("InCat",IncatName," original catalog");
   fos_.WriteKey("NGALCAT",ngall_," N gals in InCat");
-  fos_.WriteKey("NOBSPIX",n_obs_pixels_," original catalog");
-  fos_.WriteKey("NGRID",ng_," N gals in grid");
-  fos_.WriteKey("NOGRID",ngout_," N gals outside grid");
-  fos_.WriteKey("NWGRID",ngw_," N weighted gals in grid");    
+  fos_.WriteKey("NumberOfGrids",int(vgrids_.size())," number of grids");
+
+  for(size_t i=0; i<vgrids_.size(); i++) {
+    fos_.WriteKey("NGRID",ng_[i]," N gals in grid");
+    fos_.WriteKey("NOGRID",ngout_[i]," N gals outside grid");
+    fos_.WriteKey("NWGRID",ngw_[i]," N weighted gals in grid");   
+  } 
   fos_.WriteKey("NRGRID",wnrand_," N (weighted if appl.) gals in random grid");
           
   //modified by Adeline : write cosmo parameters in file header
@@ -1694,28 +1348,10 @@ void  Cat2Grid::WriteHeader(string IncatName) {
 };
 
 
-void Cat2Grid::ZeroGalArrays(){
-  wngals_.ZeroSize();
-  ngals_.ZeroSize();
-}
-
 void Cat2Grid::WriteGalArrays() {
-  ngals_.PackElements();
-  wngals_.PackElements();
-  fos_ << ngals_; fos_ << wngals_;
+  if (vgrids_.size()>0) {
+    cout << "Cat2Grid::WriteGalArrays() - writing vector of grids with NGrids="<<vgrids_.size()<<endl;
+    for(size_t i=0; i<vgrids_.size(); i++) fos_ << vgrids_[i].getGrid();
+  }
 }
 
-void Cat2Grid::SaveNgArray(string outfileroot, string IncatName) {
-  
-  string outfile;
-  outfile = "tmp_" + outfileroot;//outfileroot +"_ngals.fits";
-  cout <<"    Writing NGALS array to "<< outfile <<endl;
-  FitsInOutFile fos(outfile, FitsInOutFile::Fits_Create);
-  
-  fos << ngals_;
-  //WriteHeader(fos,IncatName);
-  fos.WriteKey("NGRID",ng_," N gals in grid");
-  fos.WriteKey("NOGRID",ngout_," N gals outside grid");
-}
-
-        
