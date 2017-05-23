@@ -70,6 +70,7 @@ void usage(void) {
 	cout << " -P : PSFile: power spectrum file to read in               "<<endl;
 	cout << "              (3 columns: k (Mpc^-1), P(k) Mpc^3, err)     "<<endl;
 	cout << " -U : cosmogical model read from grid file                 "<<endl;
+	cout << " -R : ref_file: PS without oscillation                     "<<endl; 
 	cout << " -O : outfile_root: file root name to write results to     "<<endl; 
 	cout << " -s : if input file is simulation (no shotnoise, no sigma) "<<endl; 
 	cout << endl;
@@ -86,7 +87,7 @@ int main(int narg, char *arg[]) {
 	string ps_file, cosmo_file, ref_file;
 	// output file
 	string outfile_root;
-	double maxk;
+	double maxk  = 1.;
 	double Sigma8, n_s;
 	bool simu_mode = false;
 
@@ -128,7 +129,11 @@ int main(int narg, char *arg[]) {
 	
     try {
 	
-	
+      if (maxk <= 0.02) {
+	cout << "Value of maxk must be larger than the hardcoded minimum value of k, which is 0.02 !"<< endl;
+	exit(-1);
+      }
+
 	// Read in power spectrum file
 	cout << "     Read in power spectrum file "<< ps_file <<endl;
 	ifstream ifs(ps_file.c_str());
@@ -193,14 +198,13 @@ int main(int narg, char *arg[]) {
 	
 	// Find best fit scale and 1-sig error
 	cout << "     Find best-fit scale and 1-sig error:"<<endl;
-	double bestfit, siglow, sighigh;
+	double bestfitS, bestfitA, bestfitChi, siglow, sighigh, sigbest;
 	int nsig = 1;
-	fitbao.BestfitStdDev(bestfit, siglow, sighigh, nsig);
-	double errup = sighigh - bestfit;
-	double errdown = bestfit - siglow;
-	cout <<"      ka = "<< bestfit <<"+"<< errup <<"-"<< errdown <<endl;
+	fitbao.BestfitStdDev(bestfitS, bestfitA, bestfitChi, siglow, sighigh, sigbest, nsig);
+	double errup = sighigh - sigbest;
+	double errdown = sigbest - siglow;
+	cout <<"      S = "<< sigbest <<" + "<< errup <<" / - "<< errdown <<endl;
 	cout <<endl;
-	
 
 	// print info to a file
 	cout << "     Print chisq and results to files"<<endl;
@@ -209,20 +213,9 @@ int main(int narg, char *arg[]) {
 	cout << "     Write chi^2 to file "<< outfile <<endl;
 	fitbao.WriteChisq(outfile);
 
-	outfile = outfile_root + "_ancillary.txt";
-	cout << "     Write reference power spectrum AND best-fit sinusoid model";
-
-	cout << " to file "<< outfile <<endl;
-	fitbao.WriteAncillaryInfo(outfile);
-
 	outfile = outfile_root + "_result.txt";
 	cout << "     Write results to file "<< outfile <<endl;
 	fitbao.WriteResults(outfile);
-
-	//ajout Marion 08.03.2016
-	outfile = outfile_root + "_wiggle.txt";
-	cout << "     Write pwiggle to file "<< outfile <<endl;
-	fitbao.WriteWiggle(outfile);
 	cout << endl;
 
 

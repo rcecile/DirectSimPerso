@@ -123,15 +123,18 @@ void usage(void) {
   
   cout << " -C : input_catalog : FITS filename containing galaxy catalog"<<endl;
   cout << " -O : out_grids_name : Write gridded data to this FITS file"<<endl;
+  cout << " -H : FullHist   text file containing the histogram from simulated catalog(s) "<<endl;
   cout << " -a : SkyArea : Specify sky area (radians)                 "<<endl;
   cout << " -e : Error : Add a Gaussian error on redshift of          "<<endl;
   cout << "      sigma = e*(1+redshift)                               "<<endl;
+  cout << " -E : file with sigma[(z-s-z_p)/(1+zp)] for random grid    "<<endl;
   cout << " -S : Error : random seed, must be set for simulations     "<<endl;
   cout << " -P : Nx,Ny,Nz,zref,ResXY,ResZ : Number of pixels, redshift of    "<<endl;
   cout << "      central pixel OR comobile distance of central pixel, pixel size in X,Y and Z - to specify how to grid   "<<endl;
   cout << " -A : list of grid axis                                     "<<endl;
   cout << " -z : ZOCol,ZSCol: read OBSERVED redshifts from column named"<<endl;
   cout << "      ZOCol, SPECTRO redshifts from column named ZSCol      "<<endl;
+  cout << " -N : NormNgalMean: to take into account negative cells     "<<endl;
   cout << " -m : nc : Mean density of random grid                      "<<endl;
   cout << " -b : correct for bias (optionnal)                          "<<endl;
   cout << " -R : do not write the HDU 3 (redshift)                     "<<endl;
@@ -163,7 +166,7 @@ int main(int narg, char* arg[]) {
 	string ZSCol = "z"; // by default SPECTRO redshift col labelled "z" read in
 	double SkyArea = 999;	// Catalog covers angle radius SkyArea [999==full sky]
 	// SELECTION FUNCTION CORRECTION PARAMETERS
-	string sffiles, bfile;			  // list of selection function files
+	string sffiles, bfile, sfile;			  // list of selection function files
 	bool doSFCorr = false;	  // if true, apply selection function correction
 	bool doBiasCorr = false;	  // if true, apply bias correction
 	bool isZRadial = false; // if true, catalog z-dimension IS radial direction
@@ -171,6 +174,7 @@ int main(int narg, char* arg[]) {
 	string all_z_file;		  // file name of catalog of ALL redshifts in sim
 	bool doSFCompute = false; // if true, do selection function computation here
 	bool isForceZspec =false; // force selection function to be computed using the SPEC-z
+	double NormNgalMean = 1.; // factor taking into account impact of cells set to 0
 	// GRID SPEC PARS
 	double R_XY;		    // Grid cell size in Mpc along x & y axis (exact)
 	double R_Z;		    // Grid cell size in Mpc along z axis (exact)
@@ -182,6 +186,7 @@ int main(int narg, char* arg[]) {
 	bool DoDebug = false;
 	bool RandomSeed = false;
 	bool Write_Redshift = true;
+	bool UseSigmaForRandom = false;
 
 	// define a vector for multiple grid definition
 	vector<GridCenter> vgc;
@@ -192,7 +197,7 @@ int main(int narg, char* arg[]) {
 	//--- decoding command line arguments 
 	cout << " ==== decoding command line arguments ===="<<endl;
 	char c;
-	while((c = getopt(narg,arg,"hrSRC:O:a:e:p:g:r:P:A:z:m:b:s:d:h:")) != -1) {
+	while((c = getopt(narg,arg,"hrSRC:O:a:e:E:p:g:r:P:A:z:N:m:b:s:d:h:")) != -1) {
 	  switch (c) {
 	  case 'C' :
 	    input_catalog = optarg;
@@ -205,6 +210,10 @@ int main(int narg, char* arg[]) {
 	    break;
 	  case 'e' :
 	    sscanf(optarg,"%lf",&PzerrReds);
+	    break;
+	  case 'E' :
+	    sfile = optarg;
+	    UseSigmaForRandom = true;
 	    break;
 	  case 'S' :
 	    RandomSeed = true;
@@ -227,6 +236,9 @@ int main(int narg, char* arg[]) {
 	  case 'z' :
 	    zcols = optarg; // list of z column names to read in
 	    isZColGiven = true;
+	    break;
+	  case 'N' :
+	    sscanf(optarg,"%lf", &NormNgalMean); // parameter to correct the mean galaxies nb due to negative cells set to 0
 	    break;
 	  case 'm' :
 	    sscanf(optarg,"%lf",&nc);
@@ -451,7 +463,6 @@ int main(int narg, char* arg[]) {
 	cout << "    The number of gals in whole simulation is "<< cat.ReturnNgAll() <<endl;
 	
 	if (PzerrReds > 0.)  cat.SetGaussErrRedshift(PzerrReds,zref,RandomSeed);
-	if (doBiasCorr) cat.SetBiasCorr(bfile);
 
 	// Compute min and max coordinates and min max redshift
 	// only actually really need to do this if correcting for selection function
@@ -521,14 +532,32 @@ int main(int narg, char* arg[]) {
 	      if(inpb.fail()) { 
 		// bfile does NOT exist
 		string emsg = "ERROR! Bias function in file " + bfile;
-	      emsg += " does not exist";
-	      throw ParmError(emsg);
+		emsg += " does not exist";
+		throw ParmError(emsg);
+	      }
+	      else {
+		// bfile DOES exist
+		cout <<"    Bias file will be read from file " << bfile.c_str() <<endl;
+	      }
 	    }
-	    else {
-	      // bfile DOES exist
-	      cout <<"    Bias file will be read from file " << bfile.c_str() <<endl;
+
+	    if (UseSigmaForRandom) {
+	      ifstream inps;
+	      inps.open(sfile.c_str(), ifstream::in);
+	      inps.close();
+	      if(inps.fail()) { 
+		//  does NOT exist
+		string emsg = "ERROR! Bias function in file " + sfile;
+		emsg += " does not exist";
+		throw ParmError(emsg);
+	      }
+	      else {
+		// sfile DOES exist
+		cout <<"    Sigma file for random grid  will be read from file " << sfile.c_str() <<endl;
+	      }
 	    }
-	    }
+
+
 	  }
 	  
 	  // 3) set selection function in Cat2Grid
@@ -547,7 +576,6 @@ int main(int narg, char* arg[]) {
 	if (doBiasCorr) {
 	  ComputedSelFunc* bp = new ComputedSelFunc(bfile); // similar construction selection fonction / bias function
 	  cat.SetBiasFunction(*bp);
-
 	}
 	
 	// Project galaxies onto the grid
@@ -565,8 +593,11 @@ int main(int narg, char* arg[]) {
 	
 	// Make random galaxy grid with mean density 
 	cout << "5/ Make random catalog galaxy grid ..."<<endl;
-	cout <<"    Mean density of random grid = "<< nc <<endl;
-	cat.RandomGrid(nc, Write_Redshift,RandomSeed);
+	if (UseSigmaForRandom) {
+	  ComputedSelFunc* sp = new ComputedSelFunc(sfile); // similar construction selection fonction / sigmar function
+	  cat.SetSigrFunction(*sp);
+	}
+	cat.RandomGrid(NormNgalMean,Write_Redshift,RandomSeed,UseSigmaForRandom);
 	res.Update();
 	cout << "    Memory size increase (KB):" << res.getDeltaMemorySize() << endl;
 	cout << "    Resource usage info : \n" << res << endl;
@@ -585,7 +616,7 @@ catch (PThrowable & exc) {
 	// catching SOPHYA exceptions
     cerr << " grid_data.cc: Catched Exception (PThrowable)" << (string)typeid(exc).name() 
          << "\n...exc.Msg= " << exc.Msg() << endl;
-    rc = 99;
+    rc = 96;
 	}
 catch (std::exception & e) {  
     // catching standard C++ exceptions

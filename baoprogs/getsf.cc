@@ -243,15 +243,6 @@ int main(int narg, char *arg[])	{
 		if (DoDebug)
 			cat.SetDebugOutroot(OutRoot);
 		
-//		string sffile;
-//		sffile = SFFileName+"_nofz.txt";
-//	
-//		ifstream inp;
-//		inp.open(sffile.c_str(), ifstream::in);
-//	inp.close();
-//	cout << " ICI " << sffile.c_str() << endl;
-//	if(inp.fail()) {
-//	   inp.clear(ios::failbit);
  	    cout <<" DONE" << endl;
 	    if (MakeFullHist)
 	      cat.SaveSelecFunc(SFFileName, FullCat, ObsCat, ZFCol, ZSCol, ZOCol,MakeFullHist);
@@ -259,13 +250,8 @@ int main(int narg, char *arg[])	{
 	      cat.SaveSelecFunc(SFFileName, FullHist, ObsCat, ZFCol, ZSCol, ZOCol,MakeFullHist);
 
 	    // both SPECTRO-z and OBSERVED-z sf's are computed here
-//			}
-//	else cout << " RIEN " << endl;
 		if( remove(tmp.c_str()) != 0 )
-		  cout << "Error deleting temporary file" << endl;
-  
-  
-			
+		  cout << "Error deleting temporary file" << endl;		       
     } 
     catch(PThrowable exc ) {
         cerr << "getsf.cc , Catched exception: \n" << exc.what() << endl;

@@ -117,6 +117,7 @@ void usage(void) {
 	cout << " -t : tol_corr; min damoing value in k// -> max_corr=1/tol_corr    "<<endl;
 	cout << " -x : doPixCorr : turn off pixel shape correction                  "<<endl;
 	cout << " -w : w0,wa : if dark energy differs from grid header one          "<<endl;
+	cout << " -N : NormNgalMean: to take into account negative cells            "<<endl;
 	cout << " -P : additionnal tests and prints "<<endl;
 	cout << endl;
 	}
@@ -143,7 +144,8 @@ int main(int narg, char* arg[]) {
 	//double coeff = 1;		// keep all kradial <= coeff / sig_r
 	bool doUnDamp = true;	// undamp Fourier components
 	// POWER SPECTRUM COMPUTATION PARAMETERS
-	int nbin=175;			// Number of k bins in power spectrum
+	//	int nbin=175;			// Number of k bins in power spectrum
+	int nbin=80;			// Number of k bins in power spectrum
 	bool doPixCorr = true;	// Correct for pixel size smoothing
 	bool doSpectra_z_xy = false;  // True if you want to also compute k_perp= k_xy and k_parall=k_z
 	double maxk_in_calc = 1000; // Set maximum radial k in ps calc
@@ -155,11 +157,12 @@ int main(int narg, char* arg[]) {
 	double wa_other =-99.;
 	double ratio_AngDiam = 1.;
 	bool isMeanDensitySpec = false;
+	double NormNgalMean = 1.;
 	
 	// decoding command line arguments 
 	cout << " ==== decoding command line arguments ===="<<endl;
 	char c;
-	while((c = getopt(narg,arg,"hdxkC:S:O:E:e:w:m:a:t:")) != -1) {
+	while((c = getopt(narg,arg,"hdxkC:S:O:E:e:w:N:m:a:t:")) != -1) {
 	   switch (c) {
 	  	    case 'C' :
 			    infile = optarg;
@@ -187,6 +190,9 @@ int main(int narg, char* arg[]) {
 	        case 'w' :
 		        sscanf(optarg,"%lf,%lf",&w0_other,&wa_other);
 			do_change_w = true;
+		        break;
+	        case 'N' :
+		        sscanf(optarg,"%lf",&NormNgalMean); // parameter to correct the mean galaxies nb due to negative cells set to 0
 		        break;
 	        case 't' :
        		        tol_corr=atof(optarg);
@@ -372,12 +378,19 @@ int main(int narg, char* arg[]) {
 	    {
 	      TArray<r_8> wrgals;
 	      
-	      //modif Adeline: list order is the same from grid-data and subfromfull
 	      fin >> wrgals;
 	      
+	      // grid of Poisson nP is replaced by (nP - <nP>)/<nP> whith <nP> corrected for cells set to 0 by NormNgalMean
 	      MeanSigma(wrgals, meangr, siggr);
-	      cout << "    ... of random galaxy grid: Mean="<< meangr <<", Sigma="<< siggr <<endl;
-	      
+	      cout << "    Input random galaxy grid: Mean="<< meangr <<", Sigma="<< siggr <<endl;
+	      double MeanNgBar;
+	      MeanNgBar = meangr;// / NormNgalMean ;
+	      wrgals -= MeanNgBar ;
+	      wrgals /= MeanNgBar ;
+
+	      MeanSigma(wrgals, meangr, siggr);
+	      cout << "    Normalized random galaxy grid: Mean="<< meangr <<", Sigma="<< siggr <<endl;
+
 	      PowerSpec powerSpectrum_random(wrgals,grid_res,ratio_AngDiam);
 	      powerSpectrum_random.Setzc(z_center);
 	      
@@ -428,10 +441,16 @@ int main(int narg, char* arg[]) {
 		cout <<endl;
 	      }
 	      
+	      // grid of galaxies nG is replaced by (nG - <nG>)/<nG> whith <nG> corrected for cells set to 0 by NormNgalMean
 	      MeanSigma(wngals, meangw, siggw);
-	      cout << "    ... of weighted galaxy grid: Mean="<< meangw <<", Sigma="<< siggw <<endl;
-	      cout << "    (above will be same as raw galaxy fluctuation field if "<<endl;
-	      cout << "     original catalog had no selection effects)"<<endl;
+	      cout << "    Input weighted galaxy grid: Mean="<< meangw <<", Sigma="<< siggw <<endl;
+	      double MeanNgBar;
+	      MeanNgBar = meangw / NormNgalMean ;
+	      wngals -= MeanNgBar ;
+	      wngals /= MeanNgBar ;
+
+	      MeanSigma(wngals, meangw, siggw);
+	      cout << "   Normalized weighted galaxy grid: Mean="<< meangw <<", Sigma="<< siggw <<endl;
 	      cout << endl;
 	      
 	      volcat = wngals.SizeX()*wngals.SizeY()*wngals.SizeZ()*pow(grid_res,3); 
@@ -579,7 +598,7 @@ int main(int narg, char* arg[]) {
 	catch (PThrowable & exc) {  // catching SOPHYA exceptions
 	  cerr << " computepsfromarray.cc: Catched Exception (PThrowable)" << (string)typeid(exc).name() 
 	       << "\n...exc.Msg= " << exc.Msg() << endl;
-	  rc = 99;
+	  rc = 96;
 	}
 	catch (std::exception & e) {  // catching standard C++ exceptions
 	  cerr << " computepsfromarray.cc: Catched std::exception "  << " - what()= " << e.what() << endl;
