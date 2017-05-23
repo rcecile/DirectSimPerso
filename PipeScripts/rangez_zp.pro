@@ -3,7 +3,7 @@ PRO rangez_zp,isuff
 
 suff = ['_errPBDT9','_errPBDT8','_errP','_err0.03']
 
-dir='/sps/lsst/data/rcecile/Planck_BAO/'
+dir='/sps/lsst/data/rcecile/Planck_BAO2/'
 nslice = 100
 nslicez = 100
 z_max = 3.
@@ -14,12 +14,12 @@ poutlier = dblarr(nslicez)
 zslice = findgen(nslicez+1)*z_max/nslicez
 
 for k=3,nslice-1 do begin
-   names=dir+'cat_zOrdZP_Slice'+strtrim(k,2)+suff[isuff]+'.fits'
+   names=dir+'cat_AllzOrdZP_Slice'+strtrim(k,2)+suff[isuff]+'.fits'
    nok_tot = 0
 
    for i=3,nslice-1 do begin
 
-      name=dir+'cat_zOrd_Slice'+strtrim(i,2)+suff[isuff]+'.fits'
+      name=dir+'cat_AllzOrd_Slice'+strtrim(i,2)+suff[isuff]+'.fits'
       print,k,i,name
       zpmin = zslice[i]   - 0.15*(1.+zslice[i])
       zpmax = zslice[i+1] + 0.15*(1.+zslice[i+1])
@@ -34,7 +34,7 @@ for k=3,nslice-1 do begin
       print,k,i,zslice[k],nok
       
    endfor
-   name=dir+'cat_gold_AllSlice'+suff[isuff]+'_cataLT10.fits'
+   name=dir+'cat_AllSlice'+suff[isuff]+'_cataLT10.fits'
    check = FILE_TEST(name)
    if (check eq 1) then begin
       m=mrdfits(name ,1)

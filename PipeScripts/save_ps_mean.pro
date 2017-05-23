@@ -1,134 +1,97 @@
-PRO save_ps_mean,saveplot
+PRO save_ps_mean2,saveplot,writefile 
+
+dir="/sps/lsst/data/rcecile/Planck_BAO2_PS/"
 
 namez = ['0.5','0.9','1.5']
 ;namezmean=['0.525', '0.96', '1.54']
 ;nx= ['_160','_300', '_225']
 nx= ['_120','_225', '_320']
+nx_cell= [120.,225., 320.]
+nz_cell= [125.,125.,175.]
+cell=8.
 namezmean=['0.51', '0.93', '1.57']
+lpsym=[0,4,0]
+llin = [2,0,0]
+
 nameerr = ['', '_err0.03', '_errP','_errPBDT9','_errPBDT8']
+lcol  = [95,210,35,135,  120]
+lerr=['spectroZ','Gaussian 0.03','photoZ','photoZ BDT 90%','photoZ BDT 80%']
 
 loadct,12
 
-lcol  = [95,210,35,135,  120,0]
-;lcol  = [95,210,135,  120,0]
-lerr=['spectroZ','Gaussian 0.03','photoZ','photoZ BDT 90%','photoZ BDT 80%','fiducial, no oscillation']
-;lerr=['spectroZ','Gaussian 0.03','photoZ BDT 90%','photoZ BDT 80%','theoretical, no oscillation']
-lpsym=[0,-5,-4]
-llin = [0,3,2]
 
 nz = n_elements(namez)
 nerr = n_elements(nameerr)
 nsim=10
 
-restore,'temp_ascii.sav'   
-dir="/sps/lsst/data/rcecile/Planck_BAO_PS/"
-dirn="/sps/lsst/data/rcecile/Planck_noBAO_PS/"
-myformat = '(F9.7," ",G14.6," ",G14.6," ",G14.6," ",G14.6," ",G14.6," ",G14.6," ",G14.6," ",I6," ",I6," ",G14.6)'
-!p.thick=3
-!p.charsize=2
+kmax = intarr(n_elements(namez), n_elements(nameerr))
+kmax[*,0] = [20,20,12]
+kmax[*,1] = [20,20,12]
+kmax[*,2] = [20,20,12]
+kmax[*,3] = [18,18,10]
+kmax[*,4] = [16,16,10]
 
+restore,'temp_ascii.sav'   
+myformat = '(F9.7," ",G14.6," ",G14.6," ",G14.6," ",G14.6)'
+!p.thick=3
+!p.charsize=1.5
 
 if (saveplot ) then begin
 ; current plotting device.
       mydevice = !D.NAME
       SET_PLOT, 'PS'
-      DEVICE, FILENAME='/sps/lsst/dev/rcecile/Fig/ps_undamped.eps', /PORTRAIT,/COLOR,XSIZE=8.8,YSIZE=5.5,FONT_SIZE=5
+      DEVICE, FILENAME='/sps/lsst/dev/rcecile/Fig/ps_ready2fit_Nz.eps', /PORTRAIT,/COLOR,XSIZE=8.8,YSIZE=6.6,FONT_SIZE=5
    endif
 
 
-plot,[0.01,0.1],[1,1],/xs,/ys,xra=[0.005,0.15],/nodata,yra=[1100.,.5e5],/yl,xtit='wavenumber [Mpc^-1]',ytit='Undamped Power spectrum',xma=[4,0.5],yma=[3.,.5],ytickn=replicate(" " ,10)
+plot,[0.01,0.1],[1,1],/xs,/ys,xra=[0.01,0.19],/nodata,yra=[.2,94],xtit='wavenumber k [Mpc^-1]',ytit='Power spectrum x k^2 [(Mpc)^-5]',xma=[4.5,1],yma=[3.5,.5],ytickn=replicate(" " ,10),/xl,/yl
+plot,[0.01,0.1],[1,1],/xs,/ys,xra=[0.02,0.19],/nodata,yra=[1,94],xtit='wavenumber k [Mpc^-1]',ytit='Power spectrum x k^2 [(Mpc)^-5]',xma=[4.5,1],yma=[3.5,.5],ytickn=replicate(" " ,10),/xl,/yl
 
 err=dblarr(nz,nerr,nsim)
 for iz = 0,nz-1 do begin
    
-   ; spectre th??orique no osc, no error
-   ftheo  = dirn + 'simu_ps'+nx[iz]+'_z'+namezmean[iz]+'_ntpk.txt'
-   ptheo = read_ascii(ftheo, template =  TEMP_POW_SPEC_TH)     
-   xt=ptheo.(0)
-   
-   fobs  = dir + 'PS_newErr'+nx[iz]+'_z'+namez[iz]+'_G0_wngal.txt' 
-   pobs = read_ascii(fobs, template =  TEMP_POW_SPEC_TXT)   
-   xs = pobs.(0)
-
    for ir = 0, nerr-1 do begin
-      pnoise=dblarr(n_elements(xs))
-      npnoise = 0
+      suff = nameerr[ir]
       for igd =0,4 do begin
-         suff = nameerr[ir]
-                                ; spectre observ??
-         fobs  = dir + 'PS_newErr'+nx[iz]+'_z'+namez[iz]+suff+'_G'+strtrim(igd,2)+'_wngal.txt' 
-                                ;    print,fobs
-         pobs = read_ascii(fobs, template =  TEMP_POW_SPEC_TXT)     
-         if (igd eq 0) then p2fit =pobs.(1) * 0.
-         ok = intarr(n_elements(xs))
-         for i=0,n_elements(xs)-1 do ok[i] = where( abs(xs[i]-xt) eq min(abs(xs[i]-xt)))
-         
-                                ; < spectre simul?? no osc, with error >
-         pnobao=dblarr(n_elements(xs))
-         pshot=dblarr(n_elements(xs),nsim)
-         mynsim = 0
-         for j=0,nsim-1 do begin
-            fnobao  = dirn + 'PS_newErr_'+strtrim(j,2)+nx[iz]+'_z'+namez[iz]+suff+'_G'+strtrim(igd,2)+'_wngal.txt' 
-            ;print,fnobao
-            check = FILE_TEST(fnobao)
-            if (check eq 0) then continue
-            mynsim = mynsim+1
-            p = read_ascii(fnobao, template =  TEMP_POW_SPEC_TXT)     
-            pnobao = pnobao + p.(1) - p.(6)
-            pnoise = pnoise +  p.(6)
-            npnoise = npnoise+1
-            pshot[*,j] = p.(6)
-         endfor
-         pnobao = pnobao / double(mynsim)
-         print,suff, '   Grille n.',igd,' N sim OK =',mynsim
-         std_shot = dblarr(n_elements(xs))
-         for i=0,n_elements(xs)-1 do std_shot[i] = sqrt(mean(pshot[i,where(pshot[i,*] ne 0)]))
-         okerr = where(p.(0) gt 0.02 and p.(0) lt 0.1)
-         for j=0,nsim-1 do begin
-            fnobao  = dirn + 'PS_newErr_'+strtrim(j,2)+nx[iz]+'_z'+namez[iz]+suff+'_G'+strtrim(igd,2)+'_wngal.txt' 
-            check = FILE_TEST(fnobao)
-            if (check eq 0) then continue
-            p = read_ascii(fnobao, template =  TEMP_POW_SPEC_TXT)    
-            rap = p.(1)/pnobao
-            err[iz,ir,j] = stddev(rap[okerr])
-                                ;   print,j
-         endfor
-                                ;    print,iz,ir,' ',mean(err[iz,ir,*])
-         
-          p2fit = p2fit + (pobs.(1)-pobs.(6)) / (pnobao) *(ptheo.(2)[ok])
-         
-        ; oplot,xs,(pobs.(1)-pobs.(6)) / (pnobao) *(ptheo.(2)[ok]),col=lcol[ir]
- 
-       endfor
-      pnoise = pnoise / npnoise
-      p2fit = p2fit / 5.
-      oplot,xs,p2fit,col=lcol[ir]
 
-      fname = dir + 'PS_2fit_newErr'+nx[iz]+'_z'+namez[iz]+suff+'_wngal.txt' 
-  ;    print,fname
-      openw,lun1, fname, /get_lun
+        ; < spectre observe with osc >
+         fobs  = dir + 'PS_nZ'+nx[iz]+'_z'+namez[iz]+suff+'_G'+strtrim(igd,2)+'_wngal.txt' 
+         pobs = read_ascii(fobs, template =  TEMP_POW_SPEC_TXT)     
+
+         if (igd eq 0) then begin
+            xs = pobs.(0)
+            SN = mean((pobs.(3))[where(pobs.(0) gt 0.2 and pobs.(0) lt 0.4)])
+            p_osc =pobs.(1)
+         endif else p_osc = p_osc + pobs.(1)
+      endfor
+      p_osc = p_osc / 5.      
+      p2fit = p_osc - SN
+
+      oplot,xs,(p2fit)*xs*xs,col=lcol[ir],li=llin[iz],psym=lpsym[iz]
  
-      newp1 = p2fit + pnoise
-      p7shot = pobs.(7)
-      print,'SHOT  ',iz, ir, (pobs.(7))[25],p7shot[25]
-      newp7 = (newp1-pobs.(6))/(pobs.(1)-pobs.(6))*p7shot ; erreur hors shot-noise"undampee", comme le signal
-;      newp7 = (newp1-pnoise)/(pobs.(1)-pnoise)*p7shot ; erreur hors shot-noise"undampee", comme le signal
-;      newp7 = newp7*sqrt(1.+1./10.)                     ; car 10
-;      simus sans BAOs pour la base
-     for i=0,n_elements(p2fit)-1 do  printf, lun1, (pobs.(0))[i], $
-                                              newp1[i], $ ;spectre
-                                              (pobs.(2))[i], (pobs.(3))[i], (pobs.(4))[i], (pobs.(5))[i], (pobs.(6))[i], $
-                                              newp7[i], $ ; erreur
-                                              (pobs.(8))[i], (pobs.(9))[i], (pobs.(10))[i],format=myformat
-      close, lun1 
-      free_lun, lun1
-  ;    print,'  ',fname
-   endfor
-   oplot,xt,ptheo.(2),li=2
-;legend,'z = '+ namez+nsuff,col=lcol,box=1,line=0,/fill,/left,/bottom,charsize=1.5
-;legend,'z = '+ namez,col=lcol,box=1,line=0,/fill,/left,/bottom,charsize=1.5
+      delta_k = (pobs.(0))[15]-(pobs.(0))[10] / 5. ; pour moyenner eventuelle erreur d'arrondi
+      Vsurvey = nx_cell[iz]*nx_cell[iz]*nz_cell[iz]*cell*cell*cell * 5.
+      CteSigmaPk = 2*!pi/sqrt(delta_k * Vsurvey)
+      sig_osc = CteSigmaPk /pobs.(0)* (p2fit + SN)
+ 
+     ; errplot,xs,(p2fit-sig_osc)*xs*xs,(p2fit+sig_osc)*xs*xs,col=lcol[ir]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      if (writefile) then begin
+         fname = dir + 'PS_nZ'+nx[iz]+'_z'+namez[iz]+suff+'_wngal.txt' 
+         print,'OUTPUT in ', fname
+         openw,lun1, fname, /get_lun
+       
+         for i=0,n_elements(p2fit)-1 do  printf, lun1, (pobs.(0))[i], $
+                                                 p2fit[i] + SN, $ ;spectre
+                                                 (pobs.(2))[i], SN, sig_osc[i],format=myformat
+         close, lun1 
+         free_lun, lun1
+         print,'  ',fname
+         endif
+    endfor
 endfor
-legend,lerr,li=[replicate(0,n_elements(nameerr)),2],col=lcol,box=1,/fill,/right,/top,charsize=1.25
+legend,[lerr],li=0,col=[lcol],th=3,box=1,/fill,/left,/bottom,charsize=1.25
+legend,'z='+namez,li=[2,0,0],psym=[-3,4,-3],box=1,col=lcol[4],/fill,/left,/top,charsize=1.5,th=3
 
    if (saveplot) then begin
       DEVICE, /CLOSE
@@ -136,3 +99,4 @@ legend,lerr,li=[replicate(0,n_elements(nameerr)),2],col=lcol,box=1,/fill,/right,
    endif
 
 END
+ ;write_jpeg,'/sps/lsst/dev/rcecile/BAO_InOut/ps_k2.jpg' ,tvrd(true=3),true=3

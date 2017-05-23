@@ -58,8 +58,6 @@ oplot,[0,cos(mxt+!pi/2.)*hmax*2],[0.,sin(mxt+!pi/2.)*hmax*2],th=3
 ;cell_g=[8, 8, 8, 8]
 
 zc=[0.5,0.9,1.5]
-nzc = [140., 125.,150.] ;Nz du cube produit par cat_grid
-nzc = [100., 125.,150.] ;Nz du cube produit par cat_grid
 nzc = [125., 125.,175.] ;Nz du cube produit par cat_grid
 cell_g=[8, 8, 8, 8]
 
@@ -119,7 +117,9 @@ endfor
 oplot,cos(xx+!pi/2.)*dloscom(0.2),sin(xx+!pi/2.)*dloscom(0.2),li=2,th=2
 
 oplot,cos(xx+!pi/2.)*dloscom(2.45),sin(xx+!pi/2.)*dloscom(2.45),li=2,th=2
-   
+;oplot,cos(xx+!pi/2.)*dloscom(.5),sin(xx+!pi/2.)*dloscom(.5),li=2
+;oplot,cos(xx+!pi/2.)*dloscom(.75),sin(xx+!pi/2.)*dloscom(.75),li=2
+
 
 xyouts,700,300,'redshift=0.2'
 xyouts,4000,4200,'redshift=2.45'

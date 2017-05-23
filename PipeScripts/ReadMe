@@ -21,5 +21,5 @@ Mode d'emploi : des parametres cosmo a l'echelle BAO
 
 -- etapes 9 a 10 a faire pour simu avec BAO et N simus sans BAO --
 
-11/ calcul des spectres "undampes" sans oscillations (save_ps_mean.pro)
+11/ calcul des spectres "undampes" sans oscillations (save_ps_mean.pro) et le shot noise (comp_sn.pro)
 12/ calculer l'echelle BAO (dofit.sh)

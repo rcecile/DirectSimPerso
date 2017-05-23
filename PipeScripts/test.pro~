@@ -1,2 +1,0 @@
-href=fits("/sps/lsst/data/rcecile/TJP_BAO/cat_G2_Slice63_errP.fits",ext=1)
-hjs=fits("/sps/lsst/data/rcecile/TJP_BAO/file0.fits",ext=1)

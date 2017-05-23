@@ -1,23 +1,23 @@
-PRO rangez
+PRO rangez2
 ; Catalog must be totaly produced before use of this routine
 
-dir='/sps/lsst/data/rcecile/Planck_noBAO/'
 nslice = 70
 nslicez = 100
 z_max = 3.
+nsim=0
 
 zslice = findgen(nslicez+1)*z_max/nslicez
-
-for isim=4,4 do begin
-for k=51,51 do begin
+suff='zSED'
+dir='/sps/lsst/data/rcecile/Planck_BAO2/'
+for k=0,nslicez-1 do begin
    nok_tot = 0
    for i=0,nslice-1 do begin
-      name=dir+'cat_gold_'+strtrim(isim,2)+'_Slice'+strtrim(i,2)+'.fits'
+      name=dir+'cat_'+suff+'_Slice'+strtrim(i,2)+'.fits'
       h = headfits(name,ext=1)
       n = sxpar(h,'NAXIS2')
       zmin = sxpar(h,'ZCAT_MIN')
       zmax = sxpar(h,'ZCAT_MAX')
-      print,'z range  ',isim, k,i,zmin,zmax,' for range ' ,zslice[k],'-',zslice[k+1]
+      print,'z range  ',k,i,zmin,zmax,' for range ' ,zslice[k],'-',zslice[k+1]
 
       if (zmin ge zslice[k+1]  OR zmax lt zslice[k] ) then continue
       m=mrdfits(name ,1)
@@ -33,7 +33,7 @@ for k=51,51 do begin
 
    print,'Ready to sort the catalog'
    msz = mz[sort(mz.(3))]
-   names=dir+'cat_zOrdCLOSE_'+strtrim(isim,2)+'_Slice'+strtrim(k,2)+'.fits'
+   names=dir+'cat_'+suff+'_zOrd_Slice'+strtrim(k,2)+'.fits'
    MWRFITS, msz, names, h
    print,'############# ', names,'  written'
    sxaddpar,h,'ZCAT_MIN',zslice[k]
@@ -44,6 +44,6 @@ for k=51,51 do begin
    fits_close,0
 
 endfor
-endfor
+
 
 END

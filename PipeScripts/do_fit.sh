@@ -8,8 +8,8 @@
 
  function do_fit {
      echo "==========================================================================="
-     command="${code1}fitkbao -P ${dirp}PS_2fit_newErr_$1_z$2$4_wngal.txt -U ${dirg}grids_$1_z$2_5cubes.fits -R ${dirp}simu_ps_$1_z${zmean}_ntpk.txt -k ${maxk} -O ${dirp}fit_newErr_k${maxk}_$1_z$2$4" 
-     echo "I launch" $command
+#     command="${code1}fitkbao -P ${dirp}PS_2fit_SN_Ref_$1_z$2$3_wngal.txt -U ${dirg}grids_SN_$1_z$2_5cubes.fits -R ${dirp}simu_ps_$1_z${zmean}_ntpk.txt -k ${maxk} -O ${dirp}fit_Ref_k${maxk}_$1_z$2$4" 
+     command="${code1}fitkbao -P ${dirp}PS_2fit_SN_Ref_$1_z$2$3_wngal.txt -U ${dirg}grids_SN_$1_z$2_5cubes.fits -R ${dirpJ}PS_2fitJulienSN_$1_z$2$3_nosc_out.txt -k ${maxk} -O ${dirp}fit_J_k${maxk}_$1_z$2$4" 
      $command
      
        rm -f *.ppf
@@ -17,8 +17,9 @@
 
  function do_fit_simple {
      echo "==========================================================================="
-     command="${code1}fitkbao -P ${dirp}PS_2fit_newErr_$1_z$2$4_wngal.txt -U ${dirg}grids_$1_z$2_5cubes.fits -R ${dirp}simu_ps_$1_z${zmean}_ntpk.txt -O ${dirp}fit_newErr_$1_z$2$4" 
-     echo "I launch" $command
+#     command="${code1}fitkbao -P ${dirp}PS_2fit_SN_Ref_$1_z$2$3_wngal.txt -U ${dirg}grids_SN_$1_z$2_5cubes.fits -R ${dirp}simu_ps_$1_z${zmean}_ntpk.txt -O ${dirp}fit_Ref_$1_z$2$4" 
+     command="${code1}fitkbao -P ${dirp}PS_2fit_SN_Ref_$1_z$2$3_wngal.txt -U ${dirg}grids_SN_$1_z$2_5cubes.fits -R ${dirpJ}PS_2fitJulienSN_$1_z$2$3_nosc_out.txt -O ${dirp}fit_J_$1_z$2$4" 
+     echo $command
      $command
      
       rm -f *.ppf
@@ -30,6 +31,7 @@
 code1="/sps/lsst/dev/rcecile/BAOProgs/DirectSimPerso/exe/"
 dirg="/sps/lsst/data/rcecile/Planck_BAO_grids/"
 dirp="/sps/lsst/data/rcecile/Planck_BAO_PS/"
+dirpJ="/sps/lsst/data/jsouchar/PS_fit/"
 
 #Nx_list=(160 300 225)
 Nx_list=(120 225 320)
