@@ -72,15 +72,6 @@ class Mass2Gal
       @param rg           random generator                                  */
   Mass2Gal(sa_size_t ng, SimpleUniverse& su, RandomGeneratorInterface& rg);
 
-  /** Constructor for when only wanting to use MaxAbsMag() function 
-      @param su           Cosmology calculator
-      @param rg           random generator                                  */
-  Mass2Gal(SimpleUniverse& su, RandomGeneratorInterface& rg)
-    : su_(su) , rg_(rg), am( new TAM ) // CHECK-REZA-JS Ne pas oublier d'initialiser le pointeur de TAM 
-    {
-      ng_=1;
-      SFApplied = false; 
-    }
 
   /**  Copy constructor */
     Mass2Gal(Mass2Gal const& a)
@@ -118,7 +109,7 @@ class Mass2Gal
     
       /** conv=ngal_per_mpc3*pixel vol; ngal_per_mpc3 calculated by integrating 
           Schechter function of ALL gals                                            */
-      void ConvertToMeanNGal(float conv, bool Simple=false); // writes to ngals_ array  
+      void ConvertToMeanNGal(float conv1, float conv2, float conv3, bool Simple=false); // writes to ngals_ array  
     
       /** Poisson fluctuate ngals_                                              */
       sa_size_t ApplyPoisson();
@@ -132,15 +123,15 @@ class Mass2Gal
           @param SkyArea  area of sky to simulate (in radians) 
           @param ZisRad   simulate cubic sky -> z dimension is exactly the radial
           direction                                             */
-      sa_size_t CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& gfd, 
-                                 bool extinct=false, bool AMcut=false, double SkyArea=6.3, bool GoldCut=false, bool ProbaCut=false);
+      sa_size_t CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& gfd1, GalFlxTypDist& gfd2, GalFlxTypDist& gfd3, 
+                                 bool extinct=false, bool AMcut=false, double SkyArea=6.3, bool GoldCut=false);
         
       /** Instead of outputing whole simulation, just output a Histo object
           of redshifts to a PPF file 
           @param fitsname FITS file to write catalog to
           @param gfd      galaxy distributions to simulate wit
           @param SkyArea  area of sky to simulate (in radians)                  */
-      void CreateNzHisto(string fitsname, GalFlxTypDist& gfd, bool extinct=false, 
+      void CreateNzHisto(string fitsname, GalFlxTypDist& gfd1, GalFlxTypDist& gfd2, GalFlxTypDist& gfd3, bool extinct=false, 
                          double SkyArea=6.3);
                 
       /** Instead of outputing whole simulation, just output all the true redshifts
@@ -156,15 +147,7 @@ class Mass2Gal
           @param fitsname FITS file to write catalog to
           @param SkyArea  area of sky to simulate (in radians)                  */
       sa_size_t CreateSimpleCatalog(int idsim, string fitsname, double SkyArea=6.3);
-        
-      /** Calculate maximum observable absolute magnitude as a function of z  
-      *** modified by Adeline (golden sample cut)   */
-      void MaxAbsMag(bool doGoldenCut=false);
-      
-      // Modified by JS Fev 2016 to mimic true photometry, include reddening and photometric errors thus the cut
-      // is replaced by a probability(z,type,mag) for the galaxy to be detected in the golden sample i<25.3
-      void MaxAbsMag(string goldencutFileName); 
-    
+            
       /** Randomise galaxy positions within pixel                               
           @param RP   if true randomise positions of galaxies within each pixel */
       void SetRandPos(bool RP){ RandPos_ = RP;
@@ -326,6 +309,10 @@ class Mass2Gal
       //where survey does not cover, 1 where it does
       //double AddSurveyWindow(double Phi);// fills mass_ array with -1 where 
       //survey does not cover
+        
+      /** Calculate maximum observable absolute magnitude as a function of z  
+      *** modified by Adeline (golden sample cut)   */
+      void MaxAbsMag();
     
     
       /* CLASS VARIABLES */
@@ -335,49 +322,41 @@ class Mass2Gal
       int_8 ng_;                                            /**< Number of galaxies                   */
       SimpleUniverse& su_;                      /**<  Holds cosmological parameters       */
       RandomGeneratorInterface& rg_;  /**<  For random number generation        */
-      sa_size_t Nx_;  /**< Number of pixels in x direction: NOTE arrays not always defined as (Nx, Ny, Nz)*/
-      sa_size_t Ny_;  /**< Number of pixels in y direction: NOTE arrays not always defined as (Nx, Ny, Nz)*/
-      sa_size_t Nz_;    /**< Number of pixels in z direction: NOTE arrays not always defined as (Nx, Ny, Nz)*/
-      double Dx_;     /**< Pixel size in x-dimension in Mpc                     */
-      double Dy_;     /**< Pixel size in y-dimension in Mpc                     */
-      double Dz_;               /**< Pixel size in z-dimension in Mpc                     */
-      double Dkx_;    /**< Fourier space pixel size in x-dimension in 1/Mpc     */
-      double Dky_;    /**< Fourier space pixel size in y-dimension in 1/Mpc     */
-      double Dkz_;    /**< Fourier space pixel size in z-dimension in 1/Mpc     */
-      double zref_;     /**< Redshift of center pixel                             */
-      double DCref_;  /**< Comoving distance to zref_                           */
-      int idmidz_;    /**< Indices of centre pixel in z-dimension (assuming 1st pixel is index 1)*/
-      int idmidy_;    /**< Indices of centre pixel in y-dimension (assuming 1st pixel is index 1)*/
-      int idmidx_;    /**< Indices of centre pixel in x-dimension (assuming 1st pixel is index 1)*/
-      SInterp1D dist2z_;          /**< Distance to redshift converter           */
-      int mean_dens_;             /**< mean density of random grid              */
-      double mean_overdensity_;   /**< mean over-density of simlss grid AFTER setting cells with <-1 to =-1 */
-      bool ZisRad_;       /** True is z-axis is radial (coincide with redshift direction */
-      bool RandPos_;      /**< If true randomise galaxy positions                                       */
-      bool fg_nodrho;           /**< A flag to identify if we have drho or random generation                  */
-      bool fg_readvals; /**< A flag to identify if the SimLSS FITS header has been read in            */
-      bool fg_cleancells;       /**< A flag to identify if haven't cleaned cells                              */
-      bool SFApplied;           /**< Flag turns to true when selection function applied to simulated catalogs */
+      sa_size_t Nx_;             /**< Number of pixels in x direction: NOTE arrays not always defined as (Nx, Ny, Nz)*/
+      sa_size_t Ny_;             /**< Number of pixels in y direction: NOTE arrays not always defined as (Nx, Ny, Nz)*/
+      sa_size_t Nz_;             /**< Number of pixels in z direction: NOTE arrays not always defined as (Nx, Ny, Nz)*/
+      double Dx_;                /**< Pixel size in x-dimension in Mpc                     */
+      double Dy_;                /**< Pixel size in y-dimension in Mpc                     */
+      double Dz_;                /**< Pixel size in z-dimension in Mpc                     */
+      double Dkx_;               /**< Fourier space pixel size in x-dimension in 1/Mpc     */
+      double Dky_;               /**< Fourier space pixel size in y-dimension in 1/Mpc     */
+      double Dkz_;               /**< Fourier space pixel size in z-dimension in 1/Mpc     */
+      double zref_;              /**< Redshift of center pixel                             */
+      double DCref_;             /**< Comoving distance to zref_                           */
+      int idmidz_;               /**< Indices of centre pixel in z-dimension (assuming 1st pixel is index 1)*/
+      int idmidy_;               /**< Indices of centre pixel in y-dimension (assuming 1st pixel is index 1)*/
+      int idmidx_;               /**< Indices of centre pixel in x-dimension (assuming 1st pixel is index 1)*/
+      SInterp1D dist2z_;         /**< Distance to redshift converter           */
+      int mean_dens_;            /**< mean density of random grid              */
+      double mean_overdensity_;  /**< mean over-density of simlss grid AFTER setting cells with <-1 to =-1 */
+      bool ZisRad_;              /** True is z-axis is radial (coincide with redshift direction */
+      bool RandPos_;             /**< If true randomise galaxy positions                                       */
+      bool fg_nodrho;            /**< A flag to identify if we have drho or random generation                  */
+      bool fg_readvals;          /**< A flag to identify if the SimLSS FITS header has been read in            */
+      bool fg_cleancells;        /**< A flag to identify if haven't cleaned cells                              */
+      bool SFApplied;            /**< Flag turns to true when selection function applied to simulated catalogs */
       SelectionFunctionInterface* selfuncp_;/**< pointer to selection function */
-      double zcat_min;  /**< minimal value of the redshift in the catalog */
-      double zcat_max;  /**< maximal value of the redshift in the catalog */
+      double zcat_min;            /**< minimal value of the redshift in the catalog */
+      double zcat_max;            /**< maximal value of the redshift in the catalog */
 
       /* arrays */
-      SOPHYA::TArray<r_8> mass_;          /**< 3D array holding rho/rho^bar             */
-      vector<double> MBmax_;      /**< Maximum observable absolute magnitude as a function of z     */
-      SOPHYA::TArray<r_4> MBmax_type_;    /**< Maximum observable absolute magnitude as a function of z and type    */
-      vector<double> zv_;               /**< z values MBmax_ defined as               */
-      vector<double> magv_;               /**< z values MBmax_ defined as               */
-      SOPHYA::TArray<int_8> ngals_;             /**< 3D array holding total galaxy number in each pixel           */
-      SOPHYA::TArray<r_8> ngalssm_;       /**< array of n galaxies per cell after applying photo-z smearing */
-      SOPHYA::TArray<r_8> randgsm_;       /**< array of random grid after applying photo-z smearing         */
-    
-      // golden cut params//
-      double ***pgold;
-      float zmin, zmax, zbin;
-      float typemin, typemax, typebin;
-      float magmin, magmax, magbin;
-      int nz, ntype, nmag;
+      SOPHYA::TArray<r_8> mass_;       /**< 3D array holding rho/rho^bar             */
+      vector<double> MBmax_;           /**< Maximum observable absolute magnitude as a function of z     */
+      vector<double> zv_;              /**< z values MBmax_ defined as               */
+      vector<double> magv_;            /**< z values MBmax_ defined as               */
+      SOPHYA::TArray<int_8> ngals_;    /**< 3D array holding total galaxy number in each pixel           */
+      SOPHYA::TArray<r_8> ngalssm_;    /**< array of n galaxies per cell after applying photo-z smearing */
+      SOPHYA::TArray<r_8> randgsm_;    /**< array of random grid after applying photo-z smearing         */
 
       TAM *am;
 

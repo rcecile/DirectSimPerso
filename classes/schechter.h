@@ -493,11 +493,11 @@ public:
     SchechterDist(Schechter& schA, Schechter& schE, Schechter& schL, Schechter& schS, int type)
     : schA_(schA) , schE_(schE) , schL_(schL) , schS_(schS) , type_(type) {
         if ( (type_>0.5)&(type_<1.5) )
-            cout << "     type=EARLY"<<endl;
+            cout << "Schechter distribution     type=EARLY"<<endl;
 	    if ( (type_>1.5)&(type_<2.5) )
-            cout << "     type=LATE"<<endl;
+            cout << "Schechter distribution     type=LATE"<<endl;
         if ( (type_>2.5)&(type_<3.5) )
-            cout << "     type=STARBURST"<<endl; };
+            cout << "Schechter distribution     type=STARBURST"<<endl; };
 	
     /** Returns luminosity function normalized to correct number density      
         @param M    absolute magnitude                                        */
@@ -508,6 +508,16 @@ public:
             return (schL_(M) * (schA_(M)/(schE_(M)+schL_(M)+schS_(M))) );
         if ( (type_>2.5)&(type_<3.5) )
             return (schS_(M) * (schA_(M)/(schE_(M)+schL_(M)+schS_(M))) );
+       /*
+     
+        if ( (type_>0.5)&(type_<1.5) )
+            return (schE_(M) );
+        if ( (type_>1.5)&(type_<2.5) )
+            return (schL_(M) );
+        if ( (type_>2.5)&(type_<3.5) )
+            return (schS_(M) );
+       */
+
         else {
             stringstream ss;
             ss << type_;

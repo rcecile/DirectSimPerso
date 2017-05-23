@@ -50,7 +50,7 @@ bool TAM::PassGoldenCut(double mag_abs, int type, double z){
   tam->EvalApparentMagnitudes(appmag, err_appmag, mag_abs, type, z, ebv, 3);
   //cout << "AM : " << appmag[3] << " (type = " << type << ", z = " << z << ")" << endl;
   bool pass = appmag[3]<25.3;
-  //cout << "goldentcut pass : " << pass << endl;
+  
   return pass;
 }
 

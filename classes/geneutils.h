@@ -350,7 +350,7 @@ double findMinimum(vector<double> values);
     @param array    TArray of doubles
     @param iRow     index (zero-indexed) of row containing min value
     @param jCol     index (zero-indexed of column containing min value        */
-double findMinimumPosition(TArray<double> array, int& iRow, int& jCol);
+double findMinimumPosition(TArray<r_8> array, int& iRow, int& jCol);
 
 /** Find position of minimum value within a 1-dimensional array
     @param array    vector of doubles

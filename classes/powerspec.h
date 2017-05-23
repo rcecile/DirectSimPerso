@@ -60,7 +60,8 @@ public:
         @param dx             grid pixel size in x-dimension (Mpc
         @param ratio_AngDiam  ratio angular diameter with different cosmologies)              */
   PowerSpec(TArray<r_8> delta_gal, double dr, double ratio_AngDiam); 
-	
+
+
 	/** Compute Fourier transform of galaxy fluctuation grid
 	    @param real_grid      real value array 
 	    @param fourier_grid   Fourier space array                             */

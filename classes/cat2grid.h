@@ -1,5 +1,3 @@
-
-
 /**
  * @file  cat2grid.h
  * @brief grid a galaxy catalog for power spectrum analysis
@@ -41,7 +39,7 @@
 
 #include "cosmocalcs.h"
 #include "constcosmo.h"
-#include "sinterp.h"
+#include "slininterp.h"
 #include "schechter.h"
 #include "selectfunc.h"
 #include "mass2gal.h"
@@ -193,11 +191,19 @@ class Cat2Grid
   inline void SetBiasFunction(SelectionFunctionInterface& b) { 
     biasp_=&b; 
     cout <<"    Set bias function"<<endl;};
+        
+  /** Set sigma function                                                */
+  inline void SetSigrFunction(SelectionFunctionInterface& b) { 
+    sigrp_=&b; 
+    cout <<"    Set sigma for random function"<<endl;};
             
   /** Project the galaxy distribution into the grid, fill grid arrays
       @param SkyArea    angle covered by observation cone                   */
   void GalGrid(double SkyArea = 999);
-        
+          
+  /** Compute <ng(z)> form the histogram of the observed number of galaxies  */
+  void computeMeanNg_z(double NormNgalMean = 1.);
+
   /** Check if all pixels are seen. Error if not                         */
   void ObsPixels();
         
@@ -274,21 +280,12 @@ class Cat2Grid
   /** Compute random weighted grid with same selection function as data 
       @param nc         mean density of random grid
       @param SaveArr    if true fill an array of pixel center redshifts     */
-  void RandomGrid(double nc, bool SaveArr=true, bool seed=false);
-        
-  /** Normalise the galaxy number and weighted galaxy number grids          */
-  void NormNArrays();
-        
-  /** Normalise galaxy random grid                                          */
-  void NormRArray();
+  void RandomGrid(double NormNgalMean=1, bool SaveArr=true, bool seed=false, bool SigRandom=false);
 
   /** Add Gaussian errors to redshifts  (Cecile)
       @param Err   redshift error size (Err*(1+z))                          */
   void SetGaussErrRedshift(double Err, double zref, bool seed);
                 
-  /** Add bias to redshifts  (Cecile)
-      @param file with col 1 : redsfift, col2 : bias                        */
-  void SetBiasCorr(string biasFileName);
               
   /** Add photo-z errors to redshifts compute from pdf (Adeline)
       @param Err   pdf File Name (root file)                          */        
@@ -335,9 +332,6 @@ class Cat2Grid
   /** Return number of galaxies in WEIGHTED galaxy number grid              */
   r_8 ReturnWg(sa_size_t i){return ngw_[i];}; 
         
-  /** Return number of galaxies in WEIGHTED random grid                     */
-  r_8 ReturnRg(){return nrand_;}; 
-        
   /** Return total number of galaxies in the simulation                     */
   sa_size_t ReturnNgAll(){return ngall_;};
                 
@@ -374,6 +368,7 @@ class Cat2Grid
   RandomGenerator& rg_;                   /**< random number generator              */
   SelectionFunctionInterface* selfuncp_;    /**< selection function           */
   SelectionFunctionInterface* biasp_;      /**< bias function          */
+  SelectionFunctionInterface* sigrp_;      /**< sigma for random function          */
   SInterp1D z2dist_;                /**< redshift to distance look up table   */
   SInterp1D dist2z_;                      /**< distance to redshift look up table   */
         
@@ -442,7 +437,6 @@ class Cat2Grid
   sa_size_t *ngout_;   /**< number of gals outside grid              */ 
   r_8 *ngw_;           /**< number of gals inside weighted grid      */
   r_8 *meanz_;         /**< mean redshift of a grid      */
-  sa_size_t nrand_;    /**< number of gals in random grid                    */
   r_8 wnrand_;        /**< number of gals in weighted random grid           */
 
   int_4 nz_0_;        /** for PDF proba, where to start the table filling    */
@@ -464,17 +458,18 @@ class Cat2Grid
   sa_size_t Izy_;     /**< index of z-y color column in data tabl           */    
   sa_size_t Itype_;   /**< index of type column in data tabl              */  
   sa_size_t Imag_;    /**< index of MA column in data tabl                */  
-  //double phistar_,Mstar_,alpha_,mlim_,Mc_; // parameters for selection function ???REDUNDANT???
   double mean_overdensity_; /**< mean over-density of simlss grid AFTER setting cells with <-1 to =-1 */
   string ObsCat_;     /**< optionnal, list of catalog files, useful if more than 1 catalog must be read */
-        
+	  
   vector<ProjGrid> vgrids_;   /**< Vector of grids filled with weighted number of galaxies */
   
-  TArray<r_8> randomcat_;       /**< random galaxy number grid                     */
   TArray<r_8> wrgals_;  /**< weighted random number grid                   */
   TArray<r_8> zc_;          /**< redshift value at grid pixel centers          */
-        
+  Histo ngalz_;       /**< Histogram of the number   of galaxies per redshift bin */
+  Histo ngalzw_;       /**< Histogram of the number   of galaxies per redshift bin weighted by inverse of selfunc*/
+  SLinInterp1D ngalz_cell_; /** mean observed nb of galaxies per cell corrected cells set to 0 by argument*/
   SelectionFunctionInterface defselfunc_;   // Default selection function 
   SelectionFunctionInterface defbiasfunc_;   // Default bias function 
+  SelectionFunctionInterface defsigrfunc_;   // Default sigma function 
   FitsInOutFile fosdefault_;
 };

@@ -232,6 +232,7 @@ void TFlux::LoadTable(string filename) {
       
       for (int i_band = 0; i_band < nfilter; i_band++) {
 	if (iebv < nebv && iz < nz && itype < ntype){
+	  cout << "TEST " << i_band << " " << k[i_band] << endl;;
 	  fflux[itype][iz][iebv][i_band] = k[i_band];
 	  ffluxb[itype][iz][iebv] = fb;
 	}

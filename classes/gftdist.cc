@@ -684,6 +684,7 @@ int GalFlxTypDist::GetGalaxy(int& typ, r_8& mag) const
   // think this part randmonly selects styp to be 0, 1 or 2 according to the type fraction
   for(size_t kt=0; kt<NTypes(); kt++) 
 	{
+	  
     if (rndt <= v_sumfrac_[kt])  {  styp = kt; badtype = false; break; }
 	}
 	//cout <<"print check: styp="<<styp<<", badtype="<<badtype<<endl;
@@ -809,7 +810,7 @@ ostream& GalFlxTypDist::Print(ostream& os) const
 os << "----- GalFlxTypDist::Print() N_Types= " << NTypes() << " TotalTypeFrac=" <<  tot_frac_ << endl;
 for(size_t k=0; k<NTypes(); k++) {
   os << " --Type=" << k+1 << " typeFraction=" << v_frac_[k] << " SumtypeFrac=" << v_sumfrac_[k] << endl;
-  v_mag_[k].Print(os, v_mag_[k].Size());
+  // v_mag_[k].Print(os, v_mag_[k].Size());
   os << endl;
 }
 os << " -------------------------------------------- " << endl;

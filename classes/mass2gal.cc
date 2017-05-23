@@ -184,8 +184,6 @@ void Mass2Gal::ReadHeader(FitsInOutFile& fin)
   idmidx_=(int)ceil(atof(NXs.c_str())/2);
         
   su_.SetEmissionRedShift(zref_);
-  // DCref_=su_.RadialCoordinateMpc(); // radial distance of central pixel: Z COORD POS OF CENTRE PIXEL
-  // modif Cecile - avoid computation error when cube cut in slices
   drefs =fin.KeyValue("DREF");
   DCref_=atof(drefs.c_str()); // radial distance of central pixel: Z COORD POS OF CENTRE PIXEL
         
@@ -267,7 +265,7 @@ sa_size_t Mass2Gal::CheckNegativeMassCells()
   return nbad;
 }
 
-void Mass2Gal::ConvertToMeanNGal(float conv, bool Simple)
+void Mass2Gal::ConvertToMeanNGal(float conv1, float conv2, float conv3, bool Simple)
 // converts rho/rho^bar to a (mean) number of galaxies in the cell
 // follows the following logic:
 // Define quantities:
@@ -283,14 +281,14 @@ void Mass2Gal::ConvertToMeanNGal(float conv, bool Simple)
 // so all we have to do is multiply the values in the cells by Vc*n
 //
 // conv=Vc*n: Vc is the volume of the pixels, n=mean number density of gals calculated from 
-//            integrating the Schechter luminosity function
+//            integrating the Schechter luminosity function // !!! depends on redshift (modif JSR/CR 18-04-17)
 // ALSO SWITCHES AROUND DIMENSIONS SO NOW: ngals_(Nx_,Ny_,Nz_) whereas mass_(Nz_,Ny_,Nx_)
 // If Simple = true just puts conv gals in each cell
 { 
   cout <<endl<<"    Mass2Gal::ConvertToMeanNGal()"<<endl;
 
   if(Simple)
-    cout <<"    Simulating "<< conv <<" galaxies in each cell"<<endl;
+    cout <<"    Simulating "<< conv1 <<" galaxies in each cell"<<endl;
         
   if(fg_nodrho)
     throw ParmError("No clustering information: cannot convert rho/rho^bar to ngal^bar");
@@ -298,7 +296,9 @@ void Mass2Gal::ConvertToMeanNGal(float conv, bool Simple)
   if(!fg_readvals)
     throw ParmError("ERROR!: SimLSS cube information not read in from FITS header");
                 
-  cout <<"    Conversion value="<< conv <<endl;
+  cout <<"0    < z < 0.5    Conversion value="<< conv1 <<endl;
+  cout <<"0.5  < z < 0.75   Conversion value="<< conv2 <<endl;
+  cout <<"0.75 < z          Conversion value="<< conv3 <<endl;
   int ndim=3;
   sa_size_t mydim[ndim];
   mydim[0] = Nx_; mydim[1] = Ny_; mydim[2] = Nz_;
@@ -306,10 +306,25 @@ void Mass2Gal::ConvertToMeanNGal(float conv, bool Simple)
   cout <<"    Length of each dimension of ngals cube: "<<endl;
   cout<<"    1st = "<<ngals_.SizeX()<<", 2nd = "<<ngals_.SizeY()<<", 3rd = "<<ngals_.SizeZ()<<endl;
 
+  float conv;
+  double rx,ry,rz,rr,rphi,rtet,rreds;// note names phi,theta follow the usual spehric. coord convention 
   for(sa_size_t ix=0; ix<mass_.SizeZ(); ix++) // along sim's X-direction 
     for(sa_size_t iy=0; iy<mass_.SizeY(); iy++) // along sim's Y-direction
       for(sa_size_t iz=0; iz<mass_.SizeX(); iz++) { // along sim's Z-direction
-                                
+                   
+	GetCellCoord(ix,iy,iz, rx, ry, rz); // given pixel indices (ix,iy,iz) get comoving coords
+	  
+	if (ZisRad_)
+	  Conv2ParaCoord(rx,ry,rz,rr,rphi,rtet);
+	else
+	  Conv2SphCoord(rx,ry,rz,rr,rphi,rtet); 
+	// convert comoving distance into a redshift
+	rreds = dist2Redshift(rr);
+
+	if (rreds < 0.5) conv = conv1 ;
+	else if (rreds > 0.75) conv = conv3 ;
+	else conv = conv2;
+
         if(Simple)
           ngals_(ix,iy,iz) = conv;
         else
@@ -370,12 +385,12 @@ double Interpol2D(double x, double y, double x1, double y1, double z1, double x2
 }
 
 
-sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& gfd, 
-                                     bool extinct, bool AMcut, double SkyArea, bool GoldCut, bool ProbaCut)
+sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& gfd1, GalFlxTypDist& gfd2, GalFlxTypDist& gfd3,
+                                     bool extinct, bool AMcut, double SkyArea, bool GoldCut)
 {
   if(fg_nodrho)
     throw ParmError("No clustering information: cannot apply Poisson fluctuations to ngal^bar");
-        
+
   Timer tm("CreateGalCatalog");
         
   // Create swap space FITS file structure
@@ -414,44 +429,9 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
   }
   int nint=1000;
   SInterp1D *maxAM = NULL;
-
-  cout << " Gold Cut "<< GoldCut << endl;       
-  if (!GoldCut && !ProbaCut) maxAM = new SInterp1D(zv_, MBmax_, zv_[0], zv_[zv_.size()-1], nint);
-        
-  if(!GoldCut && !ProbaCut) {
-    // If not cutting just fill with junk MB(z) function
-    for (int i=0;i<10;i++){
-      for(int j=0; j<3; j++)
-        MBmax_type_(i,j) = 10;
-    }
-  }
-  //if cut is compute as a function of type (Adeline)
-  //should be better with a 3D interpolator ?
-  vector<double> MBmax_type0; 
-  vector<double> MBmax_type1; 
-  vector<double> MBmax_type2; 
-  int size =  MBmax_type_.SizeX();
-  cout << " MBmax_type_.SizeX() " << size <<endl;
-  for(int icut=0; icut<size; icut++){
-    if(icut<10){
-      cout <<icut << "  "<< MBmax_type_(icut,0)<< "  "<< MBmax_type_(icut,1)<< "  "<< MBmax_type_(icut,2) <<endl;
-    }
-    MBmax_type0.push_back(MBmax_type_(icut,0));
-    MBmax_type1.push_back(MBmax_type_(icut,1));
-    MBmax_type2.push_back(MBmax_type_(icut,2));
-  }
-  cout << "in Mass2Gal::CreateGalCatalog "<< GoldCut << " test "<< MBmax_type0.size() << " ";
-  cout << MBmax_type1.size() << " "<< MBmax_type2.size() << " "<< endl;
-
-  
-  SInterp1D *maxAM_type0 = NULL;
-  SInterp1D *maxAM_type1 = NULL;
-  SInterp1D *maxAM_type2 = NULL;
-
-  if (GoldCut){
-    maxAM_type0 = new SInterp1D(zv_, MBmax_type0, zv_[0], zv_[zv_.size()-1], nint);
-    maxAM_type1 = new SInterp1D(zv_, MBmax_type1, zv_[0], zv_[zv_.size()-1], nint);
-    maxAM_type2 = new SInterp1D(zv_, MBmax_type2, zv_[0], zv_[zv_.size()-1], nint);
+     
+  if(AMcut && !GoldCut) {
+    maxAM = new SInterp1D(zv_, MBmax_, zv_[0], zv_[zv_.size()-1], nint);
   }
   
   // to create object id
@@ -478,7 +458,6 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
         GetCellCoord(ix,iy,iz, xc, yc, zc); // given pixel indices (ix,iy,iz) get comoving coords
         double rx,ry,rz,rr,rphi,rtet,rreds;// note names phi,theta follow the usual spehric. coord convention 
         double mag,gtype,gext;  // galaxy absolute magnitude and type and internal extinction
-        // dc = sqrt(xc*xc+yc*yc+zc*zc);// comoving distance to each pixel center Cecile - useless here and wrong is cae of z-radial
         rtet = -1;
 
         for(int ing=0; ing<ng; ing++) { // from gal 1 to gal n in cell...
@@ -504,12 +483,15 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
           rreds = dist2Redshift(rr);
                 
           // draw the galaxy properties
-          mag = DrawMagType(gfd, gtype);
-          gext=0.;// extinction is set to 0 for now
+	  
+	  if (rreds < 0.5) mag = DrawMagType(gfd1, gtype);
+	  else if (rreds > 0.75) mag = DrawMagType(gfd3, gtype);
+	  else mag = DrawMagType(gfd2, gtype);
+
+	  gext=0.;// extinction is set to 0 for now
           ngsum++;// should be same as ng_
 	  
           double mAM =  0.;
-          if (!GoldCut && ! ProbaCut) mAM = (*maxAM)(rreds); // given redshift of galaxy what's max (faintest) absolute mag possible
           
           bool pass = 1;
 
@@ -523,63 +505,13 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
 	  int type = (int) (typeval+0.1);
 	  
 	  if(GoldCut){  
-	    /*
-	      if(gtype>=1 && gtype<2)
-              mAM =  (*maxAM_type0)(rreds);
-	      if(gtype>=2 && gtype<3)
-              mAM =  (*maxAM_type1)(rreds);
-	      if(gtype>=3 && gtype<4)
-              mAM =  (*maxAM_type2)(rreds);
-	    */
 	    pass = am->PassGoldenCut(mag, type, rreds);
           }
-          
-          if (ProbaCut) {
-            int iz = int((rreds-zmin)/zbin +0.5);
-            
-            int imag = int((mag-magmin)/magbin +0.5);
-            double prob = 0;
-	    
-	    //if (iz==20 && imag>=50 && imag <=50 && itype==0)
-	    //print = 1;
 
-            if (iz>=0 && iz<nz && itype>=0 && itype<ntype && imag>=0 && imag<nmag){
-              prob = pgold[iz][itype][imag];
-	      
-	      //if (print)
-	      //cout << iz << " " << itype << " " << imag << " " << prob << endl;
-
-              if (prob<1e-9)
-                prob = 0;
-              else{
-                if (iz==nz-1)
-                  iz--;
-                if (imag==nmag-1)
-                  imag--;
-                prob = Interpol2D(rreds, mag,
-                                  zv_[iz], magv_[imag], pgold[iz][itype][imag],
-                                  zv_[iz+1], magv_[imag], pgold[iz+1][itype][imag],
-                                  zv_[iz], magv_[imag+1], pgold[iz][itype][imag+1],
-                                  zv_[iz+1], magv_[imag+1], pgold[iz+1][itype][imag+1]);
-	      }
-	      //if (print)
-	      //cout << "prob = " << prob << endl;
-            }
-	    
-	    //if (print && prob>1e-9)
-	    //cout << "BAD" << endl;
-	    
-            if (prob<1e-9)
-              pass = 0;
-            else {
-              double rand_prob = rg_.Flat01();  // Reza - dist plate entre 0,1 - rand.Uniform();
-              if (rand_prob>prob)
-                pass = 0;
-            }
-          }
-          else if (mag>mAM){
+	  else if (mag > (*maxAM)(rreds)){
             pass = 0;
           }
+
           if(rtet>SkyArea) {
             pass = 0; 
 	    ngal_out_area ++;
@@ -622,7 +554,7 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
             row2[0] = gid;
             row2[1] = rreds; 
                   
-            gals2.AddRow(row2);
+	    gals2.AddRow(row2);
           }
                 
         }  // end of loop over galaxies in the cell 
@@ -634,8 +566,6 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
     }  // end of loop over iy (cells) 
         
   cout <<" \n Mass2Gal::CreateGalaxyCatalog() finished loop"<<endl;
-
-  // want to delete swf2 file if no magnitude cut, not sure how to do this
         
   gals.Info()["NAllObject"]=nginzfile;// ALL in sim
   gals.Info()["NBrightObject"]=nginfile;// ALL in file 1
@@ -687,7 +617,7 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
   return nginfile;
 }
 
-void Mass2Gal::CreateNzHisto(string ppfname, GalFlxTypDist& gfd, bool extinct, double SkyArea)
+void Mass2Gal::CreateNzHisto(string ppfname, GalFlxTypDist& gfd1, GalFlxTypDist& gfd2, GalFlxTypDist& gfd3, bool extinct, double SkyArea)
 {
   if(fg_nodrho)
     throw ParmError("No clustering information: cannot create N(z) Histo");
@@ -738,7 +668,11 @@ void Mass2Gal::CreateNzHisto(string ppfname, GalFlxTypDist& gfd, bool extinct, d
             Conv2SphCoord(rx,ry,rz,rr,rphi,rtet); 
                         
           rreds = dist2Redshift(rr);
-          mag = DrawMagType(gfd, gtype);
+	  
+	  if (rreds < 0.5) mag = DrawMagType(gfd1, gtype);
+	  else if (rreds > 0.75) mag = DrawMagType(gfd3, gtype);
+	  else mag = DrawMagType(gfd2, gtype);
+
           gext = 0.;
           ngsum++; 
                         
@@ -955,232 +889,6 @@ sa_size_t Mass2Gal::CreateSimpleCatalog(int idsim, string fitsname, double SkyAr
   return nginfile;
 };
 
-
-// JSR version
-void Mass2Gal::MaxAbsMag(string goldencutFileName){
-  cout << "JS GOLD CUT" << endl;
-  
-  ifstream goldfile(goldencutFileName.c_str());
-  string header;
-  
-  for (int ihead = 0; ihead<3; ihead++){
-    goldfile >> header;
-    
-    if (goldfile.eof() || header.find("#")==std::string::npos)
-      cout << "Goldenfile parameters not defined in ... " << goldencutFileName << endl
-           << "### Program will crash ###" << endl;
-    
-    if (header.find("#z")!=std::string::npos){
-      goldfile >> zmin >> zmax >> zbin;
-    }
-    if (header.find("#type")!=std::string::npos){
-      goldfile >> typemin >> typemax >> typebin;
-    }
-    if (header.find("#mag")!=std::string::npos){
-      goldfile >> magmin >> magmax >> magbin;
-    }
-  }
-  
-  nz = int( (zmax-zmin)/zbin )+1;
-  ntype = int( (typemax-typemin)/typebin )+1;
-  nmag = int( (magmax-magmin)/magbin)+1;
- 
-  cout << endl << "######################################" << endl;
-  cout << "#Z   : " << nz << " " << zmin << " " << zmax << " " << zbin << endl;
-  cout << "#T   : " << ntype << " " << typemin << " " << typemax << " " << typebin << endl;
-  cout << "#MAG : " << nmag << " " << magmin << " " << magmax << " " << magbin << endl;
-  cout << "######################################" << endl << endl;
-
-  for (int i=0; i<nz;i++) {
-    double z=zmin+double(i)*zbin;
-    zv_.push_back(z);
-  }
-
-  for (int i=0; i<nmag;i++) {
-    double m=magmin+double(i)*magbin;
-    magv_.push_back(m);
-  }
-  
-  pgold = new double**[nz];
-  for (int iz=0; iz<nz; iz++){
-    pgold[iz] = new double*[ntype];
-    for (int it=0; it<ntype; it++){
-      pgold[iz][it] = new double[nmag];
-    }
-  }
-  
-  
-
-  int iz, it, im;
-  double p;
-  
-  while(1){
-    goldfile >> iz;
-    if (goldfile.eof())
-      break;
-    goldfile >> it >> im >> p;
-    if (iz>=nz || it>=ntype || im >= nmag){
-      cout << "WARNING goldencutfile params out of range : " << iz << " " << it << " " << im << endl;
-      continue;
-    }
-    pgold[iz][it][im]=p;
-  }
-  goldfile.close();
-  // CHECK-REZA-JS , c'est quoi ca ?  rand.SetSeed(0);
-  
-}
-
-  
-// AC version
-void Mass2Gal::MaxAbsMag(bool doGoldenCut)
-// Calculate maximum absolute magnitude that 
-// can be observed with LSST as a function of 
-// redshift
-// Needs SimData class to calculate k-correction
-{
-
-  cout << "ADELINE FAINT CUT" << endl;
-  
-  double lmin=5e-8, lmax=2.5e-6;
-  
-  // Read in CWWK SEDs
-  string sedFile = "CWWK.list"; // "SEDs/CWWK.list" ??
-  ReadSedList readSedList(sedFile);
-  readSedList.readSeds(lmin,lmax);
-  vector<SED*> sedArray=readSedList.getSedArray();
-  int nSEDs = sedArray.size();
-  
-  // Read in LSST filters
-  string lsstFilterFile = "LSST.filters";
-  ReadFilterList readLSSTfilters(lsstFilterFile);
-  readLSSTfilters.readFilters(lmin,lmax);
-  vector<Filter*> LSSTfilters=readLSSTfilters.getFilterArray();
-  int nFilters = LSSTfilters.size();
-  
-  // Read in GOODS B filter
-  string goodsBFilterFile = "GOODSB.filters";
-  ReadFilterList readBfilter(lsstFilterFile);
-  readBfilter.readFilters(lmin,lmax);
-  vector<Filter*> BFilter=readBfilter.getFilterArray();
-  
-  // Initialise SimData class
-  string outcat="tmp";
-  PhotometryCalcs photoCalcs(lmin, lmax);
-  
-  // 5-sig depth for point sources (10 years + 0.1 mag)
-  // these should be input variables
-  double udepth =27.5505+0.1;
-  double gdepth =28.7324+0.1;
-  double rdepth =28.45+0.1;
-  double idepth =27.7536+0.1;
-        
-  //Adeline : golden cut
-  if(doGoldenCut == true)
-    idepth = 25.3;
-    
-        
-  double zdepth =27.0585+0.1;
-  double ydepth =25.8424+0.1;
-  vector<double> depths;
-  depths.push_back(udepth);
-  depths.push_back(gdepth);
-  depths.push_back(rdepth);
-  depths.push_back(idepth);
-  depths.push_back(zdepth);
-  depths.push_back(ydepth);
-
-  cout << "idepth : " << idepth << " " << depths[3] << endl;
-  
-  
-  // Loop over redshifts
-  double zmin=0.05, zmax=4;
-  double dz=0.05;
-  int nz = int((zmax-zmin)/dz+0.5)+1;
-  
-  cout << nz << " bins between " << zmin << " & " << zmax << endl;
-  
-
-  //to compute cut as a function of type (if golden sample)
-  int ndim = 2;
-  int nMainType = 3;
-  sa_size_t cutDim[ndim];
-  cutDim[0] = nz;
-  cutDim[1] = nMainType;
-  MBmax_type_.SetSize(ndim, cutDim);
-
-  ofstream outtest("out/test.txt");
-  
-
-  double eps=1e-10;
-  double dmsMax;
-  double dmsMax_type[nSEDs]; //compute cut as a function of type
-
-
-  cout << "MBmax_type_ size "<< MBmax_type_.SizeX() << "  "<< MBmax_type_.SizeY() << endl; 
-  for (int i=0; i<nz;i++) {
-    double z=zmin+i*dz;
-    zv_.push_back(z);
-    
-    // distance modulus
-    su_.SetEmissionRedShift(z);
-    double dL = su_.LuminosityDistanceMpc();
-    double mu = 5.*log10(dL) + 25.;
-    
-    // MB = Xdepth - mu - kBX
-    // To get MAX MB want Xdepth MAX and kBX MIN 
-    // So want to find: max(Xdepth - kBX)               
-    
-    dmsMax = -1000;
-    
-    for (int j=0; j<nSEDs; j++) {
-      if(doGoldenCut == true){ //cut only on i filter
-        double dms = depths[3] - photoCalcs.Kcorr(z,(*sedArray[j]),(*LSSTfilters[3]),(*BFilter[0]));
-
-        if (j==0)
-          cout << "dms : " << depths[3] << " " << photoCalcs.Kcorr(z,(*sedArray[j]),(*LSSTfilters[3]),(*BFilter[0]))
-               << " " << dms << endl;
-
-        dmsMax_type[j]=dms;
-        
-        if (dms>dmsMax)
-          dmsMax=dms;
-      }
-      else{     
-        for (int k=0; k<nFilters; k++) {
-          double dms = depths[k] - photoCalcs.Kcorr(z,(*sedArray[j]),
-                                                    (*LSSTfilters[k]),(*BFilter[0]));
-          if (dms>dmsMax)
-            dmsMax=dms;
-        }
-      }   
-    }
-    
-    if(doGoldenCut == 1){
-      MBmax_type_(i, 0) = dmsMax_type[0] - mu;
-      
-      cout << z << " " << dmsMax_type[0] << " " <<  mu << " " << dmsMax_type[0] - mu << endl;
-      outtest << z << " " << dmsMax_type[0] << " " <<  mu << " " << dmsMax_type[0] - mu << endl;
-      
-      //for type 1 : maximize over Sbc and Scd (cww library)
-      if(dmsMax_type[1]>= dmsMax_type[2])
-        MBmax_type_(i, 1) = dmsMax_type[1] - mu;
-      if(dmsMax_type[2]> dmsMax_type[1])
-        MBmax_type_(i, 1) = dmsMax_type[2] - mu;
-      //for type 2 : maximize over Irr, SB3 and SB2 (cww library)
-      double tempVal = eps;
-      for (int j=3; j<nSEDs; j++) {
-        tempVal = dmsMax_type[j];
-        if(tempVal > dmsMax_type[j])
-          tempVal = dmsMax_type[j];
-      }
-      MBmax_type_(i, 2) = tempVal - mu;
-      
-      MBmax_.push_back(dmsMax - mu);
-    }
-    else
-      MBmax_.push_back(dmsMax - mu);
-  }
-};
 
 
 void Mass2Gal::ApplyPZConv(string pzcf)
@@ -1440,24 +1148,20 @@ double Mass2Gal::DrawMagType(GalFlxTypDist& gfd, double& type)
   // type 30 = Im_cww_fix2.txt
   // type 40 = SB3_kin_fix2.txt
   // type 50 = SB2_kin_fix2.txt
-
-  /*
-  int a1=0,  b1=5;    //early (1)
-  int a2=6,  b2=40;   //late  (2)
-  int a3=41, b3=50;   //starburst (3)
-  */
-
-  // Then type 1 (early) : a1-b1 (0-5)
-  //            type 2 (late)  : a2-b2 (6-40)
-  //            type 3 (SBurst): a3-b3 (41-50)
   // Choice is same as Dahlen et al arXiv:0710.5532
   
-  int a1=0,  b1=5;    //early (1)
-  int a2=6,  b2=25;   //late  (2)
-  int a3=26, b3=50;   //starburst (3)
+  //USED FOR planck_BAO
+  //  int a1=0,  b1=5;    //early (1)
+  //  int a2=6,  b2=25;   //late  (2)
+  //  int a3=26, b3=50;   //starburst (3)
   // separation at 25 : irregular are considered as starburst galaxies. It is pessimist for the goldencut, optmist for the BDT efficiency. It can be balanced by a BDT at 90% to recover a similar nb of galaxies. JSR/CR 
 
-  //
+  //USED FOR planck_BAO2  - sans le 0.5 dans le calcul du sous-type, pour avoir une distribution plate: borne sup + 1
+  int a1=0,  b1=5;    //early (1)
+  int a2=5,  b2=35;   //late  (2)
+  int a3=35, b3=51;   //starburst (3)
+  // separation at 35 : irregular are considered as late galaxies.  JSR/CR 
+
   // The intermediate spectra are interpolated via:
   // type 0: 1.0*type0+0.0*type10
   // type 1: 0.9*type0+0.1*type10
@@ -1475,39 +1179,35 @@ double Mass2Gal::DrawMagType(GalFlxTypDist& gfd, double& type)
   // where the 1,2,3 represent the original broad band type
   // and the XX is the interpolated template type number
   // Therefore type values will be:
-  // 1.00 - 1.05
-  // 2.06 - 2.40
-  // 3.41 - 3.50
+  // 1.00 - 1.04
+  // 2.05 - 2.34
+  // 3.35 - 3.50
 
   // Simulation of extinction E(B-V)=extincBmV_
   // Random internal galactic exinction value for each galaxy
-  // which extinction law to use?
-  // Early types 0-0.1?
-  // Late types  0-0.3?
-  // Starburst   0-0.3?
-  // TBD
-  //CHECK
-  //MB_.SetSize(ng_);
-  //typeint_.SetSize(ng_);
-  //extincBmV_.SetSize(ng_);
+  // flat extinction law used, done in TAM.cc when checking the Golden cut
+  // Early types 0-0.1
+  // Late types  0-0.3
+  // Starburst   0-0.3
   int typ; double mag;
 
   int t123;
+
   gfd.GetGalaxy(typ,mag); 
   t123=typ; // simulates whether galaxy is early (if=1), late (if=2) or starburst (if=3)
         
   // simulate more precise type
   switch (t123) {
   case 1 : {
-    double typ1=floor(a1+(b1-a1)*rg_.Flat01()+0.5); 
+    double typ1=floor(a1+(b1-a1)*rg_.Flat01()); 
     type=1.0+typ1/100.0;}
     break;
   case 2 :
-    { double typ2=floor(a2+(b2-a2)*rg_.Flat01()+0.5); 
+    { double typ2=floor(a2+(b2-a2)*rg_.Flat01()); 
       type=2.0+typ2/100.0; }
     break;
   case 3 :
-    { double typ3=floor(a3+(b3-a3)*rg_.Flat01()+0.5); 
+    { double typ3=floor(a3+(b3-a3)*rg_.Flat01()); 
       type=3.0+typ3/100.0; }
     break;
   default:
@@ -1517,6 +1217,91 @@ double Mass2Gal::DrawMagType(GalFlxTypDist& gfd, double& type)
   return mag;
 };
 
+  
+void Mass2Gal::MaxAbsMag()
+// Calculate maximum absolute magnitude that 
+// can be observed with LSST as a function of 
+// redshift
+// Needs SimData class to calculate k-correction
+{
+
+  cout << " FAINT CUT" << endl;
+  
+  double lmin=5e-8, lmax=2.5e-6;
+  
+  // Read in CWWK SEDs
+  string sedFile = "CWWK.list"; // "SEDs/CWWK.list" ??
+  ReadSedList readSedList(sedFile);
+  readSedList.readSeds(lmin,lmax);
+  vector<SED*> sedArray=readSedList.getSedArray();
+  int nSEDs = sedArray.size();
+  
+  // Read in LSST filters
+  string lsstFilterFile = "LSST.filters";
+  ReadFilterList readLSSTfilters(lsstFilterFile);
+  readLSSTfilters.readFilters(lmin,lmax);
+  vector<Filter*> LSSTfilters=readLSSTfilters.getFilterArray();
+  int nFilters = LSSTfilters.size();
+  
+  // Read in GOODS B filter
+  string goodsBFilterFile = "GOODSB.filters";
+  ReadFilterList readBfilter(lsstFilterFile);
+  readBfilter.readFilters(lmin,lmax);
+  vector<Filter*> BFilter=readBfilter.getFilterArray();
+  
+  // Initialise SimData class
+  string outcat="tmp";
+  PhotometryCalcs photoCalcs(lmin, lmax);
+  
+  // 5-sig depth for point sources (10 years + 0.1 mag)
+  // these should be input variables
+  double udepth =27.5505+0.1;
+  double gdepth =28.7324+0.1;
+  double rdepth =28.45+0.1;
+  double idepth =27.7536+0.1;        
+  double zdepth =27.0585+0.1;
+  double ydepth =25.8424+0.1;
+  vector<double> depths;
+  depths.push_back(udepth);
+  depths.push_back(gdepth);
+  depths.push_back(rdepth);
+  depths.push_back(idepth);
+  depths.push_back(zdepth);
+  depths.push_back(ydepth);
+
+  cout << "idepth : " << idepth << " " << depths[3] << endl;
+  
+  // Loop over redshifts
+  double zmin=0.05, zmax=4;
+  double dz=0.05;
+  int nz = int((zmax-zmin)/dz+0.5)+1;
+  cout << nz << " bins between " << zmin << " & " << zmax << endl;
+    
+  double eps=1e-10;
+  double dmsMax;
+
+  for (int i=0; i<nz;i++) {
+    double z=zmin+i*dz;
+    zv_.push_back(z);
+    
+    // distance modulus
+    su_.SetEmissionRedShift(z);
+    double dL = su_.LuminosityDistanceMpc();
+    double mu = 5.*log10(dL) + 25.;
+    
+    // MB = Xdepth - mu - kBX
+    // To get MAX MB want Xdepth MAX and kBX MIN 
+    // So want to find: max(Xdepth - kBX)               
+    
+    dmsMax = -1000;
+    for (int j=0; j<nSEDs; j++) {
+      double dms = depths[3] - photoCalcs.Kcorr(z,(*sedArray[j]),  (*LSSTfilters[3]),(*BFilter[0]));
+      if (dms>dmsMax)  dmsMax=dms;
+    }
+    MBmax_.push_back(dmsMax - mu);
+    //   cout << z << "  " << 25.5 - mu << endl;
+  }
+};
 
 double Mass2Gal::FindPixelAtZ(double Z, sa_size_t nx, sa_size_t ny, sa_size_t nz, sa_size_t& i, sa_size_t& j, sa_size_t& k)
 // Assume the dimensions of the SimLSS cube are this way round: (Nz,Ny,Nx) so 

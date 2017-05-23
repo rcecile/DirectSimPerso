@@ -971,7 +971,7 @@ double findMinimum(vector<double> values)
 };
 
 
-double findMinimumPosition(TArray<double> array, int& iRow, int& jCol)
+double findMinimumPosition(TArray<r_8> array, int& iRow, int& jCol)
 {
 
     // set i,j to unphysical indices
@@ -986,14 +986,14 @@ double findMinimumPosition(TArray<double> array, int& iRow, int& jCol)
         for (int j=0; j<nCols; j++) {
         
             if ( minval>array(i,j) ){
-                minval = array(i,j);
-                iRow = i;
-                jCol = j;
-                }
+	      minval = array(i,j);
+	      iRow = i;
+	      jCol = j;
+	    }
             
-            }
-        }
-        
+	}
+    }
+    
     if ( (iRow<0)||(jCol<0) )
         throw ParmError("ERROR! Did not find minimum value in array");
         
@@ -1077,6 +1077,8 @@ int findClosestElement(TVector<r_8> values, double val)
     return iElement;
 
 };
+
+
 
 bool sortCheck(vector<double> values)
 {

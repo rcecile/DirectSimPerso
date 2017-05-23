@@ -52,7 +52,7 @@
   * The power of 1.4 in the decay term originates from the Silk damping fitting
   * formula in Eisenstein & Hu 1998.  Varying this decay length as well as the
   * amplitude will probably not have a significant effect on the fitted values of 
-  * ka (the BAO scale) 
+  * s (the BAO scale) 
   */
 class DecaySineFunc
 {
@@ -62,23 +62,23 @@ public:
         @param amp    amplitude of decaying sinusoid function 
         @param h      Hubble parameter in units of 100 km/s/Mpc
         @param decay  decay length                                            */
-	DecaySineFunc(double amp, double h, double decay = 1.4) 
-    	: amp_(amp) , h_(h) , decay_(decay) {};
+	DecaySineFunc(double h, double decay = 1.4) 
+    	: h_(h) , decay_(decay) {};
     	
     /** Return decaying sinusoid function \f$ 1+Ak\exp(-(k/0.1h)^d)\sin(2\pi k/k_a) \f$
         @param k    
-        @param ka                                                             */
-  	virtual double operator()(double k, double ka) {
-    		return ( 1+amp_*k*exp(-  (pow(k,decay_)/pow(0.1*h_,decay_))  )*sin(2*PI*k/ka) );
+        @param s                                                             */
+  	virtual double operator()(double k, double amp, double s) {
+	  return ( 1+amp*k*exp(-  (pow(k/0.1/h_,decay_))  )*sin(s*k) );
+	  // return ( 1+amp*sqrt(k)*exp(-  (pow(k/0.1,decay_))  )*sin(s*k) ); // suggestion Stephane mais pas convaincue (Cecile)
     		};  
 
     /** Print parameters of decaying sinusoid function                        */
    	void PrintParas()
-		{ cout <<"     Amplitude = "<< amp_ <<", decay length = "<< decay_ <<", h = "<< h_ <<endl; };
+		{ cout <<"    decay length = "<< decay_ <<", h = "<< h_ <<endl; };
 	
 
 protected:
-    double amp_;        	/**< amplitude of decaying sinusoid function            */
     double h_;          	/**< Hubble parameter in units of 100 km/s/Mpc          */
     double decay_;      	/**< decay length                                       */
 };
@@ -122,38 +122,25 @@ public:
 	not used anymore because sim spectrum read
 	------------------------------------------
 	   */
-	/** Set grid of trial ka values 
-	    minka    start ka value
-	    maxka    end ka value
-	    nka      number of ka values to try                                   */
-	void Setka(double minka, double maxka, int nka)
-		{ minka_=minka; maxka_=maxka; nka_=nka; };
+	/** Set grid of trial s values 
+	    mins    start s value
+	    maxs    end s value
+	    ns      number of s values to try                                   */
+	void Sets(double mins, double maxs, int ns, double mina, double maxa, int na)
+		{ Smin_=mins; Smax_=maxs; nS_=ns;  Amin_=mina; Amax_=maxa; nA_=na; };
 		
 	/** Compute ratio between observed and reference power spectra            */
 	void Pratio() {
 	    for (int i=0; i<kobs_.Size(); i++){
 		    Pratio_(i) = Pobs_(i)/Pref_(i); 
-		    		    		
-		    /****** modif Adeline */
-		    sig_(i) = sig_(i) / Pref_(i); 
-		    /*******/
+		    sig_(i)    = sig_(i) /Pref_(i); 
             }
 	};
 		    
-	/** Compute the chi-square values as a function of ka using ratio of power
+	/** Compute the chi-square values as a function of s using ratio of power
 	    spectra up to some maximum k
 	    @param maxk    maximum k of power spectra to use in chi-square calc   */
-	void ComputeChisq(double maxk = 1);
-	
-	/** Compute the chi-square values as a function of ka and A using ratio of power
-	    spectra up to some maximum k
-	    @param maxk    maximum k of power spectra to use in chi-square calc   */
-	void ComputeChisq_Avar(double maxk = 1);
-	
-	
-	/** Write the chi-square as a function of ka to a file
-	    @param outfile    file to write chi-square values to                  */
-	void WriteChisq(string outfile);
+	void ComputeChisq(double maxk);
 	
 	/** Return redshift of power spectrum                                     */
 	double ReturnZPS() { return zref_; };
@@ -168,46 +155,22 @@ public:
 	/** Return ratio between observed and reference power spectra             */
 	TVector<r_8> ReturnPSRatio() { return Pratio_; };
 	
-	/** Compute best-fit ka with error with given n-sigma precision 
-	   @param bestfit    best-fit ka
-	   @param siglow     lower error range
-	   @param sighigh    upper error range
-	   @param nsig       n-sigma precision                                    */
-	void BestfitStdDev(double& bestfit, double& siglow, double& sighigh, int nsig = 1);
-	
-	/** Compute best-fit ka with error with given n-sigma precision 
-	   @param bestfit_ka     best-fit ka
-	   @param bestfit_amp    best-fit A
-	   @param siglow     lower error range
-	   @param sighigh    upper error range
-	   @param nsig       n-sigma precision                                    */
-	void BestfitStdDev_Avar(double& bestfit_ka, double& bestfit_amp, double& siglow, double& sighigh, int nsig = 1);
-	
+	/** Compute best-fit s with error with given n-sigma precision            */
+	void BestfitStdDev(double& bestfit_S, double& bestfit_A, double& bestfit_Chi, double& siglow, double& sighigh, double& sigbest, int nsig = 1);
+       
 	/** Analytical approximation of the error on the power spectrum due to the 
 	    sample variance 
 	    @param VolCat    volume of galaxy catalog used to compute power spectrum */
 	void CalcSigSampVar(double VolCat);
 	
-	/** Write results: redshift of power spectrum, best-fit ka, n-sigma of 
+	/** Write results: redshift of power spectrum, best-fit s, n-sigma of 
 	    error ranges, upper error range, lower error range to a file 
 	    @param outfile    file to write results to                            */
 	void WriteResults(string outfile);
 	
-	/** Write fiducial/reference power spectrum to a file                 
-	    @param outfile    file to write reference power spectrum to           */
-	void WriteRefPS(string outfile);
-	
-	/** Write reference power spectrum AND best-fit sinosoid to a file 
-	    @param outfile    file to write functions to                          */
-	void WriteAncillaryInfo(string outfile);
-	
-	/** Write wiggle power spectrum AND sigma(P_{wiggle}) to a file 
-	    @param outfile    file to write functions to                          */
-	void WriteWiggle(string outfile);
-	
 	/** Write marginalized chi2 to a file 
 	    @param outfile    file to write functions to   			  */
-	void WriteChisqMarg(string outfile);
+	void WriteChisq(string outfile);
 	
 
 protected:
@@ -217,17 +180,14 @@ protected:
 	TVector<r_8> sig_;       /**< error on observed power spectrum            */
 	TVector<r_8> Pref_;      /**< smooth reference power spectrum             */
 	TVector<r_8> Pratio_;    /**< ratio between observed and reference power spectra 		  */
-	TVector<r_8> kavals_;    /**< grid of trial ka values                     */
-	TVector<r_8> kavals_short_;    /**< grid of trial ka values (adeline a revoir)                    */
-	TVector<r_8> ampvals_short_;   /**< grid of trial A values (adeline a revoir)                	  */
-	TVector<r_8> ampvals_;   /**< grid of trial A values                      */
-	TVector<r_8> Chisq_;     /**< chi-square value at each ka value           */
-	TArray<r_8> chisq_avar_; /**< to compute chisq if amp varies (Adeline) 	  */
-	TArray<r_8> margChisq_;	 /**< marginalize chisq (over A and ka) (Adeline) */
-		
-	double minka_;           /**< min ka value in trial ka grid               */   
-	double maxka_;           /**< max ka value in trial ka grid               */ 
-	int nka_;                /**< number of ka values in trial ka grid        */
+	TVector<r_8> Svals_list_;/**< grid of trial s values                     */
+	TVector<r_8> Avals_list_;/**< grid of trial A values                      */
+	TArray<r_8> Chisq_;     /**< chi-square value at each A,S value           */
+	TVector<r_8> Chisq1D_;  /**< chi-square value at each S value, 1 row of A           */
+	
+	double Smin_;           /**< min s value in trial s grid               */   
+	double Smax_;           /**< max s value in trial s grid               */ 
+	int nS_;                /**< number of s values in trial s grid        */
 	double Amin_;		 /**< min Amp value in trial Amp grid             */  
   	double Amax_; 		 /**< max Amp value in trial Amp grid             */  
    	int nA_;		 /**< number of Amp value in trial Amp grid       */  
@@ -235,8 +195,9 @@ protected:
 	
 	double zref_;            /**< redshift of power spectrum                  */
 	double h_;               /**< Hubble parameter in units of 100 km/s/Mpc   */
-	double bestfit_;         /**< best fit ka                                 */
-	double bestfit_amp_;     /**< best fit amp (adeline)      		  */
+	double bestfitS_;         /**< best fit s                                  */
+	double bestfitA_;     /**< best fit amp (adeline)      		  */
+	double bestChisq_;     /**< best fit amp (adeline)      		  */
 	double errup_;           /**< upper error range                           */
 	double errdown_;         /**< lower error range                           */
 	int nsig_;               /**< n-sigma of error ranges                     */

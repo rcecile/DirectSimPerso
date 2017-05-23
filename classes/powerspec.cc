@@ -479,16 +479,12 @@ void PowerSpec::WritePS(string fname, HProf& Pdata, r_4 Voldata, HProf& PSimlss,
 		outp << "# Nx,Ny,Nz,R(Mpc),zc = "<< Nx_ <<","<< Ny_ <<","<< Nz_ <<",";
 		outp << Dx_ <<","<< zc_ <<endl;
 		
-		double sigma_factor = sqrt(4. * PI * PI / Nx_ / Ny_ /  Nz_ / Dx_/Dy_/Dz_ /  Pdatah.BinWidth());
-		//outp << "k \t Pnorm \t Pnorm_uncorr \t Praw*Voldata \t  Pslss*Volsimlss \t Pslssf*Volsimlss \t nmode \t nkeepMode \t  fracmod" <<endl;
+		double sigma_factor = 2. * PI * sqrt(1. / Nx_ / Ny_ / Nz_ / Dx_ / Dy_ / Dz_ / Pdatah.BinWidth());
+	
 		for(int_4 i=0;i<nbk;i++) {
 		
 			r_8 kvals=Pdatah.BinCenter(i);
 			r_8 Praw=Pdatah.operator()(i);
-			//	r_8 kvals_z=Pdatah_z.BinCenter(i);
-			//	r_8 Praw_z=Pdatah_z.operator()(i);
-			//	r_8 kvals_xy=Pdatah_xy.BinCenter(i);
-			//			r_8 Praw_xy=Pdatah_xy.operator()(i);
 
 			r_8 kv2= PSimlssh.BinCenter(i);
 			r_8 Pslss= PSimlssh.operator()(i);
@@ -498,47 +494,25 @@ void PowerSpec::WritePS(string fname, HProf& Pdata, r_4 Voldata, HProf& PSimlss,
 			if(abs(kvals-kv2)>eps||abs(kvals-kv3)>eps)
 				throw ParmError("ERROR! k bins are different between data and SimLSS");
 
-			r_8 Pnorm_uncorr = Praw*Voldata*(1+meandens)*(1+meandens);
-			r_8 Pnorm = Pnorm_uncorr*(Pslss/Pslssf);
-			//			r_8 Pnorm_uncorr_z = Praw_z*Voldata*(1+meandens)*(1+meandens);
-			//			r_8 Pnorm_z = Pnorm_uncorr_z*(Pslss/Pslssf);
-			//			r_8 Pnorm_uncorr_xy = Praw_xy*Voldata*(1+meandens)*(1+meandens);
-			//			r_8 Pnorm_xy = Pnorm_uncorr_xy*(Pslss/Pslssf);
+			r_8 Pnorm = Praw*Voldata;
+			r_8 Prap = Pslss/Pslssf;
 			
 			r_8 kv4=Pnoiseh.BinCenter(i);
 			if(abs(kvals-kv4)>eps)
 				throw ParmError("ERROR! k bins are different between data and shot-noise");
 
-			r_8 Pnoise = Pnoiseh.operator()(i) *Voldata*(1+meandens)*(1+meandens)*(Pslss/Pslssf);
-			//			r_8 Pnoise_z = Pnoiseh_z.operator()(i) *Voldata*(1+meandens)*(1+meandens)*(Pslss/Pslssf);
-			//			r_8 Pnoise_xy = Pnoiseh_xy.operator()(i) *Voldata*(1+meandens)*(1+meandens)*(Pslss/Pslssf);
-			// ca c'est ce qu'on avait : r_8 sigmaP  = (Pnorm - Pnoise) / kvals * sigma_factor;
-			r_8 sigmaP  = (Pnorm + Pnoise) / kvals * sigma_factor;
+			r_8 Pnoise = Pnoiseh.operator()(i) *Voldata;
+		
+			r_8 sigmaP  = (Pnorm) / kvals * sigma_factor;
  
-			r_8 nmode = 0;
-			r_8 nKeepMode = 0;
-			r_8 fracmod = 0;
-			if((hmode_!=NULL) && (hkeepMode_!=NULL)){
-			   nmode = hmode.operator()(i);
-			   nKeepMode = hkeepMode.operator()(i);
-			   fracmod = fracmodok.operator()(i);
-			}
 			
-			outp << kvals <<"    \t"<< Pnorm <<"    \t" << Pnorm_uncorr <<"    \t";
-			outp << Praw*Voldata <<"    \t"<< Pslss*Volsimlss <<"    \t"<< Pslssf*Volsimlss  <<"    \t";
-			outp << Pnoise <<"    \t" << sigmaP<<"    \t"<< nmode << "   \t"<< nKeepMode << "   \t"<< fracmod << endl;
-			/*
-			outp << kvals <<"    \t"<< Pnorm <<"    \t" << kvals_z <<"    \t"<< Pnorm_z <<"    \t" << kvals_xy <<"    \t" ;
-			outp << Pnorm_xy <<"    \t"<< Pnorm_uncorr <<"    \t";
-			outp << Praw*Voldata <<"    \t"<< Pslss*Volsimlss <<"    \t"<< Pslssf*Volsimlss  <<"    \t";
-			outp << Pnoise  <<"    \t"<< Pnoise_z  <<"    \t"<< Pnoise_xy  <<"    \t" ;
-			outp << sigmaP << "   \t"<< nmode << "   \t"<< nKeepMode << "   \t"<< fracmod <<endl;
-			*/
+			outp << kvals <<"    \t"<< Pnorm <<"    \t" << Prap <<"    \t";
+			outp << Pnoise <<"    \t" << sigmaP << endl;
 			}
 		outp.close();
 		}
 	else
-	    cout << "Error...file """ << fname.c_str() << """ exists" << endl;
+	  cout << "Error...file """ << fname.c_str() << """ exists" << endl;
 
 	cout << "    EXIT PowerSpec::WritePS()"<<endl;
 };

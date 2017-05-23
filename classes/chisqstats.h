@@ -34,75 +34,62 @@
 class ChisqStats 
 {
 public:
+	
+  /** Constructor  find best fit when ka AND A are variable
+      @param Svals     parameter values of chi-square (must be evenly spaced)
+      @param Avals     parameter values of chi-square (must be evenly spaced)
+      @param chisq     chi-square value for each parameter
+      @param dof       degree of freedom                                    */
+ ChisqStats(TVector<r_8> svals, TVector<r_8> ampvals,  TArray<r_8> chisq, double dof=1)
+   : Svals_list_(svals), Avals_list_(ampvals), Chisq_(chisq), dof_(dof) {
+    dof_ = dof;
+    cout << "init chisq Array" << Chisq_.SizeX() << " " << Chisq_.SizeY()<<endl;
+    // for (int i=0;i<10;i++) cout << "TEST 2D "<< i << " " << Chisq_(i,10) << endl;
+  };
+ ChisqStats(TVector<r_8> svals, TVector<r_8> chisq, double dof=1)
+   : xvals_(svals), Chisq1D_(chisq), dof_(dof) {
+    dof_ = dof;
+    cout << "init chisq Vector " << Chisq1D_.Size() << endl;
+    // for (int i=0;i<10;i++) cout << "TEST 1D "<< i << " " << Chisq1D_(i) << endl;
 
-    /** Constructor 
-        @param xvals     parameter values of chi-square (must be evenly spaced)
-        @param chisq     chi-square value for each parameter
-        @param dof       degree of freedom                                    */
-	ChisqStats(TVector<r_8> xvals, TVector<r_8> chisq, double dof=1)
-	  : xvals_(xvals), chisq_(chisq), dof_(dof) { };
-	
-	/** Constructor  Adeline modif : find best fit when ka AND A are variable
-        @param kavals     parameter values of chi-square (must be evenly spaced)
-        @param ampvals     parameter values of chi-square (must be evenly spaced)
-	@param chisq     chi-square value for each parameter
-        @param dof       degree of freedom                                    */
-	ChisqStats(TVector<r_8> kavals, TVector<r_8> ampvals,  TVector<r_8> chisq, TArray<r_8> chisq_avar, double dof=1)
-	  : kavals_(kavals), ampvals_(ampvals), chisq_(chisq), chisq_avar_(chisq_avar), dof_(dof) {
-	  	dof_ = dof;
-		cout << "init chisq " << chisq_avar_.SizeX() << " " << chisq_avar_.SizeY()<<endl;
-		/*for (int i=0; i<=10; i++){
+  };
+  
+  
+  /** Find the best fit parameter value ie parameter value at the minimum 
+      chi-square                                                            */
+  double BestFit(double& bestamp, double& bests); 
+  
+  /** Estimate the parameter error 
+      @param siglow    lower error range
+      @param sighigh   upper error range
+      @param clevel    confidence level of error range
+      @param npt       number of points to interpolate chi-square func with */
+  void ErrSig(double& siglow, double& sighigh, double& sigbest, double clevel=0.683,int npt=100); // find error
+  //int NearestIndex(double,TVector<r_8>);
+  
+  /** Return chi-square function                                            */
+  TArray<r_8> ReturnChisq(){return Chisq_;};
+  
+  /** Return parameter values of chi-square                                 */
+  TVector<r_8> ReturnXvals(){return xvals_;};
+  
+  /** Return lower error range                                              */
+  double ReturnMinus(){return minus_;};
+  
+  /** Return upper error range                                              */
+  double ReturnPlus(){return plus_;};
+  
+  /** Marginalize chisq over Amp and ka (Adeline) 	 		  */
+  void GetMarg(double *step_, TArray<r_8> MargChisq);
+  
+  
+ protected:
+	TArray<r_8> Chisq_; /**< chi-square value for each parameter         */
+	TVector<r_8> Chisq1D_; /**< chi-square value for each parameter         */
+	TVector<r_8> Svals_list_;/**< grid of trial s values                     */
+	TVector<r_8> Avals_list_;/**< grid of trial A values                      */
+	TVector<r_8> xvals_;     /**< grid of trial values                     */
 
-		  for (int j=0; j<=10; j++){
-		    cout << "chisqavar " << chisq_avar_(i,j) << endl;
-		  }
-		}
-		*/
-		cout << "dim chisqavar : " << chisq_avar_.SizeX() << " " << chisq_avar_.SizeY() << endl;
-
-
-
-
-};
-	
-	
-	/** Find the best fit parameter value ie parameter value at the minimum 
-	    chi-square                                                            */
-	double BestFit();
-	double BestFit_Avar(double& bestamp); /*(Adeline)*/
-	
-	/** Estimate the parameter error 
-	    @param siglow    lower error range
-	    @param sighigh   upper error range
-	    @param clevel    confidence level of error range
-	    @param npt       number of points to interpolate chi-square func with */
-	void ErrSig(double& siglow, double& sighigh, double clevel=0.683,int npt=100); // find error
-	//int NearestIndex(double,TVector<r_8>);
-	
-	/** Return chi-square function                                            */
-	TVector<r_8> ReturnChisq(){return chisq_;};
-	
-	/** Return parameter values of chi-square                                 */
-	TVector<r_8> ReturnXvals(){return xvals_;};
-	
-	/** Return lower error range                                              */
-	double ReturnMinus(){return minus_;};
-	
-	/** Return upper error range                                              */
-	double ReturnPlus(){return plus_;};
-	
-	/** Marginalize chisq over Amp and ka (Adeline) 	 		  */
-	void GetMarg(double *step_, TArray<r_8> MargChisq);
-	
-	
-protected:
-	TVector<r_8> xvals_;     /**< parameter values of chi-square              */
-	TVector<r_8> kavals_;    /**< parameter values of chi-square              */
-	TVector<r_8> ampvals_;   /**< parameter values of chi-square              */
-	TVector<r_8> chisq_;     /**< chi-square value for each parameter         */
-	TArray<r_8> chisq_avar_; /**< chi-square value for each parameter         */
-	TVector<r_8> chisq_Margka;
-	
 	double dof_;             /**< degree of freedom                           */
 	double minus_;           /**< lower error range                           */
 	double plus_;            /**< upper error range                           */

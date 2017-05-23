@@ -1,85 +1,60 @@
 #include "chisqstats.h"
 
-double ChisqStats::BestFit()
+double ChisqStats::BestFit(double& bestamp, double& bests)
 {
-  
-    double minchisq, maxchisq;
-    chisq_.MinMax(minchisq, maxchisq);
-    int indexmin = findClosestElement(chisq_, minchisq);
-
-    cout <<"    Minimum chisq per d.o.f. (d.o.f="<< dof_ <<") = "<< minchisq/dof_ <<endl;
-    cout <<"    Value of x at min(chisq) = "<< xvals_(indexmin) <<endl;
-
-    return xvals_(indexmin);
-
-};
-
-double ChisqStats::BestFit_Avar(double& bestamp)
-{
-    double minchisq, maxchisq;
-    chisq_.MinMax(minchisq, maxchisq);
-    int indexmin = findClosestElement(chisq_, minchisq);
-    
-    
-    cout <<"    chisq min = "<<  minchisq  <<endl;
-    cout <<"    Minimum chisq per d.o.f. (d.o.f="<< dof_ <<") = "<< minchisq/dof_ <<endl;
-    cout <<"    Value of ka at min(chisq) = "<< kavals_(indexmin) <<endl;
-    cout <<"    Value of amp at min(chisq) = "<< ampvals_(indexmin) <<endl;
-    bestamp = ampvals_(indexmin);
-    
-    return kavals_(indexmin);
+  int Sindexmin, Aindexmin;
+  double minchisq = findMinimumPosition(Chisq_, Aindexmin, Sindexmin);
+  cout <<"    Value of min(chisq) = "<< minchisq <<endl;
+  cout <<"    Value of s at min(chisq) = "<< Svals_list_(Sindexmin) <<endl;
+  cout <<"    Value of amp at min(chisq) = "<< Avals_list_(Aindexmin) <<endl;
+  bestamp = Avals_list_(Aindexmin);
+  bests = Svals_list_(Sindexmin);
+  return minchisq;
 };
 
 void ChisqStats::GetMarg(double *step_, TArray<r_8> MargChisq)
 { 
     cout << "  marginalize chisq" << endl;
-    int nka = chisq_avar_.SizeY();
-    int nA = chisq_avar_.SizeX();
+    int nA = Chisq_.SizeX();
+    int nS = Chisq_.SizeY();
     
-    cout << "   "<< nA << " x "<< nka <<" val in chisq "<< endl; 
-    cout << "  dka "<< step_[0] << " dA "<<step_[1] << endl; 
+    cout << "   "<< nA << " x "<< nS <<" val in chisq "<< endl; 
+    cout << "  dS "<< step_[0] << " dA "<<step_[1] << endl; 
     
     int nVar = int(dof_);
     if(dof_>2)
     	cout << "ERROR dof > 2" <<endl;
     int dim[nVar];
     double step;
-
-    //chisq_Margka.SetSize(nka); 
     
     for(int ivar=0; ivar<nVar; ivar ++){
-       if(ivar == 0){	//marginalization over A => chi(ka)
-	 dim[0] = chisq_avar_.SizeY();
-	 dim[1] = chisq_avar_.SizeX();
-		step = step_[1]; //dA
-	}if(ivar == 1){	//marginalization over ka => chi(A)
-	 dim[0] = chisq_avar_.SizeX();
-	 dim[1] = chisq_avar_.SizeY();
-		step = step_[0]; //dka
-	}
+      if(ivar == 0){	//marginalization over A => chi(S)
+	dim[0] = Chisq_.SizeY();
+	dim[1] = Chisq_.SizeX();
+	step = step_[1]; //dA
+      }if(ivar == 1){	//marginalization over S => chi(A)
+	dim[0] = Chisq_.SizeX();
+	dim[1] = Chisq_.SizeY();
+	step = step_[0]; //dS
+      }
       
-    	double content = 0;
-    	for(int i=0; i<dim[0]; i++){ 
-    	   content = 0;
-	   for(int j=0; j<dim[1]; j++){ 
-    		if(ivar == 0)
-		   content += (chisq_avar_(j,i) * step);	 
-		if(ivar == 1){
-		   content += (chisq_avar_(i,j) * step);
-		}
-	   }
-       	   MargChisq(ivar, i) = content;
-	  
-	   //if(ivar == 1)
-	   //	cout << i << "  "<< MargChisq(ivar, i) << endl;
-	   //if(ivar == 0)
-	   // chisq_Margka(i) = MargChisq(ivar, i);
+      double content = 0;
+      for(int i=0; i<dim[0]; i++){ 
+	content = 0;
+	for(int j=0; j<dim[1]; j++){ 
+	  if(ivar == 0)
+	    content += (Chisq_(j,i) * step);	 
+	  if(ivar == 1){
+	    content += (Chisq_(i,j) * step);
+	  }
 	}
+	MargChisq(ivar, i) = content;
+	
+      }
     }
-    //chisq_Margka= MargChisq(0);
 }
 
-void ChisqStats::ErrSig(double& siglow, double& sighigh, double clevel, int npt)
+void ChisqStats::ErrSig(double& siglow, double& sighigh, double& sigbest, double clevel, int npt)
 {
 // xvals_= abscissa for logP (must be evenly spaced)
 // logP  = vector of probabilities
@@ -88,9 +63,7 @@ void ChisqStats::ErrSig(double& siglow, double& sighigh, double clevel, int npt)
 // using log(prob) instead of prob
 // avoids more NaNs and therefore gives a more accurate answer
     int ylevelstep=100;
-
-    TVector<r_8> logPraw = -0.5*chisq_;
-    //TVector<r_8> logPraw = -0.5*chisq_Margka;
+    TVector<r_8> logPraw = -0.5*Chisq1D_;
 
     // REMOVE ANY XVALUES WHERE LOGP=INF
     
@@ -192,8 +165,6 @@ void ChisqStats::ErrSig(double& siglow, double& sighigh, double clevel, int npt)
 	
     int i = findClosestElement(y2peak, ylevel); 
     minus_ = x(i);
-    //cout <<"    minus="<<minus_<<endl;
-    //cout <<"    size of x="<<x.Size()<<endl;
 
     // START AT PEAK AND STEP FORWARD ALONG X AXIS UNTIL y<ylevel
     if(imax<(n-1)) {
@@ -209,10 +180,10 @@ void ChisqStats::ErrSig(double& siglow, double& sighigh, double clevel, int npt)
 	    plus_=-9999;
 		cout <<"    WARNING: probability peaks at last index"<<endl;
 		}
-    //cout <<"     plus="<<plus_<<endl;
 
-	siglow = minus_;
-	sighigh = plus_;
+    siglow = minus_;
+    sighigh = plus_;
+    sigbest = x(imax);
 };
 
 
