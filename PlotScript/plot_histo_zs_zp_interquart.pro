@@ -1,8 +1,6 @@
-PRO plot_histo_zs_zp_interquart,saveplot,mode
-; plot_histo_zs_zp_interquart,0,0 : plot as a function of z_s
-; plot_histo_zs_zp_interquart,0,1 : plot as a function of z_p
+PRO plot_histo_zs_zp_interquart,saveplot
 
-dir='/sps/lsst/data/rcecile/Planck_BAO/'
+dir='/sps/lsst/data/rcecile/Planck_BAO2/'
 loadct,12
 lcol  = [0,210,105,  135, 120]
 !p.thick=3
@@ -18,43 +16,24 @@ if (saveplot) then begin
 ; current plotting device.
    mydevice = !D.NAME
    SET_PLOT, 'PS'
-   if (mode eq 0) then DEVICE, FILENAME='/sps/lsst/dev/rcecile/Fig/plot_stat_interquartile.eps',    /PORTRAIT,/COLOR,XSIZE=8.8,YSIZE=4.4,FONT_SIZE=4
-   if (mode eq 1) then DEVICE, FILENAME='/sps/lsst/dev/rcecile/Fig/plot_stat_interquartile_zp.eps', /PORTRAIT,/COLOR,XSIZE=6.6,YSIZE=6.6,FONT_SIZE=4
+   DEVICE, FILENAME='/sps/lsst/dev/rcecile/Fig/plot_stat_interquartile_zp.eps', /PORTRAIT,/COLOR,XSIZE=6.6,YSIZE=6.6,FONT_SIZE=4
 endif
 
-if (mode eq 0) then begin
-   sxtit = "Spectroscopic redshift" 
-   restore,dir+'histo_zs_zp_errP.sav'
-   p_sig = pinterquart
-   p_out = poutlier
-   p_bias = pbias
-   
-   restore,dir+'histo_zs_zp_errPBDT9.sav'
-   d_sig = pinterquart
-   d_out = poutlier
-   d_bias = pbias
-   restore,dir+'histo_zs_zp_errPBDT8.sav'
-   b_sig = pinterquart
-   b_out = poutlier
-   b_bias = pbias
-endif
-   restore,dir+'histo_zs_zp_errPBDT8.sav'
 
-if (mode eq 1) then begin
-   sxtit = "Photometric redshift" 
-   restore,dir+'stat_zp_1pzs_errP.sav'
-   p_sig = pinterquart
-   p_out = poutlier
-   p_bias = pbias
-   restore,dir+'stat_zp_1pzs_errPBDT9.sav'
-   d_sig = pinterquart
-   d_out = poutlier
-   d_bias = pbias
-   restore,dir+'stat_zp_1pzs_errPBDT8.sav'
-   b_sig = pinterquart
-   b_out = poutlier
-   b_bias = pbias
-endif
+sxtit = "Photometric redshift" 
+restore,dir+'stat_zp_1pzs_errP.sav'
+p_sig = pinterquart
+p_out = poutlier
+p_bias = pbias
+restore,dir+'stat_zp_1pzs_errPBDT9.sav'
+d_sig = pinterquart
+d_out = poutlier
+d_bias = pbias
+restore,dir+'stat_zp_1pzs_errPBDT8.sav'
+b_sig = pinterquart
+b_out = poutlier
+b_bias = pbias
+zstat = z
 
 plot,zstat,p_sig*100,/xs,/ys,yma=[0,0.2],yra=[0,0.115]*100,/nodata,ytit="IQR x100",xra=[0.2,2.45]
 oplot,zstat,p_sig*100,col=lcol[0]
@@ -103,57 +82,63 @@ for iz=0,n_elements(zref)-1 do begin
    print,zref[iz],zb,zs,zo
 
 endfor
-stop
+;stop
 
-openw,lun0, '/sps/lsst/data/rcecile/Planck_BAO_grids/Bias_photoZ.txt', /get_lun
-for i=0,n_elements(z)-1 do  printf, lun0, zstat[i], p_bias[i]
+openw,lun0, '/sps/lsst/data/rcecile/Planck_BAO2_grids/Bias_photoZ.txt', /get_lun
+for i=0,n_elements(z)-2 do  printf, lun0, zstat[i], p_bias[i]
 close, lun0
 free_lun, lun0
 
 
-openw,lun1, '/sps/lsst/data/rcecile/Planck_BAO_grids/Bias_photoZ_BDT90.txt', /get_lun
-for i=0,n_elements(z)-1 do  printf, lun1, zstat[i], d_bias[i]
+openw,lun1, '/sps/lsst/data/rcecile/Planck_BAO2_grids/Bias_photoZ_BDT90.txt', /get_lun
+for i=0,n_elements(z)-2 do  printf, lun1, zstat[i], d_bias[i]
 close, lun1
 free_lun, lun1
 
 
-openw,lun2, '/sps/lsst/data/rcecile/Planck_BAO_grids/Bias_photoZ_BDT80.txt', /get_lun
-for i=0,n_elements(z)-1 do  printf, lun2, zstat[i], b_bias[i]
+openw,lun2, '/sps/lsst/data/rcecile/Planck_BAO2_grids/Bias_photoZ_BDT80.txt', /get_lun
+for i=0,n_elements(z)-2 do  printf, lun2, zstat[i], b_bias[i]
 close, lun2
 free_lun, lun2
 
 
-openw,lun0, '/sps/lsst/data/rcecile/Planck_BAO_grids/Sigma_photoZ.txt', /get_lun
-for i=0,n_elements(z)-1 do  printf, lun0, zstat[i], p_sig[i]
+openw,lun0, '/sps/lsst/data/rcecile/Planck_BAO2_grids/Sigma_photoZ.txt', /get_lun
+for i=0,n_elements(z)-2 do  printf, lun0, zstat[i], p_sig[i]
 close, lun0
 free_lun, lun0
 
 
-openw,lun1, '/sps/lsst/data/rcecile/Planck_BAO_grids/Sigma_photoZ_BDT90.txt', /get_lun
-for i=0,n_elements(z)-1 do  printf, lun1, zstat[i], d_sig[i]
+openw,lun1, '/sps/lsst/data/rcecile/Planck_BAO2_grids/Sigma_Gauss0.03.txt', /get_lun
+for i=0,n_elements(z)-2 do  printf, lun1, zstat[i], 0.03
 close, lun1
 free_lun, lun1
 
 
-openw,lun2, '/sps/lsst/data/rcecile/Planck_BAO_grids/Sigma_photoZ_BDT80.txt', /get_lun
-for i=0,n_elements(z)-1 do  printf, lun2, zstat[i], b_sig[i]
+openw,lun1, '/sps/lsst/data/rcecile/Planck_BAO2_grids/Sigma_photoZ_BDT90.txt', /get_lun
+for i=0,n_elements(z)-2 do  printf, lun1, zstat[i], d_sig[i]
+close, lun1
+free_lun, lun1
+
+
+openw,lun2, '/sps/lsst/data/rcecile/Planck_BAO2_grids/Sigma_photoZ_BDT80.txt', /get_lun
+for i=0,n_elements(z)-2 do  printf, lun2, zstat[i], b_sig[i]
 close, lun2
 free_lun, lun2
 
-openw,lun0, '/sps/lsst/data/rcecile/Planck_BAO_grids/Outliers_photoZ.txt', /get_lun
-for i=0,n_elements(z)-1 do  printf, lun0, zstat[i], p_out[i]
+openw,lun0, '/sps/lsst/data/rcecile/Planck_BAO2_grids/Outliers_photoZ.txt', /get_lun
+for i=0,n_elements(z)-2 do  printf, lun0, zstat[i], p_out[i]
 close, lun0
 free_lun, lun0
 
 
-openw,lun1, '/sps/lsst/data/rcecile/Planck_BAO_grids/Outliers_photoZ_BDT90.txt', /get_lun
-for i=0,n_elements(z)-1 do  printf, lun1, zstat[i], d_out[i]
+openw,lun1, '/sps/lsst/data/rcecile/Planck_BAO2_grids/Outliers_photoZ_BDT90.txt', /get_lun
+for i=0,n_elements(z)-2 do  printf, lun1, zstat[i], d_out[i]
 close, lun1
 free_lun, lun1
 
 
-openw,lun2, '/sps/lsst/data/rcecile/Planck_BAO_grids/Outliers_photoZ_BDT80.txt', /get_lun
-for i=0,n_elements(z)-1 do  printf, lun2, zstat[i], b_out[i]
+openw,lun2, '/sps/lsst/data/rcecile/Planck_BAO2_grids/Outliers_photoZ_BDT80.txt', /get_lun
+for i=0,n_elements(z)-2 do  printf, lun2, zstat[i], b_out[i]
 close, lun2
 free_lun, lun2
 

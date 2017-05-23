@@ -1,6 +1,6 @@
 PRO plot_hist_zs_zp_all,doplot,isuff
 
-dir='/sps/lsst/data/rcecile/Planck_BAO/'
+dir='/sps/lsst/data/rcecile/Planck_BAO2/'
 ;dir='/sps/lsst/data/rcecile/Planck_noBAO/'
 loadct,39
 

@@ -4,7 +4,7 @@ PRO prepa_hist_zs_zp_all,isuff,option,icase
 ; option 1 : stat
 ; icase=-1 : avec BAO, 0--9 : no BAO
 
-if (icase lt 0) then dir='/sps/lsst/data/rcecile/Planck_BAO/' $
+if (icase lt 0) then dir='/sps/lsst/data/rcecile/Planck_BAO2/' $
 else dir='/sps/lsst/data/rcecile/Planck_noBAO/' 
 nslice =100
 
@@ -24,8 +24,8 @@ all_hist = dblarr(nz,nz)
 ;for i = 4,nslice-1 do begin
 for i=4,99 do begin
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   if (icase lt 0) then file='cat_zOrd_Slice'+strtrim(i,2)+suff[isuff]+'.fits' $
-   else  file='cat_zOrd_'+strtrim(icase,2)+'_Slice'+strtrim(i,2)+suff[isuff]+'.fits' 
+   if (icase lt 0) then file='cat_AllzOrd_Slice'+strtrim(i,2)+suff[isuff]+'.fits' $
+   else  file='cat_AllzOrd_'+strtrim(icase,2)+'_Slice'+strtrim(i,2)+suff[isuff]+'.fits' 
    print,file
    if(isuff le 2) then m=mrdfits(dir+file,1,h,col=['ZS','ZP']) else m=mrdfits(dir+file,1,h,col=['ZS','ZG'])  
  
@@ -39,8 +39,8 @@ for i=4,99 do begin
    t = (m.(0)-m.(1))/(1.+m.(1))
 
 
-  if (icase lt 0) then  file='cat_zOrd_Slice'+strtrim(i,2)+suff[isuff]+'_cata.fits' $
-  else  file='cat_zOrd_'+strtrim(icase,2)+'_Slice'+strtrim(i,2)+suff[isuff]+'_cata.fits'
+  if (icase lt 0) then  file='cat_AllzOrd_Slice'+strtrim(i,2)+suff[isuff]+'_cata.fits' $
+  else  file='cat_AllzOrd_'+strtrim(icase,2)+'_Slice'+strtrim(i,2)+suff[isuff]+'_cata.fits'
    print,dir+file
    check = FILE_TEST(dir+file)
    if (check eq 1) then begin
@@ -81,8 +81,8 @@ endfor
 zstat = dblarr(nslice)
 if (option eq 0) then restore,histname
 for i = 3,nslice-1 do begin
-   if (icase lt 0) then  file='cat_zOrd_Slice'+strtrim(i,2)+'.fits' $
-   else file='cat_zOrd_'+strtrim(icase,2)+'_Slice'+strtrim(i,2)+'.fits' 
+   if (icase lt 0) then  file='cat_AllzOrd_Slice'+strtrim(i,2)+'.fits' $
+   else file='cat_AllzOrd_'+strtrim(icase,2)+'_Slice'+strtrim(i,2)+'.fits' 
    print,file
    hh=headfits(dir+file,ext=1)
    zmin = sxpar(hh,'ZCAT_MIN')

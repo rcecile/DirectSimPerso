@@ -1,6 +1,6 @@
 PRO prepa_stat_zp,isuff
 
-dir='/sps/lsst/data/rcecile/Planck_BAO/'
+dir='/sps/lsst/data/rcecile/Planck_BAO2/'
 
 nslice = 100
 suff = ['_errP','_errPBDT9','_errPBDT8']
@@ -11,11 +11,10 @@ z_max = 3.
 
 z = findgen(nslice+1)*z_max/nslice
 
-
 ; better to do this part in qlogin mode
 for i = 3,nslice-2 do begin
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   file='cat_zOrdZP_Slice'+strtrim(i,2)+suff[isuff]+'.fits'
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   file='cat_AllzOrdZP_Slice'+strtrim(i,2)+suff[isuff]+'.fits'
    print,file
    m=mrdfits(dir+file,1,h,col=['ZS','ZP'])
    t = (m.(1)-m.(0))/(1.+m.(0))
