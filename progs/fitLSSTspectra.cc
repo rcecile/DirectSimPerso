@@ -6,6 +6,7 @@
 #include <string>
 #include <math.h>
 #include <typeinfo>
+#include <getopt.h>
 
 // sophya libraries
 //#include "histinit.h"

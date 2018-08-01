@@ -4,6 +4,7 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include <getopt.h>
 
 #include "sopnamsp.h"
 #include "histinit.h"

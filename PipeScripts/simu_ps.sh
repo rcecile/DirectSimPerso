@@ -27,8 +27,8 @@
 #########################################################################################################
 nCase=10
 
-code0="/sps/lsst/dev/rcecile/BAOProgs/SimLSS/exe/"     
-code1="/sps/lsst/dev/rcecile/BAOProgs/DirectSimPerso/exe/"     
+code0="/sps/lsst/users/rcecile/BAOProgs/SimLSS/exe/"     
+code1="/sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/"     
 err2=0.03
 
 cell=8

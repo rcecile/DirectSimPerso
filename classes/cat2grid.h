@@ -50,6 +50,7 @@
 #include "TFile.h"
 #include "TF1.h"
 #include "TRandom3.h"
+using namespace std;
 
 /** @class GalRecord
 
@@ -150,15 +151,7 @@ class Cat2Grid
   /** Find the minimum and maximum x,y,z,zs (zs=phot or spec) of galaxies in 
       catalog                                                               */
   double FindMinMaxCoords(); 
-        
-  /** Set grid over the galaxy data by specifying angle and redshift range 
-      grid needs to cover @warning probably doesn't work
-      @param Phi   angular range grid to cover
-      @param zl    minimum redshift grid to cover
-      @param zh    maximum redshift grid to cover
-      @param R   pixel size of grid cell in Mpc                           */       
-  void SetGrid(double Phi=0, double zl=-1, double zh=-1,double R=8);
-        
+                
   /** Set grid over the galaxy data by specifying redshift of central pixel, 
       size of the pixels, and (approx) number of pixels along each dimension
       @param Nx    (approx) number of pixels along x-dimension

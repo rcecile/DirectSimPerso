@@ -57,8 +57,10 @@ oplot,[0,cos(mxt+!pi/2.)*hmax*2],[0.,sin(mxt+!pi/2.)*hmax*2],th=3
 ;nzc = [140., 125.,75.,65.] ;Nz du cube produit par cat_grid
 ;cell_g=[8, 8, 8, 8]
 
-zc=[0.5,0.9,1.5]
-nzc = [125., 125.,175.] ;Nz du cube produit par cat_grid
+;zc=[0.5,0.9,1.5]
+;nzc = [125., 125.,175.] ;Nz du cube produit par cat_grid
+zc=[0.5,0.9,1.3]
+nzc = [125., 125.,125.] ;Nz du cube produit par cat_grid
 cell_g=[8, 8, 8, 8]
 
 ng = n_elements(zc)
@@ -73,6 +75,7 @@ print,'Nx_parfait =',Nx_parfait
 
 nxc=[160,300,225]
 nxc=[120,225,320]
+nxc=[120,225,300]
 print,'Nx used =',nxc
 print,'Hgrids = ',hg
 

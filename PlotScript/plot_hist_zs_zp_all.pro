@@ -1,28 +1,18 @@
 PRO plot_hist_zs_zp_all,doplot,isuff
+; to do after rangez_zp.pro
 
 dir='/sps/lsst/data/rcecile/Planck_BAO2/'
-;dir='/sps/lsst/data/rcecile/Planck_noBAO/'
 loadct,39
 
-suff = ['_errPBDT9','_errPBDT8','_errP','_err0.03']
-nsuff = ['_errPBDT9','_errPBDT8','_errP','_errG']
-;suff = ['_errPBDT9','_errPBDT8','_errP','_err0.03']
-;nsuff = ['_errPBDT9','_errPBDT8','_errP','_errG']
-mytit = [' with BDT 90% cut',' with BDT 80% cut',', no quality cut','with Gaussian error']
+suff = ['_errP','_errPBDT9','_errPBDT8','_err0.03']
+mytit = [', no quality cut',' with BDT 90% cut',' with BDT 80% cut','with Gaussian error']
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-print,'restore ','histo_zs_zp'+suff[isuff]+'.sav'
-restore,dir+'histo_zs_zp'+suff[isuff]+'.sav'
+filename='histo_zs_zp_lfZuccaAllFalse'+suff[isuff]+'.sav'
+print,'restore ',filename
+restore,dir+filename
 
-;print,'restore ','histo_zs_statZp'+suff[isuff]+'.sav'
-;restore,dir+'histo_zs_statZp'+suff[isuff]+'.sav'
-
-;print,'restore ','histo_zs_statZp_0'+suff[isuff]+'.sav'
-;restore,dir+'histo_zs_statZp_0'+suff[isuff]+'.sav'
 lhp = alog10(double(all_hist))
-binz=0.01
-zmax=3.
-z=findgen(zmax/binz+1)*binz
 
 ws = 660
 myc = findgen(12)/2.
@@ -36,8 +26,9 @@ im=contour(lhp,z,z,xtit='Spectroscopic redshift z_s',ytit='Photometric redshift 
 cb = COLORBAR(TARGET=im,POSITION=[0.1,0.065,0.95,0.1],  TITLE='log(Ngal) with redshift bin width = 0.01',FONT_SIZE=15)
 
 
-if (doplot eq 1) then im.Save, "/sps/lsst/dev/rcecile/Fig/stat_zs_zp"+nsuff[isuff]+".pdf",xmargin=0.2, ymargin=0, /CENTIMETERS, page_size=[6.8, 7.5], height=7.50
+if (doplot eq 1) then im.Save, "/sps/lsst/users/rcecile/Fig/stat_zs_zp"+suff[isuff]+".pdf",xmargin=0.2, ymargin=0, /CENTIMETERS, page_size=[6.8, 7.5], height=7.50
 
+stop
    
 END
 

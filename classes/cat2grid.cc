@@ -2,6 +2,7 @@
 #include "ctimer.h"
 #include "progbar.h"
 
+using namespace std;
 
 // autre input ng tot pour avoir ng(z)
 // faire grille random comme gal : tirage des "gal-bruit" dans cellule + erreur photoZ
@@ -221,107 +222,6 @@ Cat2Grid& Cat2Grid::Set(const Cat2Grid& a)
 };
 
 
-void Cat2Grid::SetGrid(double Theta, double zl, double zh,double R)
-// Computes range of grid to lay over galaxy simulation
-// from specified survey volume
-{
-  cout <<endl<<"    Cat2Grid::SetGrid()"<<endl;
-  cellsize_=R;
-        
-  cout << "    Using survey geometry to define grid"<<endl;
-  cout << "    Grid to cover: "<< zl <<"<z<"<< zh <<", Theta = "<< Theta <<" radians"<<endl;
-  cout << "    Pixel size = "<< cellsize_ <<endl;
-  // To find minx,maxx,miny,maxy need to find size Theta extends
-  // at the maximum redshift (zh).  Since x=y=0 at center of survey:
-  su_.SetEmissionRedShift(zh);
-  Xmin_ = -su_.RadialCoordinateMpc()*tan(Theta);
-  Ymin_ = Xmin_;
-  Xmax_ = -Xmin_;
-  Ymax_ = -Ymin_;
-  // Min z value is just distance to min redshift (zl) at CENTER of survey
-  su_.SetEmissionRedShift(zl);
-  Zmin_=su_.RadialCoordinateMpc();
-  // Max z value is distance to max redshift at EDGE of survey
-  su_.SetEmissionRedShift(zh);
-  Zmax_=su_.RadialCoordinateMpc()/cos(Theta);
-  cout <<"    CHECK Cartesian survey boundaries: "<< Xmin_ <<"<X<"<< Xmax_;
-  cout <<", "<< Ymin_ <<"<Y<"<< Ymax_ <<", "<< Zmin_ <<"<Z<"<< Zmax_ <<endl;
-        
-  // calculate EXACT number of cells that reach from one side of sim to the other (including remainder)
-  double Lx, Ly, Lz; 
-  Lx = (Xmax_-Xmin_)/cellsize_;
-  Ly = (Ymax_-Ymin_)/cellsize_;
-  Lz = (Zmax_-Zmin_)/cellsize_;
-  cout <<"    Number of cells which cover survey in each direction"<<endl;
-  cout <<"    Nx="<< Lx <<", Ny="<< Ly <<", Nz="<< Lz <<endl;
-  // round DOWN to get INTEGER number of cells that cover each dimension
-  // round down because don't want a pixel going outside of survey area
-  // integer number cells needed
-  Nx_ = (sa_size_t)floor(Lx); Ny_ = (sa_size_t)floor(Ly); Nz_ = (sa_size_t)floor(Lz); 
-  cout <<"    Integer number of cells: Nx="<< Nx_ <<", Ny="<< Ny_ <<", Nz="<< Nz_ <<endl;
-        
-  double idzd = ceil((double)Nz_/2); // index of center pixel in z direction
-  double idxd = ceil((double)Nx_/2);
-  double idyd = ceil((double)Ny_/2);    
-  idx_ = idxd, idy_ = idyd,idz_ = idzd;
-  cout <<"    Indices of center pixels: Ix="<< idx_ <<", Iy="<< idy_ <<", Iz="<< idz_ <<endl;
-  DCref_ = Zmin_+cellsize_/2+(idz_-1)*cellsize_;
-  cout <<"CHECK: comoving distance = "<< DCref_ <<endl;
-        
-  // Need to recompute Xmin_ etc to EXACTLY match grid edges
-  Xmin_ = -(idx_-1)*cellsize_-cellsize_/2;
-  Xmax_ = (idx_-1)*cellsize_+cellsize_/2;
-  Ymin_ = -(idy_-1)*cellsize_-cellsize_/2;
-  Ymax_ = (idy_-1)*cellsize_+cellsize_/2;
-  Zmin_ = DCref_-(idz_-1)*cellsize_-cellsize_/2;
-  Zmax_ = DCref_+(idz_-1)*cellsize_+cellsize_/2;
-        
-  cout <<"    Initial survey boundaries: "<< Xmin_ <<"<X<"<< Xmax_;
-  cout <<", "<< Ymin_ <<"<Y<"<< Ymax_ <<", "<< Zmin_ <<"<Z<"<< Zmax_ <<endl;
-
-  //    // round down to nearest integer SHOULD REMOVE THIS
-  //    Xmin_=floor(Xmin_);
-  //    Xmax_=floor(Xmax_);
-  //    Ymin_=floor(Ymin_);
-  //    Ymax_=floor(Ymax_);
-  //    Zmin_=floor(Zmin_);
-  //    Zmax_=floor(Zmax_);
-  //    cout <<"    Rounded survey boundaries: "<<Xmin_<<"<X<"<<Xmax_<<", "<<Ymin_<<"<Y<"<<Ymax_<<", "<<Zmin_<<"<Z<"<<Zmax_<<endl;
-
-  DCref_ = Zmin_+R/2+(idz_-1)*R;
-        
-  // convert DCref_ to a redshift
-  int_8 nz=1000;
-  vector<double> zrs, codist;
-  double minz=0, maxz=10;
-  double dz = (maxz-minz)/(nz-1);
-  for(int kk=0; kk<nz; kk++) {
-    double zs=minz+kk*dz;
-    su_.SetEmissionRedShift(zs);
-    double cod =su_.RadialCoordinateMpc(); // radial distance 
-    zrs.push_back(zs);
-    codist.push_back(cod); 
-  }
-  double mind = codist[0];
-  double maxd = codist[codist.size()-1];
-  SInterp1D dist2z(codist,zrs,mind,maxd,2*nz);
-  zref_ = dist2z(DCref_);
-  cout <<"    Redshift of central pixel = "<< zref_;
-  cout <<", found from comoving distance = "<< DCref_ <<endl;
-        
-  // INITIALISE ARRAYS TO GRID SIZE
-  int ndim=3;
-  sa_size_t mydim[ndim];
-  mydim[0]=Nx_; mydim[1]=Ny_; mydim[2]=Nz_;
-  if (sfcompute_) {
-    wrgals_.SetSize(ndim, mydim);       // weighted galaxy density field: random catalog
-    zc_.SetSize(ndim, mydim);       // weighted galaxy density field: random catalog
-  }
-        
-  cout <<"    EXIT Cat2Grid::SetGrid()"<<endl<<endl<<endl;
-};
-
-
 void Cat2Grid::SetGrid(int_8 Nx, int_8 Ny, int_8 Nz, double R, double zref)
 // Computes range of grid to lay over galaxy simulation
 // from SimLSS cube parameters
@@ -393,7 +293,7 @@ void Cat2Grid::SetGrid(int_8 Nx, int_8 Ny, int_8 Nz, double R, double zref)
     cout << "TEMP FUDGE, setting Nz to input value"<<endl;
     Nz_=Nz;
   }
-        
+       
   su_.SetEmissionRedShift(zref_);
   double cod = su_.RadialCoordinateMpc(); // radial distance
   cout <<"    Redshift of central pixel = "<< zref_;
@@ -420,7 +320,7 @@ void Cat2Grid::SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, s
 // Loops over observed catalog and adds observed redshifts to
 // Histo object
 {
-  cout <<"    Cat2Grid::SaveSelecFunc()"<<endl;
+  cout << "    Cat2Grid::SaveSelecFunc()"<<endl;
   cout << "OBSCAT : " << ObsCat_ << endl;
   Timer tm("SaveSelecFunc");
   
@@ -675,6 +575,7 @@ void Cat2Grid::SaveSelecFunc(string SFTextFile, string FullCat, string ObsCat, s
         
       outp << bc <<"      "<< sf1 <<endl;
       outp2 << bc <<"      "<< sf2 <<endl;
+      cout << " HISTO " << bc <<"  " << nzo <<endl;
       if (MakeFullHist)
 	outp0 << bc <<"      "<< nzt <<endl;
       // cout << bc <<"      "<< sf1 <<endl;
@@ -727,10 +628,8 @@ void Cat2Grid::GalGrid(double SkyArea)
                 
   // NUMBER OF GALAXIES IN EACH CELL
 
-  cout <<"    Cells in each direction: Nx="<< Nx_ <<", Ny="<< Ny_ <<", Nz=";
-  cout << Nz_ <<endl;
-  cout <<"    Grid boundaries: "<< Xmin_ <<"<X<"<< Xmax_ <<", ";
-  cout << Ymin_ <<"<Y<"<< Ymax_ <<", "<< Zmin_ <<"<Z<"<< Zmax_ <<endl;
+  cout <<"    Cells in each direction: Nx="<< Nx_ <<", Ny="<< Ny_ <<", Nz=" << Nz_ <<endl;
+  cout <<"    Grid boundaries: "<< Xmin_ <<"<X<"<< Xmax_ <<", " << Ymin_ <<"<Y<"<< Ymax_ <<", "<< Zmin_ <<"<Z<"<< Zmax_ <<endl;
   cout <<"    Grid cell size = "<< cellsize_ <<endl;
   cout <<"    Start loop over galaxies..."<<endl;
   cout <<"    applying filters ..."<<endl;
@@ -781,7 +680,6 @@ void Cat2Grid::GalGrid(double SkyArea)
 
     DataTableRow rowin = dtobs.EmptyRow();
     for(long ig=0; ig<n_gal; ig++) {
-                
       // get row values from data table
       dtobs.GetRow(ig, rowin); 
             
@@ -830,6 +728,7 @@ void Cat2Grid::GalGrid(double SkyArea)
       int Ngrid_per_gal = 0;
       for (size_t igd=0; igd<vgrids_.size(); igd++) {
 	if (vgrids_[igd].AddGal(x,y,z,invselfunc)) {
+	  cout << " gal OK " <<endl;
 	  ngw_[igd] += invselfunc; 
 	  ng_[igd] ++;
 	  Ngrid_per_gal ++;
@@ -1013,7 +912,7 @@ void Cat2Grid::Rec2EuclidCoord(GalRecord& rec, double& x, double& y, double& z, 
 
   double ph=rec.alpha;
   double th=rec.delta;
-  if(isnan(th)) {
+  if(std::isnan(th)) {
     cout <<"    Cat2Grid::Rec2EuclidCoord/PB theta=nan -> set theta=0"<<endl;
     th=0;
   }
@@ -1041,10 +940,11 @@ void Cat2Grid::Rec2ShellCoord(GalRecord& rec, double& x, double& y, double& z, d
   double dc = z2dist_(redshift);
   double ph=rec.alpha;
   double th=rec.delta;
-  if(isnan(th)) {
-    cout <<"    Cat2Grid::Rec2ShellCoord/PB theta=nan -> set theta=0"<<endl;
-    th=0;
-  }
+  //Commenter en attendant Cecile
+  //  if(isnan(th)) {
+  //    cout <<"    Cat2Grid::Rec2ShellCoord/PB theta=nan -> set theta=0"<<endl;
+  //    th=0;
+  //  }
   double r = dc*tan(th);
   r = th * dc;
   x = r*cos(ph);
@@ -1085,14 +985,14 @@ void Cat2Grid::RandomGrid(double NormNgalMean, bool SaveArr, bool seed, bool Sig
   ErrRandomSeed_  = seed;
   cout <<endl<<"    Cat2Grid::RandomGrid()"<<endl;
   Timer tm("RandomGrid");
-        
+  
   if (!sfcompute_)
     cout <<"    Selection function should be CONSTANT with z, check this ..."<<endl;
   else
     cout <<"    Check selection function .... "<<endl;
   cout <<"    Only filling pixels with theta <= "<< SkyArea_ <<endl;
-        
-                    
+  
+  
   if (ErrRandomSeed_) {
     rg_.AutoInit(0);
     cout << "Seed automatically generated for random grid" << endl;
@@ -1101,22 +1001,7 @@ void Cat2Grid::RandomGrid(double NormNgalMean, bool SaveArr, bool seed, bool Sig
     rg_.SetSeed(seed);
   }          
 
-  if (wrgals_.NbDimensions()<2) {
-    int ndim=3;
-    sa_size_t mydim[ndim];
-    mydim[0]=Nx_; mydim[1]=Ny_; mydim[2]=Nz_;
-    wrgals_.SetSize(ndim, mydim);       // weighted galaxy density field: random catalog
-  }
-  if (SaveArr) {
-    int ndim=3;
-    sa_size_t mydim[ndim];
-    mydim[0]=Nx_; mydim[1]=Ny_; mydim[2]=Nz_;
-    zc_.SetSize(ndim, mydim); // redshifts of pixel centers
-  }
-  cout <<"    Compute weights and random catalog ..."<<endl;
-  ProgressBar pgb(Nx_*Ny_, ProgBarM_Time);  // ProgBarM_None, ProgBarM_Percent, ProgBarM_Time
-  size_t ccnt=0;
-
+  
   double NgalWObsTot = 0.;
   for(size_t i=0; i<vgrids_.size(); i++) NgalWObsTot += ngw_[i];
   double NgalWObsPerCell = NormNgalMean * NgalWObsTot /  (double)Npix_ / (double)vgrids_.size();
@@ -1129,91 +1014,147 @@ void Cat2Grid::RandomGrid(double NormNgalMean, bool SaveArr, bool seed, bool Sig
       cout << "For ngalz_ bin "<< i << " (z = " << ngalz_.BinCenter(i) << ")  n gal=" << ngalz_(i) << ", n gal weighted="<< ngalzw_(i) ;
       cout << "  and normalized ng per cell=" << ngalz_cell_(ngalz_.BinCenter(i)) << endl;
     }
-  int print_ing=0;
-  for(int i=0; i<Nx_; i++) {
-    for(int j=0; j<Ny_; j++) {
-      for(int k=0; k<Nz_; k++)  {
-              
-        double xc,yc,zc;
-        GetCellCoord(i,j,k,xc,yc,zc);
-        double dcell =  ((RadialZ_) ? zc : sqrt(xc*xc+yc*yc+zc*zc));
-        double thetac = ((RadialZ_) ? fabs(xc/zc) : acos(zc/dcell));
-        double redshift = dist2z_(dcell);
-        double phi = (*selfuncp_)(redshift);
-	double z_rdm,rx,ry,rz;
-	double rr,rphi,rtet;
+ 
 
-	// Average number of gals expected in cell
-	uint_8 npoiss = rg_.PoissonAhrens(ngalz_cell_(redshift)); // Poisson fluctuate
-	wrgals_(i,j,k)= (double)npoiss / phi; 
+  for(size_t iv=0; iv<vgrids_.size(); iv++) {
+    if (wrgals_.NbDimensions()<2) {
+      int ndim=3;
+      sa_size_t mydim[ndim];
+      mydim[0]=Nx_; mydim[1]=Ny_; mydim[2]=Nz_;
+      wrgals_.SetSize(ndim, mydim);       // weighted galaxy density field: random catalog
+    }
+  
+    int Nmargin = 0;
+    TArray<r_8> superwrgals;
+    if (SigRandom) {
+      int ndim=3;
+      sa_size_t superdim[ndim];
+      double margin = 400.; // 400 = 8 x 50 Mpc with 50 Mpc roughly 1 sigma for err = 0.03(1+z) so 4 sigma on each side
+      Nmargin = (int)(margin / cellsize_ + 0.5) *2;
+      cout << Nmargin << endl;
+      superdim[0]=Nx_ + Nmargin; superdim[1]=Ny_ + Nmargin; superdim[2]=Nz_ + Nmargin;
+      superwrgals.SetSize(ndim, superdim);       // weighted galaxy density field: random catalog
+      cout << "Random grid will be extracted from a super-grid of size "<< superdim[0] <<"x"<< superdim[1] <<"x"<< superdim[2] <<" pixels" <<endl;
+    } 
+    
+    if (SaveArr) {
+      int ndim=3;
+      sa_size_t mydim[ndim];
+      mydim[0]=Nx_; mydim[1]=Ny_; mydim[2]=Nz_;
+      zc_.SetSize(ndim, mydim); // redshifts of pixel centers
+    }
+    
+    cout <<"    Compute weights and random catalog ..."<<endl;
+    ProgressBar pgb((Nx_ + Nmargin)*(Ny_ + Nmargin), ProgBarM_Time);  // ProgBarM_None, ProgBarM_Percent, ProgBarM_Time
+    size_t ccnt=0;
+    int print_ing=0;
+    int offsetX_rdm = ceil((Nx_ + Nmargin)/2. -1./2.);
+    int offsetY_rdm = ceil((Ny_ + Nmargin)/2. -1./2.);
+    int offsetZ_rdm = ceil((Nz_ + Nmargin)/2. -1./2.);
 
-	if(SigRandom) {
+    int Xmin_rdm =  -ceil((Nx_ + Nmargin)/2)*cellsize_;	   
+    int Ymin_rdm =  -ceil((Ny_ + Nmargin)/2)*cellsize_;	   
+    int Zmin_rdm =  DCref_ - ceil((Nz_ + Nmargin)/2)*cellsize_;
+ 
+    for(int i=0; i<Nx_ + Nmargin; i++) {
+      for(int j=0; j<Ny_ + Nmargin; j++) {
+	for(int k=0; k<Nz_ + Nmargin; k++)  {
+	  
+	  double z_rdm,rx,ry,rz;
+	  double rphi,rtet,dc,zoverr;
+	  double xc,yc,zc;
+	  double selfunc, redshift_rdm, dcell_rdm,xc_rdm,yc_rdm,zc_rdm;
+	  sa_size_t ix, jy, kz;
 
-	  for(int ing=0; ing<npoiss; ing++) { // from gal 1 to gal n in cell...
-	    rx = xc+rg_.Flatpm1()*(cellsize_/2);
-	    ry = yc+rg_.Flatpm1()*(cellsize_/2);
-	    rz = zc+rg_.Flatpm1()*(cellsize_/2);
-	    
-	    rphi=atan2(ry,rx);
-	    double zoverr=rz/dcell;
-	    rtet=acos(zoverr);
-	    
-	    z_rdm = redshift + (1.+redshift) * rg_.Gaussian() * ((*sigrp_)(redshift));
-	    double dc = z2dist_(z_rdm);
-	    rx=dc*cos(rphi)*sin(rtet);
-	    ry=dc*sin(rphi)*sin(rtet);
-	    rz=dc*cos(rtet);  
-	    
-	    sa_size_t ix=(sa_size_t)floor((rx-Xmin_)/cellsize_);
-	    sa_size_t iy=(sa_size_t)floor((ry-Ymin_)/cellsize_);
-	    sa_size_t iz=(sa_size_t)floor((rz-Zmin_)/cellsize_);
-	    if (ix<Nx_&&iy<Ny_&&iz<Nz_&&ix>=0&&iy>=0&&iz>=0) { 
-	      wrgals_(ix,iy,iz) += 1. / phi;
-	    
+	  // Average number of gals expected in cell
+	  xc = Xmin_rdm + i*cellsize_ + cellsize_/2 ;
+	  yc = Ymin_rdm + j*cellsize_ + cellsize_/2;
+	  zc = Zmin_rdm + k*cellsize_ + cellsize_/2;
+	  double dcell =  ((RadialZ_) ? zc : sqrt(xc*xc+yc*yc+zc*zc));
+	  double redshift = dist2z_(dcell);
+	  uint_8 npoiss = rg_.PoissonAhrens(ngalz_cell_(redshift)); // Poisson fluctuate
+
+	  if (SaveArr && iv == vgrids_.size()-1) 
+	    zc_(i,j,k) = redshift;
+
+	  if(SigRandom) { // case error on the redshift
+	    for(int ing=0; ing<npoiss; ing++) { // from gal 1 to gal npoiss-1 in this cell...
+	      if (print_ing <10)  cout << "D avant " << xc << " " << yc << " " << zc << endl;
+	      // no random inside the cell: would add an additionnal error
+	      // theta, phi using "true" position
+	      double phi=atan2(yc,xc);
+	      double zoverr=zc/dcell;
+	      double theta=acos(zoverr);
+	      // add an error on the redshift
+	      z_rdm = redshift + (1.+redshift) * rg_.Gaussian() * ((*sigrp_)(redshift));
+	      // compute new cell using theta, phi, z_rdm
+	      dc = z2dist_(z_rdm);
+	      rx=dc*cos(phi)*sin(theta);
+	      ry=dc*sin(phi)*sin(theta);
+	      rz=dc*cos(theta);  	      
+	      ix=(sa_size_t)floor( rx/cellsize_)     +offsetX_rdm;
+	      jy=(sa_size_t)floor( ry/cellsize_)     +offsetY_rdm;
+	      kz=(sa_size_t)floor((rz-DCref_ -1)/cellsize_  )  +offsetZ_rdm;
 	      if (print_ing <10)  {
-		cout << "RANDOM SIG "<< redshift << " sig = " << ((*sigrp_)(redshift)) << " new z " << z_rdm ;
-		cout << " old cell "<< i << " "<< j << " "<<  k << " et new cell "<<  ix << " "<<  iy << " "<<  iz << endl;
+		cout << "RANDOM SIG "<< redshift << "   Gaussian "<< ((*sigrp_)(redshift)) << " sig = " << ((*sigrp_)(redshift)) << " new z " << z_rdm ;
+		cout << " old cell "<< i << " "<< j << " "<<  k << " et new cell "<<  ix << " "<<  jy << " "<<  kz << "(old d "<< dcell << ", new d " << dc << ")"<< endl;
 	      }
+	      if (print_ing <10) cout << cellsize_ << " "<<  DCref_ << " "<< offsetX_rdm<< " "<< offsetY_rdm<< " "<<  offsetZ_rdm << endl;
+	      if ((ix>=0) && (ix<Nx_ + Nmargin) && (jy>=0) && (jy<Ny_ + Nmargin) && (kz>=0) && (kz<Nz_ + Nmargin))   { 
+		selfunc = (*selfuncp_)(z_rdm);
+		superwrgals(ix,jy,kz) += 1. / selfunc ;
+	      } 
 	      print_ing ++;
+
 	    }
-	  } 
-	} else {
-	  wrgals_(i,j,k)= (double)npoiss / phi; 
+	    
+	  } else { // case no error on the redshift
+	    selfunc = (*selfuncp_)(redshift);
+	    
+	    wrgals_(i,j,k)= (double)npoiss / selfunc; 
+	    
+	  }
+	  
+	}   // end of loop over k (z-direction)
+	ccnt++;  pgb.update(ccnt); 
+      } // end of loop over j (y-direction)
+    } // end of loop over  (x-direction)
+    
+    if(SigRandom) {
+      // we extract the central cube of size NxNyNz from the super-cube with margin
+      for(int i=0; i<Nx_; i++) {
+	for(int j=0; j<Ny_ ; j++) {
+	  for(int k=0; k<Nz_; k++)  {
+	    wrgals_(i,j,k)= superwrgals(i + Nmargin/2,j + Nmargin/2,k + Nmargin/2);
+	  }
 	}
-
-        if (SaveArr)
-          zc_(i,j,k) = redshift;
-              
-      }   // end of loop over k (z-direction)
-      ccnt++;  pgb.update(ccnt); 
-    } // end of loop over j (y-direction)
-  } // end of loop over  (x-direction)
-  wnrand_=wrgals_.Sum();
-  cout <<"    Number of galaxies in RANDOM weighted grid = "<< wnrand_;
-  cout <<", should be approximately input density*npixels = "<< NgalWObsPerCell*Npix_ <<endl;
-  cout <<"    Calculated weighted random grid density = "<< wnrand_/Npix_;
-  cout <<", input density = "<< NgalWObsPerCell <<" (should be approximately the same)"<<endl;
-        
-  VarianceRandomGrid();
-  cout <<"    Mean of weighted random grid should be roughly "<< NgalWObsPerCell << endl;
-  double minv,maxv;
-
-  // write the arrays here!
-  fos_ << wrgals_;
-
-  if (SaveArr) {
-    fos_ << zc_;
-    cout << "WRITE Z array" << endl;
+      }
+    }
+    wnrand_=wrgals_.Sum();
+    cout <<"    Number of galaxies in RANDOM weighted grid = "<< wnrand_;
+    cout <<", should be approximately input density*npixels = "<< NgalWObsPerCell*Npix_ <<endl;
+    cout <<"    Calculated weighted random grid density = "<< wnrand_/Npix_;
+    cout <<", input density = "<< NgalWObsPerCell <<" (should be approximately the same)"<<endl;
+    VarianceRandomGrid();
+    cout <<"    Mean of weighted random grid should be roughly "<< NgalWObsPerCell << endl;
+    double minv,maxv;
+    
+    // write the arrays here!
+    fos_ << wrgals_;
+    
+    if (SaveArr && iv == vgrids_.size()-1) {
+      fos_ << zc_;
+      cout << "WRITE Z array" << endl;
+    }
   }
-
-  // write histo of number of galaxies (wieghted or not)
+  // write histo of number of galaxies (weighted or not)
   fos_ << ngalz_;
   fos_ << ngalzw_;
-
+  
   tm.Split();
   cout <<"    Elapsed time "<< tm.TotalElapsedTime()<<endl;
   cout <<"    EXIT Cat2Grid::RandomGrid()"<<endl<<endl; 
-
+  
 };
 
 void Cat2Grid::SetGaussErrRedshift(double Err, double zref, bool seed) {
@@ -1301,7 +1242,7 @@ void Cat2Grid::SetPhotozErrRedshift(string pdfFileName, bool seed, double zcat_m
   int i_zcat_min = int( (zcat_min - z_min)/binz + 0.5);
   int i_zcat_max = int( (zcat_max - z_min)/binz + 0.5);
   cout << "**********************************************************************************************************************"<< endl;
-  cout << "REDSHIFT range : from " << zcat_min << " to "<< zcat_max << " so from bin "<< i_zcat_min << " to "<< i_zcat_min << ". " << endl;
+  cout << "REDSHIFT range : from " << zcat_min << " to "<< zcat_max << " so from bin "<< i_zcat_min << " to "<< i_zcat_max << ". " << endl;
   cout << "*********************************************************************************************************************"<< endl;
   if (i_zcat_max-i_zcat_min > 4 ) {
     cout << "catalogue redshift is too large to support the photoZ method, please cut it."<< endl;

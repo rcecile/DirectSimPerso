@@ -30,7 +30,7 @@
 #include "fitsarrhand.h"
 #include "fiosinit.h"
 #include "tarray.h"
-
+#include "datacards.h"
 // DirectSim
 #include "geneutils.h"
 #include "cosmocalcs.h"
@@ -136,10 +136,17 @@ int main(int narg, char *arg[]) {
 
 	// Read in power spectrum file
 	cout << "     Read in power spectrum file "<< ps_file <<endl;
+	double h;
 	ifstream ifs(ps_file.c_str());
+	DataCards dc(ps_file);
+		 h = dc.DParam("HUBBLE");
+		cout << "my h "<< h << endl;
+
 	TArray<r_8> power_spectrum;
 	sa_size_t nr, nc;
-	power_spectrum.ReadASCII(ifs,nr,nc);
+	power_spectrum.ReadASCII(ifs,nr,nc,'@');
+	for (int i=0; i<10; i++) cout << i << " " <<  power_spectrum(0,i)<< " " <<  power_spectrum(1,i) << endl;
+	exit(0);
 	cout << power_spectrum ;
 
 	// Set cosmology 
@@ -150,7 +157,7 @@ int main(int narg, char *arg[]) {
 
 	//Modif Adeline : read cosmo parameters in file header
 	string H0_s, OmegaM_s, OmegaL_s, OmegaB_s, OmegaR_s, wDE_s, wDA_s, Sigma8_s, Ns_s;
-	double h, OmegaM, OmegaL, OmegaB, OmegaR, wDE, wDA; // Sigma8 et n_s defined before as they can be given as parameters
+	double OmegaM, OmegaL, OmegaB, OmegaR, wDE, wDA; // Sigma8 et n_s defined before as they can be given as parameters
 	H0_s = fin.KeyValue("H0");
 	OmegaM_s = fin.KeyValue("OMEGAM0");
 	OmegaL_s = fin.KeyValue("OMEGADE0");

@@ -75,12 +75,18 @@ public:
   ocx_= (double)OutNx()*0.5;
   ocy_= (double)OutNy()*0.5;
   ocz_= (double)OutNz()*0.5;
+  dx_ = (double)getOutdX();
+  dy_ = (double)getOutdY();
+  dz_ = (double)getOutdZ();
+  Nx_ = (double)OutNx();
+  Ny_ = (double)OutNy();
+  Nz_ = (double)OutNz();
   }
 
   // Constructeur de copie
  ProjGrid(ProjGrid const& a) :
   outg_(a.outg_), out_grid(a.out_grid), out_rot(a.out_rot), 
-    ocx_(a.ocx_), ocy_(a.ocy_), ocz_(a.ocz_) {
+    ocx_(a.ocx_), ocy_(a.ocy_), ocz_(a.ocz_), dx_(a.dx_), dy_(a.dy_), dz_(a.dz_) {
   } 
   // destructeur 
   ~ProjGrid() { }
@@ -89,6 +95,7 @@ public:
     {
       outg_=a.outg_; out_grid=a.out_grid; out_rot=a.out_rot; 
       ocx_=a.ocx_; ocx_=a.ocy_; ocz_=a.ocz_;
+      dx_=a.dx_; dx_=a.dy_; dz_=a.dz_;
    }
     // Return the number of cells alons each direction  
   inline sa_size_t OutNx()   const { return out_grid.SizeX(); }
@@ -103,11 +110,14 @@ public:
   inline bool AddGal(double x, double y, double z, double invselfunc) 
   {
     sa_size_t ix, jy, kz;
+    // CECILE aucune gal ne passe le cut, plein de x,y, negatif : y a un probleme qui reste 
+    // parfois ne compile que si make clean ...
     Vector3d vout=out_rot.Rotate( Vector3d(x,y,z) );
-    ix=(sa_size_t)floor(vout.X()/outg_.dx+ocx_);
-    jy=(sa_size_t)floor(vout.Y()/outg_.dy+ocy_);
-    kz=(sa_size_t)floor((vout.Z()-outg_.r_center)/outg_.dz+ocz_);
-    if ((ix<0) || (ix>=outg_.Nx) || (jy<0) || (jy>=outg_.Ny) || (kz<0) || (kz>=outg_.Nz))  return false;
+    ix=(sa_size_t)floor(vout.X()/dx_+ocx_);
+    jy=(sa_size_t)floor(vout.Y()/dy_+ocy_);
+    kz=(sa_size_t)floor((vout.Z()-outg_.r_center)/dz_+ocz_);
+    cout << ix << " " << jy << " " << kz << " et "  << out_grid.SizeX() << " " << out_grid.SizeY() << " " << out_grid.SizeZ()<< endl ;
+    if ((ix<0) || (ix>=out_grid.SizeX()) || (jy<0) || (jy>=out_grid.SizeY()) || (kz<0) || (kz>=out_grid.SizeZ()))  return false;
     out_grid(ix,jy,kz) += invselfunc;
     return true;
   }
@@ -120,7 +130,9 @@ public:
   TArray< TFG > out_grid;       // output grid
 
   EulerRotation3D out_rot;
-  double ocx_, ocy_, ocz_;  // normalized coordinates (cell size=1) of the central cell for the output grid 
+  double ocx_, ocy_, ocz_, dx_, dy_, dz_;  // normalized coordinates (cell size=1) of the central cell for the output grid 
+  double Nx_, Ny_, Nz_;  // normalized coordinates (cell size=1) of the central cell for the output grid 
+  //  sa_size_t ocx_, ocy_, ocz_, dx_, dy_, dz_, Nx_, Ny_, Nz_;  // normalized coordinates (cell size=1) of the central cell for the output grid 
 };
 
 

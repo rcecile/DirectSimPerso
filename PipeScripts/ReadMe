@@ -6,20 +6,16 @@ Mode d'emploi : des parametres cosmo a l'echelle BAO
 
 2/ le couper en tranche (cut_cube.pro)
 3/ faire le catalogue simple + sel func (cat_simple.sh)
-3bis/ ordonner en redshift les galaxies (rangez.pro)
-4/ faire les erreurs (cat_err.sh)
-5/ concatener les redshifts cata (cata_concat.pro, mode qlogin)
-6/ calculer les fonctions de selection avec erreur (self_err.sh) 
+4/ ordonner en redshift les galaxies (rangez.pro)
 
--- etapes 2 a 6 faites pour simu avec BAO et N simus sans BAO --
+5/ faire les erreurs (cat_err.sh)
+6/ concatener les redshifts cata (cata_concat.pro, mode qlogin)
+7/ calculer les fonctions de selection avec erreur (self_err.sh) 
 
-7/ moyenner les fonctions de selection (self.pro)
-8/ preparer la projection des grids ( plot_cube_grids.pro et cube_grids_info.pro pour ajuster proj_grid.sh)
+8/ lisser les fonctions de selection (self.pro)
+9/ preparer la projection des grids ( plot_cube_grids.pro et cube_grids_info.pro pour ajuster proj_grid.sh)
 
-9/ projeter dans les grilles (proj_grid.sh)
-10/ calculer le spectre de puissance (comp_ps.sh)
+10/ projeter dans les grilles (proj_grid.sh)
+11/ calculer les spectres de puissance (comp_ps.sh)
 
--- etapes 9 a 10 a faire pour simu avec BAO et N simus sans BAO --
-
-11/ calcul des spectres "undampes" sans oscillations (save_ps_mean.pro) et le shot noise (comp_sn.pro)
-12/ calculer l'echelle BAO (dofit.sh)
+12/ calculer l'echelle BAO (do_fit_baseline.sh)

@@ -197,30 +197,6 @@ class ProbabilityDistAbsorbers
 {
 public:
     ProbabilityDistAbsorbers(RandomGeneratorInterface& rg,
-// AA: I think the below conflict should be removed? Left in just in case
-/*<<<<<<< HEAD
-                            AbsorberRedshiftDistribution& absorberZDist,
-                            HIColumnDensity& hiColumnDensity,
-                            DopplerParDistribution& dopplerParDist
-        );
-    
-    /** Simulate a line of sight distribution of absorbers, returns number of 
-        absorbers
-        @param zStart           Starting redshift of line of sight distribution
-        @param zMax             Max redshift along line of sight
-        @param redshifts        Vector of absorber redshifts (sorted in ascending order)
-        @param dopplerPars      Vector of absorber doppler parameters 
-        @param columnDensity    Vector of absorber column densities 
-    int simulateLineOfSight(double zStart,double zMax, 
-                    vector<double>& redshifts, vector<double>& dopplerPars,
-                               vector<double>& columnDensities, string outfile);
-            
-    void simulateAbsorber(double zCurrent, double& redshift, double& dopplerPar,
-                                                    double& columnDensity);
-    /** Draw deltaZ of next absorber (next absorber is at zLast+deltaZ).  This 
-        uses the "Inverse Transformation method"
-        @param zLast Redshift of last absorber                                  
-=======*/
                              AbsorberRedshiftDistribution& absorberZDist,
                              HIColumnDensity& hiColumnDensity,
                              DopplerParDistribution& dopplerParDist);
@@ -234,7 +210,6 @@ public:
 
     /** Using the inverse transform method and equation 7 in 
         Inoue & Iwata 2008      */
-//>>>>>>> b174eb658571fc61c81d79c7fa2a0db330092148
     double drawDeltaZ(double zLast);
     /** Draw a column density from the distribution given in 
        Inoue & Iwata 2008 equation 4        */

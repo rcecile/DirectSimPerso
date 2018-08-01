@@ -14,9 +14,11 @@ loadct,39
 !p.charsize=2
 !p.thick=3
 ;recopie une tranche sauf les catastrophiques (> 3 sigma de G 0.03), regroupes
-i_min=3
+i_min=1
 i_max=99
-     
+;i_min=5
+;i_max=90
+
 suff = nsuff[isuff]
 nok_tot= lonarr(i_max-i_min+1)
 ; do get the reasons of the cases where we have no podds value
@@ -30,7 +32,7 @@ z_tot = dblarr(i_max-i_min+1)
 ifirst=0
 for i=i_min,i_max do begin
    
-   name=dir+"cat_AllzOrd_Slice"+strtrim(i,2)+suff+"_cata.fits"
+   name=dir+"cat_lfZuccaAllFalse_zOrd_Slice"+strtrim(i,2)+suff+"_cata.fits"
    check = FILE_TEST(name)
    print,name
    if (check eq 0) then continue
@@ -57,16 +59,15 @@ for i=i_min,i_max do begin
    ifirst=1
    
 endfor
-stop
 
 plot,z_tot,n_tot,/xs,/ys,th=3
 oplot,z_tot,nok_tot,th=3,col=123
 oplot,z_tot,n10_tot+n20_tot+n50_tot+n60_tot,th=3,col=80
 
-nametot=dir+"cat_AllSlice"+suff+"_cataLT10.fits"
-MWRFITS,mtot, nametot, h
+nametot=dir+"cat_lfZuccaAllFalse_zOrd_AllSlice"+suff+"_cataLT10.fits"
+mwrfits,mtot, nametot, h
 
-save,z_tot,nok_tot,n_tot,n10_tot,n20_tot,n50_tot,n60_tot,file=dir+'/StatCata_'+suff+'.sav'
+save,z_tot,nok_tot,n_tot,n10_tot,n20_tot,n50_tot,n60_tot,file=dir+'/StatCata_lfZuccaAllFalse_'+suff+'.sav'
 
 
 END

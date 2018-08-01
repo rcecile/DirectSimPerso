@@ -17,6 +17,7 @@
 #include <string>
 #include <math.h>
 #include <typeinfo>
+#include <getopt.h>
 
 // sophya libraries
 //#include "histinit.h"
@@ -31,7 +32,6 @@
 #include "mydefrg.h"
 #include "sedfilter.h"
 #include "simdata.h"
-
 
 #define PI 3.141592
 

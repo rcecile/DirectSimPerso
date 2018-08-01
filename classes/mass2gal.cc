@@ -265,7 +265,8 @@ sa_size_t Mass2Gal::CheckNegativeMassCells()
   return nbad;
 }
 
-void Mass2Gal::ConvertToMeanNGal(float conv1, float conv2, float conv3, bool Simple)
+
+void Mass2Gal::ConvertToMeanNGalLF(MultiType_Z_LF const & mult_LF, double Vc)
 // converts rho/rho^bar to a (mean) number of galaxies in the cell
 // follows the following logic:
 // Define quantities:
@@ -283,22 +284,15 @@ void Mass2Gal::ConvertToMeanNGal(float conv1, float conv2, float conv3, bool Sim
 // conv=Vc*n: Vc is the volume of the pixels, n=mean number density of gals calculated from 
 //            integrating the Schechter luminosity function // !!! depends on redshift (modif JSR/CR 18-04-17)
 // ALSO SWITCHES AROUND DIMENSIONS SO NOW: ngals_(Nx_,Ny_,Nz_) whereas mass_(Nz_,Ny_,Nx_)
-// If Simple = true just puts conv gals in each cell
 { 
   cout <<endl<<"    Mass2Gal::ConvertToMeanNGal()"<<endl;
 
-  if(Simple)
-    cout <<"    Simulating "<< conv1 <<" galaxies in each cell"<<endl;
-        
   if(fg_nodrho)
     throw ParmError("No clustering information: cannot convert rho/rho^bar to ngal^bar");
         
   if(!fg_readvals)
     throw ParmError("ERROR!: SimLSS cube information not read in from FITS header");
                 
-  cout <<"0    < z < 0.5    Conversion value="<< conv1 <<endl;
-  cout <<"0.5  < z < 0.75   Conversion value="<< conv2 <<endl;
-  cout <<"0.75 < z          Conversion value="<< conv3 <<endl;
   int ndim=3;
   sa_size_t mydim[ndim];
   mydim[0] = Nx_; mydim[1] = Ny_; mydim[2] = Nz_;
@@ -321,14 +315,8 @@ void Mass2Gal::ConvertToMeanNGal(float conv1, float conv2, float conv3, bool Sim
 	// convert comoving distance into a redshift
 	rreds = dist2Redshift(rr);
 
-	if (rreds < 0.5) conv = conv1 ;
-	else if (rreds > 0.75) conv = conv3 ;
-	else conv = conv2;
-
-        if(Simple)
-          ngals_(ix,iy,iz) = conv;
-        else
-          ngals_(ix,iy,iz) = (int_4)floor(mass_(iz,iy,ix)*conv);
+	conv = mult_LF.getGalaxyNumberDensity(rreds) * Vc;
+	ngals_(ix,iy,iz) = (int_4)floor(mass_(iz,iy,ix)*conv);
       }
 
   // total number of gals simulated                             
@@ -384,17 +372,18 @@ double Interpol2D(double x, double y, double x1, double y1, double z1, double x2
   return mean;
 }
 
-
-sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& gfd1, GalFlxTypDist& gfd2, GalFlxTypDist& gfd3,
+sa_size_t Mass2Gal::CreateGalCatalogLF(string FITSnameLF, int idsim, MultiType_Z_LF const & mult_LF,
                                      bool extinct, bool AMcut, double SkyArea, bool GoldCut)
 {
   if(fg_nodrho)
     throw ParmError("No clustering information: cannot apply Poisson fluctuations to ngal^bar");
 
   Timer tm("CreateGalCatalog");
-        
+  double z,mag, type;
+
   // Create swap space FITS file structure
-  FitsInOutFile swf(fitsname, FitsInOutFile::Fits_Create);      
+  FitsInOutFile swf(FITSnameLF, FitsInOutFile::Fits_Create);      
+
   SwFitsDataTable gals(swf, 2048);
   // All in capital letters to avoid any pb with IDL
   gals.AddLongColumn("GALID");
@@ -403,17 +392,13 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
   gals.AddFloatColumn("ZS");
   gals.AddFloatColumn("TYPE");
   gals.AddFloatColumn("MB");
-  // @todo add option to output more/less info
-  //gals.AddFloatColumn("d_com"); 
-  //gals.AddFloatColumn("Ext");
-  //gals.AddFloatColumn("cz"); // cell redshift
 
   DataTableRow row = gals.EmptyRow();
 
   // For true z only catalog WITHOUT ABSOLUTE MAG CUT
-  size_t ppos = fitsname.find_last_of('.');
-  string fitsname2 = fitsname.substr(0,ppos)+"_ZONLY.fits";
-  FitsInOutFile swf2(fitsname2, FitsInOutFile::Fits_Create);    
+  size_t ppos = FITSnameLF.find_last_of('.');
+  string FITSname2 = FITSnameLF.substr(0,ppos)+"_ZONLY.fits";
+  FitsInOutFile swf2(FITSname2, FitsInOutFile::Fits_Create);    
   SwFitsDataTable gals2(swf2, 2048);
   gals2.AddLongColumn("GalID");
   gals2.AddFloatColumn("zs");
@@ -440,7 +425,7 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
   uint_8 gid;
   uint_8 seq=0,seq2=0;
 
-  cout <<  " Mass2Gal::CreateGalCatalog  start looping over cube cells NCells= " << ngals_.Size() << " NGals=" << ng_ << " ... "<<endl;
+  cout <<  " Mass2Gal::CreateGalCatalog  start looping over cube cells NCells= " << ngals_.Size() << " NGals=" << ng_ << " ... "<<" GoldCut="<<(GoldCut?"TRUE":"FALSE")<< " AMcut="<<(AMcut?"TRUE":"FALSE")<<endl;
   uint_8 ngsum=0;  // counter for checking  
   uint_8 nginfile=0,nginzfile=0,ngal_out_area=0;  // count of galaxies going into file, total gals simulated
         
@@ -483,22 +468,14 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
           rreds = dist2Redshift(rr);
                 
           // draw the galaxy properties
-	  
-	  if (rreds < 0.5) mag = DrawMagType(gfd1, gtype);
-	  else if (rreds > 0.75) mag = DrawMagType(gfd3, gtype);
-	  else mag = DrawMagType(gfd2, gtype);
+	  mult_LF.getTypeMagnitude(rreds,mag,gtype);
 
 	  gext=0.;// extinction is set to 0 for now
           ngsum++;// should be same as ng_
 	  
-          double mAM =  0.;
-          
           bool pass = 1;
-
 	  bool print = 0;
-	  double mag_i = 30;
 	  
-	  int itype = int(gtype-1);
 	  float typeval = gtype;
 	  typeval-=float(int(gtype));
 	  typeval*=100;
@@ -508,7 +485,7 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
 	    pass = am->PassGoldenCut(mag, type, rreds);
           }
 
-	  else if (mag > (*maxAM)(rreds)){
+	  else if (maxAM && (mag > (*maxAM)(rreds))) {
             pass = 0;
           }
 
@@ -577,7 +554,7 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
     gals2.Info()["MeanOverDensity"]=mean_overdensity_;// important
   }
   else   {
-    if( remove(fitsname2.c_str()) != 0 )
+    if( remove(FITSname2.c_str()) != 0 )
       cout << "Error deleting ZTRUE file" << endl;
   }
 
@@ -617,82 +594,8 @@ sa_size_t Mass2Gal::CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& 
   return nginfile;
 }
 
-void Mass2Gal::CreateNzHisto(string ppfname, GalFlxTypDist& gfd1, GalFlxTypDist& gfd2, GalFlxTypDist& gfd3, bool extinct, double SkyArea)
-{
-  if(fg_nodrho)
-    throw ParmError("No clustering information: cannot create N(z) Histo");
-        
-  Timer tm("CreateNzHisto");
-        
-  cout <<  " Mass2Gal::CreateNzHisto start looping over cube cells NCells= ";
-  cout << ngals_.Size() << " NGals=" << ng_ << " ... "<<endl;
-  uint_8 ngsum=0;   // counter for checking  
-  uint_8 nginfile=0;// count of galaxies in fits
-        
-  int nbin=10000;
-  double minz=0, maxz=10;
-  Histo nz(minz,maxz,nbin);
-        
-  for(sa_size_t iz=0; iz<ngals_.SizeZ(); iz++) // Z direction (~redshift direction)
-    for(sa_size_t iy=0; iy<ngals_.SizeY(); iy++) // Y direction (transverse plane)
-      for(sa_size_t ix=0; ix<ngals_.SizeX(); ix++) { // X direction ( transverse plane) 
-        cout << ix << iy << iz << endl;                  
-        // pick a cell
-        int_8 ng = ngals_(ix,iy,iz); // num galaxies in this cell
-        // comoving distance to center of cell:
-        double xc, yc, zc, dc;
-        GetCellCoord(ix,iy,iz, xc, yc, zc);
-        cout << "(xc,yc,zc) = ("<<xc<<","<<yc<<","<<zc<<") ";
-        double rx,ry,rz,rr,rphi,rtet,rreds; // note names phi,theta follow of the usual sph. coord convention
-        double mag,gtype,gext;  // galaxy absolute magnitude and type and internal extinction
-        dc = sqrt(xc*xc+yc*yc+zc*zc);
-        //double creds = dist2Redshift(dc);  // the cell center redshift
-        //cout <<" dc = "<<dc<<", z_c = "<<creds<<endl;
-        for(int ing=0; ing<ng; ing++) { // from gal 1 to gal n in cell...
-                                
-          if(RandPos_) {
-            // We generate random positions with flat distribution inside the cell
-            rx = xc+rg_.Flatpm1()*(Dx_/2);
-            ry = yc+rg_.Flatpm1()*(Dy_/2);
-            rz = zc+rg_.Flatpm1()*(Dz_/2);
-          }
-          else {
-            rx = xc;
-            ry = yc;
-            rz = zc;
-          }
-                                
-          if (ZisRad_)
-            Conv2ParaCoord(rx,ry,rz,rr,rphi,rtet);
-          else
-            Conv2SphCoord(rx,ry,rz,rr,rphi,rtet); 
-                        
-          rreds = dist2Redshift(rr);
-	  
-	  if (rreds < 0.5) mag = DrawMagType(gfd1, gtype);
-	  else if (rreds > 0.75) mag = DrawMagType(gfd3, gtype);
-	  else mag = DrawMagType(gfd2, gtype);
 
-          gext = 0.;
-          ngsum++; 
-                        
-          if(rtet<SkyArea)  // sky area selection ONLY
-            nz.Add(rreds);
-                                
-                                
-        } // end of loop over galaxies in the cell 
-      } // end of loop over ix (cells) 
-  cout <<" Mass2Gal::CreateNzHisto() finished loop"<<endl;
-        
-  POutPersist pos(ppfname);
-  //FitsInOutFile fos(fitsname, FitsInOutFile::Fits_Create);
-  pos << nz;
-  //FitsManager::Write(fos, nz);
-        
-  cout<<" Mass2Gal::CreateNzHisto() done - ng_= " << ng_ << "(?=" <<  ngsum << endl; 
-}
-
-sa_size_t Mass2Gal::CreateTrueZFile(int idsim, string fitsname, double SkyArea)
+sa_size_t Mass2Gal::CreateTrueZFile(int idsim, string FITSname, double SkyArea)
 {
   if(fg_nodrho)
     throw ParmError("No clustering information: cannot apply Poisson fluctuations to ngal^bar");
@@ -700,7 +603,7 @@ sa_size_t Mass2Gal::CreateTrueZFile(int idsim, string fitsname, double SkyArea)
   Timer tm("CreateGalCatalog");
         
   // We create first a datatable with the fits file as the swap space 
-  FitsInOutFile swf(fitsname, FitsInOutFile::Fits_Create);      
+  FitsInOutFile swf(FITSname, FitsInOutFile::Fits_Create);      
   SwFitsDataTable gals(swf, 2048);
   gals.AddLongColumn("GalID");
   gals.AddFloatColumn("z");
@@ -715,7 +618,7 @@ sa_size_t Mass2Gal::CreateTrueZFile(int idsim, string fitsname, double SkyArea)
   cout << "    Simulation ID = "<<gid0<<endl;
   uint_8 gid;
   uint_8 seq=0;// counter for checking ngal file1 = ngal file 2
-        
+  
   for(sa_size_t iz=0; iz<ngals_.SizeZ(); iz++) // Z direction (~redshift direction)
     for(sa_size_t iy=0; iy<ngals_.SizeY(); iy++) // Y direction (transverse plane)
       for(sa_size_t ix=0; ix<ngals_.SizeX(); ix++) { // X direction ( transverse plane) 
@@ -781,7 +684,7 @@ sa_size_t Mass2Gal::CreateTrueZFile(int idsim, string fitsname, double SkyArea)
   return nginfile;
 }
 
-sa_size_t Mass2Gal::CreateSimpleCatalog(int idsim, string fitsname, double SkyArea)
+sa_size_t Mass2Gal::CreateSimpleCatalog(int idsim, string FITSname, double SkyArea)
 {
   if(fg_nodrho)
     throw ParmError("No clustering information: cannot apply Poisson fluctuations to ngal^bar");
@@ -789,9 +692,9 @@ sa_size_t Mass2Gal::CreateSimpleCatalog(int idsim, string fitsname, double SkyAr
   Timer tm("CreateSimpleCatalog");
         
   // We create first a datatable with the fits file as the swap space 
-  FitsInOutFile swf(fitsname, FitsInOutFile::Fits_Create);      
+  FitsInOutFile swf(FITSname, FitsInOutFile::Fits_Create);      
   SwFitsDataTable gals(swf, 2048);
-  //gals.AddLongColumn("GalID");
+  // All in capital letters to avoid any pb with IDL
   gals.AddFloatColumn("phi");
   gals.AddFloatColumn("theta");
   gals.AddFloatColumn("z");
@@ -1134,89 +1037,6 @@ void Mass2Gal::Conv2ParaCoord(double x, double y, double z, double& r, double& p
 };
 
 
-double Mass2Gal::DrawMagType(GalFlxTypDist& gfd, double& type)
-{
-  // draw galaxy absolute magnitude and type from distribution
-  //
-  // GalFlxTypDist& gfd is 2D probability distribution of broad type and
-  // absolute magnitude in B band
-  // how to assign more precise SED type 
-  // DEFINE:
-  // type 0  = El_cww_fix2.txt
-  // type 10 = Sbc_cww_fix2.txt
-  // type 20 = Scd_cww_fix2.txt
-  // type 30 = Im_cww_fix2.txt
-  // type 40 = SB3_kin_fix2.txt
-  // type 50 = SB2_kin_fix2.txt
-  // Choice is same as Dahlen et al arXiv:0710.5532
-  
-  //USED FOR planck_BAO
-  //  int a1=0,  b1=5;    //early (1)
-  //  int a2=6,  b2=25;   //late  (2)
-  //  int a3=26, b3=50;   //starburst (3)
-  // separation at 25 : irregular are considered as starburst galaxies. It is pessimist for the goldencut, optmist for the BDT efficiency. It can be balanced by a BDT at 90% to recover a similar nb of galaxies. JSR/CR 
-
-  //USED FOR planck_BAO2  - sans le 0.5 dans le calcul du sous-type, pour avoir une distribution plate: borne sup + 1
-  int a1=0,  b1=5;    //early (1)
-  int a2=5,  b2=35;   //late  (2)
-  int a3=35, b3=51;   //starburst (3)
-  // separation at 35 : irregular are considered as late galaxies.  JSR/CR 
-
-  // The intermediate spectra are interpolated via:
-  // type 0: 1.0*type0+0.0*type10
-  // type 1: 0.9*type0+0.1*type10
-  // type 2: 0.8*type0+0.2*type10
-  // type 3: 0.7*type0+0.3*type10
-  // type 4: 0.6*type0+0.4*type10
-  // type 5: 0.5*type0+0.5*type10
-  // type 6: 0.4*type0+0.6*type10
-  // type 7: 0.3*type0+0.7*type10
-  // type 8: 0.2*type0+0.8*type10
-  // type 9: 0.1*type0+0.9*type10
-  // my original choice was: a1=0,b1=8,a2=9,b2=36,a3=37,b3=50
-
-  // The type numbers are simulated as 1.XX, 2.XX, 3.XX
-  // where the 1,2,3 represent the original broad band type
-  // and the XX is the interpolated template type number
-  // Therefore type values will be:
-  // 1.00 - 1.04
-  // 2.05 - 2.34
-  // 3.35 - 3.50
-
-  // Simulation of extinction E(B-V)=extincBmV_
-  // Random internal galactic exinction value for each galaxy
-  // flat extinction law used, done in TAM.cc when checking the Golden cut
-  // Early types 0-0.1
-  // Late types  0-0.3
-  // Starburst   0-0.3
-  int typ; double mag;
-
-  int t123;
-
-  gfd.GetGalaxy(typ,mag); 
-  t123=typ; // simulates whether galaxy is early (if=1), late (if=2) or starburst (if=3)
-        
-  // simulate more precise type
-  switch (t123) {
-  case 1 : {
-    double typ1=floor(a1+(b1-a1)*rg_.Flat01()); 
-    type=1.0+typ1/100.0;}
-    break;
-  case 2 :
-    { double typ2=floor(a2+(b2-a2)*rg_.Flat01()); 
-      type=2.0+typ2/100.0; }
-    break;
-  case 3 :
-    { double typ3=floor(a3+(b3-a3)*rg_.Flat01()); 
-      type=3.0+typ3/100.0; }
-    break;
-  default:
-    throw RangeCheckError("Mass2Gal::DrawMagType()/ERROR bad type < 1 or > 3 !");
-    break;
-  }
-  return mag;
-};
-
   
 void Mass2Gal::MaxAbsMag()
 // Calculate maximum absolute magnitude that 
@@ -1241,7 +1061,6 @@ void Mass2Gal::MaxAbsMag()
   ReadFilterList readLSSTfilters(lsstFilterFile);
   readLSSTfilters.readFilters(lmin,lmax);
   vector<Filter*> LSSTfilters=readLSSTfilters.getFilterArray();
-  int nFilters = LSSTfilters.size();
   
   // Read in GOODS B filter
   string goodsBFilterFile = "GOODSB.filters";
@@ -1277,7 +1096,6 @@ void Mass2Gal::MaxAbsMag()
   int nz = int((zmax-zmin)/dz+0.5)+1;
   cout << nz << " bins between " << zmin << " & " << zmax << endl;
     
-  double eps=1e-10;
   double dmsMax;
 
   for (int i=0; i<nz;i++) {
@@ -1295,10 +1113,12 @@ void Mass2Gal::MaxAbsMag()
     
     dmsMax = -1000;
     for (int j=0; j<nSEDs; j++) {
-      double dms = depths[3] - photoCalcs.Kcorr(z,(*sedArray[j]),  (*LSSTfilters[3]),(*BFilter[0]));
+      double dms = depths[3] - photoCalcs.Kcorr(z,(*sedArray[j]),  (*LSSTfilters[3]),(*BFilter[0])); // Dahlen for LF in B band
+      // double dms = depths[3] ; // Ramos for LF in I band
       if (dms>dmsMax)  dmsMax=dms;
     }
     MBmax_.push_back(dmsMax - mu);
+    cout << "MB max z =" << z << " " <<  dmsMax - mu<< endl;
     //   cout << z << "  " << 25.5 - mu << endl;
   }
 };

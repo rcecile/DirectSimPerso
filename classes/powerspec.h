@@ -89,7 +89,7 @@ public:
 	    @param snoise    shot noise: not implemented currently                */
 	    //modif Adeline : add  hnode_ and hkeepMode_ 
 	double AccumulatePowerSpectra(HProf& hp, bool pixcor=true, double maxk=1000,
-	     double Err=0, bool undamp=true, double tol_corr=0.15, Histo* hnode_=NULL, Histo* hkeepMode_=NULL, double snoise=0); 
+	     double Err=0, bool undamp=true, double tol_corr=0.15, double snoise=0); 
 	
 	/** Convolve Fourier transformed grid with a 1D Gaussian in z-dimension 
 	    direction. @warning may not work or be useful
@@ -112,33 +112,22 @@ public:
 	
 	/** Write power spectra to a file. None of the power spectra read in as
 	    arguments are normalised yet. Columns written to the file are (1) k-values, 
-	    (2) estimated P(k), (3) raw estimated P(k), (4) raw P(k), (5) simulation P(k),
-	    (6) simulation with distortion P(k)
+	    (2) estimated P(k), (3) simulation P(k)/ simulation with distortion P(k),
+	    (4) shot-noise grid PS (5) error on PS
 	    @param fname       file to write power spectra to
 	    @param Pdata       raw estimated power spectrum
 	    @param volData     volume of catalog used to estimate power spectrum
 	    @param Psim        power spectrum estimated from simulation wo/distortion
 	    @param Psimf       power spectrum estimated from simulation w/distortion
 	    @param volSim      volume of simulation
-	    @param Pdata_noise shot noise (modif Cecile)	
+	    @param Pdata_noise shot noise	
 	    @param meandens    mean density of simulation with distortion         
-	    @param nGalGrid    number of galaxies in weight gride (modif Adeline)	
+	    @param nGalGrid    number of galaxies in weight grid	
 	**/
 	void WritePS(string fname, HProf& Pdata, r_4 Voldata, HProf& PSimlss, 
 		     HProf& PSimlssf, r_4 Volsimlss, HProf& Pdata_noise,   
-		     double meandens = 0., double nGalGrid=0, Histo* hnode_ = NULL, Histo* hkeepMode_ = NULL); 
+		     double meandens = 0., double nGalGrid=0); 
 	
-	/** Write power spectra to a file. Columns written to the file are (1) k-values, 
-	    (2) estimated P(k), (3) raw estimated P(k), (4) raw P(k), (5) simulation P(k),
-	    (6) simulation with distortion P(k) @note supercedes the other WritePS
-	    @param fname       file to write power spectra to
-	    @param Pdata       raw estimated power spectrum
-	    @param volData     volume of catalog used to estimate power spectrum 
-	    @param Psimfile    file to read power spectra estimated from simulation 
-	                       w/ and wo/distortion from
-	    @param meandens    mean density of simulation with distortion         */
-	void WritePS(string fname, HProf& Pdata, r_4 Voldata, 
-	                                     string PSimlssfile, double meandens=0);
 	
 	/** Write power spectrum to a file 
 	    @param fname    file to write power spectrum to

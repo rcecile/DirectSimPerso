@@ -1,0 +1,132 @@
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+ ==== grid_data_main.cc program , output gridded galaxy data
+      from galaxy catalog fits file                          ==== 
+ ==== decoding command line arguments ====
+Montecarlo mode
+    - finished decoding command line arguments 
+
+     *CATALOG DETAILS*
+     Galaxy catalog read from file /sps/lsst/data/rcecile/Planck_BAO2/cat_lfZuccaAllFalse_zOrd_Slice43.fits     Reading redshifts from columns named ZS and ZS
+
+     *SELECTION FUNCTION DETAILS*
+     Correcting for selection function
+     Reading true redshifts from 
+     Saving selection function to /sps/lsst/data/rcecile/Planck_BAO2_grids/SelFunc_lfZuccaAllFalse_speczmean_nofz.txt
+     (unless /sps/lsst/data/rcecile/Planck_BAO2_grids/SelFunc_lfZuccaAllFalse_speczmean_nofz.txt already exists)
+
+     *OUTPUT DETAILS*
+     Saving full arrays to filename with root =/sps/lsst/data/rcecile/Planck_BAO2_grids/gridSN_lfZuccaAllFalse_150_z1.3
+
+ Memory size (KB):167364
+ Max memory size (KB):18014398509481983
+ Maximum allowed data segment size (KB):18014398509481983
+ Resource usage info : 
+ --------------- ResourceUsage::Print(lp=0 ) --------------- 
+ CPU-Usage= 78 Elapsed= 1 msec - Load= 100 %
+ MemoryUsage= 167364 /Max= 18014398509481983 kbytes (0 %)
+
+0/ Read in file /sps/lsst/data/rcecile/Planck_BAO2/cat_lfZuccaAllFalse_zOrd_Slice43.fits
+
+ Initialised SwFitsDataTable
+ Memory size (KB):168104
+ Max memory size (KB):18014398509481983
+ Maximum allowed data segment size (KB):18014398509481983
+ Resource usage info : 
+ --------------- ResourceUsage::Print(lp=0 ) --------------- 
+ CPU-Usage= 81 Elapsed= 1 msec - Load= 100 %
+ MemoryUsage= 168104 /Max= 18014398509481983 kbytes (0 %)
+
+     Initialise cosmology: (read from catalog)
+     OmegaK=0, OmegaM=0.3065, OmegaL=0.693409, OmegaB=0.0483, Omega_rad=9.06581e-05, Omega_cdm=0.2582, H0=67.9
+check flatness: OmegaTot=1
+ and w0=-1, wA=0, sigma8=0.8154
+Spectral index=0.9681
+
+     *GRID DETAILS*
+     Full grid defined by ....
+     pixels : Nx,Ny,Nz = 150,150,125, along x or y of size 8 and along z of size 8 Mpc, centered at redshift=1.3 with radial distance = 4078.56
+     Mean density of random grid = 1
+ Multiple grid definition , NGrids=5
+ Grid[0] : 0,0
+ Grid[1] : 0.698132,0
+ Grid[2] : 0.698132,1.5708
+ Grid[3] : 0.698132,3.14159
+ Grid[4] : 0.698132,4.71239
+
+Seed automatically generated
+
+    In Cat2Grid constructor ...
+    Mean over-density of fudged SimLSS grid = -0.000114124
+    Reading SPECTRO redshifts from column name ZS
+    Reading OBSERVED redshifts from column name ZS
+ ---------- number of galaxies in catalog /sps/lsst/data/rcecile/Planck_BAO2/cat_lfZuccaAllFalse_zOrd_Slice43.fits = 16776868
+
+    TOTAL number of galaxies in catalog =16776868
+    Number of columns in catalog = 6
+    Angle phi = column 1, angle theta = column 2
+    Spec-z = column 3, z used in analysis = column 3
+    (the above will be the same column when reading in spec-z)
+    Exit Cat2Grid constructor ...
+
+CAUTION: UP TO NOW, NO CHECK THAT GRIDS DO NOT OVERLAPP AND ARE FULLY FILLED
+    The number of gals in whole simulation is 16776868
+1/ Find minimum and maximum galaxy cartesian coordinates
+ Computed FindMinMaxCoords()
+ Memory size (KB):340616
+ Max memory size (KB):18014398509481983
+ Maximum allowed data segment size (KB):18014398509481983
+ Resource usage info : 
+ --------------- ResourceUsage::Print(lp=0 ) --------------- 
+ CPU-Usage= 496 Elapsed= 1 msec - Load= 100 %
+ MemoryUsage= 340616 /Max= 18014398509481983 kbytes (0 %)
+
+2/ Lay grid over simulation
+    Input cell size in x,y is 8
+    Input cell size in z is 8
+
+    Cat2Grid::SetGrid()
+    Using SimLSS grid to define grid
+    SimLSS grid: 150,150,125 pixels
+    Centered at redshift z = 1.3
+    Resolution R = 8
+    Indices of center pixels: Ix=75, Iy=75, Iz=63
+    Initial survey boundaries: -596<X<596, -596<Y<596, 3578.56<Z<4578.56
+    Number of cells which cover survey in each direction
+    Nx=149, Ny=149, Nz=125
+    Integer number of cells: Nx=149, Ny=149, Nz=125
+TEMP FUDGE, setting Nx to input value
+TEMP FUDGE, setting Ny to input value
+    Redshift of central pixel = 1.3, comoving distance @zref = 4078.56
+    EXIT Cat2Grid::SetGrid()
+
+
+No check that grids are embedded in the cone filled with galaxies: do it a posteriori
+3/ Selection function .... 
+    Selection function file has already been computed and will be read from file /sps/lsst/data/rcecile/Planck_BAO2_grids/SelFunc_lfZuccaAllFalse_speczmean_nofz.txt
+ SInterp1D::ReadXYFromFile()/Info: 5000 (x,y) pairs read from file /sps/lsst/data/rcecile/Planck_BAO2_grids/SelFunc_lfZuccaAllFalse_speczmean_nofz.txt
+    Set selection function
+
+
+4/ Project galaxies onto grid & write to the file ...
+
+    Cat2Grid::GalGrid()
+Seed automatically generated
+    Volume of grid=1.44e+09
+    Cells in each direction: Nx=150, Ny=150, Nz=125
+    Grid boundaries: -596<X<596, -596<Y<596, 3578.56<Z<4578.56
+    Grid cell size = 8
+    Start loop over galaxies...
+    applying filters ...
+    Reading in OBSERVED redshifts from column ZS
+Read file #0: /sps/lsst/data/rcecile/Planck_BAO2/cat_lfZuccaAllFalse_zOrd_Slice43.fits
+    galid=0: Printing GalRecord: alpha=-2.64146, delta=1.03741, x=-9999, y=-9999, zs=1.29, zo=1.29
+ici  8  75
+ici  8  75
+ici  8  75
+ici  8  75
+ici  8  75
+    galid=1: Printing GalRecord: alpha=2.41896, delta=1.03191, x=-9999, y=-9999, zs=1.29, zo=1.29
+ici  8  75
+ici  8  75
+ici  8  75

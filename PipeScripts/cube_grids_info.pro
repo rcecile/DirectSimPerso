@@ -30,10 +30,13 @@ hmax = Dloscom(zslice + (1.+zslice)*0.15)
 ;nxc=[120,225,320]
 
 ;BAO2
-zref=[0.61,0.96,1.55]
-thick = [81., 128.,175.]
-nxc=[75,225,320]
+;zref=[0.61,0.96,1.55]
+;thick = [81., 128.,175.]
+;nxc=[75,225,320]
 
+zref=[1.3]
+thick = [125.]
+nxc=[300]
 
 cellg=[8.,8.,8.,8.]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -47,7 +50,6 @@ zmin=zref
 zmax=zmin
 for i=0,n_elements(zref)-1 do zmin[i] = zfrlos(dmin[i],7)
 for i=0,n_elements(zref)-1 do zmax[i] = zfrlos(dmax[i],7)
-
 
 for i=0,n_elements(zref)-1 do begin
    print,'================================================================================================='

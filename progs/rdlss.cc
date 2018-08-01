@@ -476,36 +476,24 @@ int main(int narg, char* arg[]) {
 
     int z1row=0, z2row=1, z3row=2;
     // ALL GALAXIES
-    double MstarAz1=LFTable(MstarCol,z1row),alpAz1=LFTable(AlphaCol,z1row),
-      phistarAz1=LFTable(PhiStarCol,z1row)/**1e-4*/;
-    double MstarAz2=LFTable(MstarCol,z2row),alpAz2=LFTable(AlphaCol,z2row),
-      phistarAz2=LFTable(PhiStarCol,z2row)/**1e-4*/;
-    double MstarAz3=LFTable(MstarCol,z3row),alpAz3=LFTable(AlphaCol,z3row),
-      phistarAz3=LFTable(PhiStarCol,z3row)/**1e-4*/;
+    double MstarAz1=LFTable(MstarCol,z1row),alpAz1=LFTable(AlphaCol,z1row), phistarAz1=LFTable(PhiStarCol,z1row)/**1e-4*/;
+    double MstarAz2=LFTable(MstarCol,z2row),alpAz2=LFTable(AlphaCol,z2row), phistarAz2=LFTable(PhiStarCol,z2row)/**1e-4*/;
+    double MstarAz3=LFTable(MstarCol,z3row),alpAz3=LFTable(AlphaCol,z3row), phistarAz3=LFTable(PhiStarCol,z3row)/**1e-4*/;
         
     // EARLY TYPES
-    double MstarEz1=LFTable(MstarCol+3,z1row),alpEz1=LFTable(AlphaCol+3,z1row),
-      phistarEz1=LFTable(PhiStarCol+3,z1row)/**1e-4*/;
-    double MstarEz2=LFTable(MstarCol+3,z2row),alpEz2=LFTable(AlphaCol+3,z2row),
-      phistarEz2=LFTable(PhiStarCol+3,z2row)/**1e-4*/;
-    double MstarEz3=LFTable(MstarCol+3,z3row),alpEz3=LFTable(AlphaCol+3,z3row),
-      phistarEz3=LFTable(PhiStarCol+3,z3row)/**1e-4*/;
+    double MstarEz1=LFTable(MstarCol+3,z1row),alpEz1=LFTable(AlphaCol+3,z1row), phistarEz1=LFTable(PhiStarCol+3,z1row)/**1e-4*/;
+    double MstarEz2=LFTable(MstarCol+3,z2row),alpEz2=LFTable(AlphaCol+3,z2row), phistarEz2=LFTable(PhiStarCol+3,z2row)/**1e-4*/;
+    double MstarEz3=LFTable(MstarCol+3,z3row),alpEz3=LFTable(AlphaCol+3,z3row), phistarEz3=LFTable(PhiStarCol+3,z3row)/**1e-4*/;
         
     // LATE TYPES
-    double MstarLz1=LFTable(MstarCol+6,z1row),alpLz1=LFTable(AlphaCol+6,z1row),
-      phistarLz1=LFTable(PhiStarCol+6,z1row)/**1e-4*/;
-    double MstarLz2=LFTable(MstarCol+6,z2row),alpLz2=LFTable(AlphaCol+6,z2row),
-      phistarLz2=LFTable(PhiStarCol+6,z2row)/**1e-4*/;
-    double MstarLz3=LFTable(MstarCol+6,z3row),alpLz3=LFTable(AlphaCol+6,z3row),
-      phistarLz3=LFTable(PhiStarCol+6,z3row)/**1e-4*/;
+    double MstarLz1=LFTable(MstarCol+6,z1row),alpLz1=LFTable(AlphaCol+6,z1row), phistarLz1=LFTable(PhiStarCol+6,z1row)/**1e-4*/;
+    double MstarLz2=LFTable(MstarCol+6,z2row),alpLz2=LFTable(AlphaCol+6,z2row), phistarLz2=LFTable(PhiStarCol+6,z2row)/**1e-4*/;
+    double MstarLz3=LFTable(MstarCol+6,z3row),alpLz3=LFTable(AlphaCol+6,z3row), phistarLz3=LFTable(PhiStarCol+6,z3row)/**1e-4*/;
         
     // STARBURST TYPES
-    double MstarSz1=LFTable(MstarCol+9,z1row),alpSz1=LFTable(AlphaCol+9,z1row),
-      phistarSz1=LFTable(PhiStarCol+9,z1row)/**1e-4*/;
-    double MstarSz2=LFTable(MstarCol+9,z2row),alpSz2=LFTable(AlphaCol+9,z2row),
-      phistarSz2=LFTable(PhiStarCol+9,z2row)/**1e-4*/;
-    double MstarSz3=LFTable(MstarCol+9,z3row),alpSz3=LFTable(AlphaCol+9,z3row),
-      phistarSz3=LFTable(PhiStarCol+9,z3row)/**1e-4*/;
+    double MstarSz1=LFTable(MstarCol+9,z1row),alpSz1=LFTable(AlphaCol+9,z1row), phistarSz1=LFTable(PhiStarCol+9,z1row)/**1e-4*/;
+    double MstarSz2=LFTable(MstarCol+9,z2row),alpSz2=LFTable(AlphaCol+9,z2row), phistarSz2=LFTable(PhiStarCol+9,z2row)/**1e-4*/;
+    double MstarSz3=LFTable(MstarCol+9,z3row),alpSz3=LFTable(AlphaCol+9,z3row), phistarSz3=LFTable(PhiStarCol+9,z3row)/**1e-4*/;
         
     /////////////////////////////////////////////////////////////////////////////////////
 

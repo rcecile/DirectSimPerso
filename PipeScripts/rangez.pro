@@ -1,18 +1,18 @@
-PRO rangez2
+
+PRO rangez
 ; Catalog must be totaly produced before use of this routine
 
 nslice = 70
 nslicez = 100
 z_max = 3.
-nsim=0
 
 zslice = findgen(nslicez+1)*z_max/nslicez
-suff='zSED'
+suff='_lfZuccaAllFalse'
 dir='/sps/lsst/data/rcecile/Planck_BAO2/'
-for k=0,nslicez-1 do begin
+for k=21,nslicez-1 do begin
    nok_tot = 0
    for i=0,nslice-1 do begin
-      name=dir+'cat_'+suff+'_Slice'+strtrim(i,2)+'.fits'
+      name=dir+'cat'+suff+'_Slice'+strtrim(i,2)+'.fits'
       h = headfits(name,ext=1)
       n = sxpar(h,'NAXIS2')
       zmin = sxpar(h,'ZCAT_MIN')
@@ -33,7 +33,7 @@ for k=0,nslicez-1 do begin
 
    print,'Ready to sort the catalog'
    msz = mz[sort(mz.(3))]
-   names=dir+'cat_'+suff+'_zOrd_Slice'+strtrim(k,2)+'.fits'
+   names=dir+'cat'+suff+'_zOrd_Slice'+strtrim(k,2)+'.fits'
    MWRFITS, msz, names, h
    print,'############# ', names,'  written'
    sxaddpar,h,'ZCAT_MIN',zslice[k]

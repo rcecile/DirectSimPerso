@@ -105,7 +105,7 @@ void TApparentMagnitude::SetFlim(){
       maglim[i] = -2.5 * log(Flim[i]/F0[i])/log(10);
       double x = pow(10, 0.4 * (maglim[i] - fm5[i]));
       double sig = sqrt((0.04 - gamma[i]) * x + gamma[i] * x * x);
-      //cout <<  "m5 = " << fm5[i] << "  MAG LIMITS " << maglim[i] << " +- " << sig <<  " F0 = " << F0[i] << endl;
+      // cout <<  "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! m5 = " << fm5[i] << "  MAG LIMITS " << maglim[i] << " +- " << sig <<  " F0 = " << F0[i] << endl;
     }
     FLUXMAGNULL[i] = Flim[i];
   }
@@ -269,7 +269,7 @@ void TApparentMagnitude::ComputeApparentMagnitudes(double *mag, double *err_mag,
 void TApparentMagnitude::EvalApparentMagnitudes(double *mag, double *err_mag, double mag_abs,
 						int type_s,double z_s, double ebv_s, int ib) {
   EvalApparentMagnitudeTheorique(mag, mag_abs, type_s, z_s, ebv_s, ib);
-  ComputeMagnitudeWithErrors(mag, err_mag, ib);
+  ComputeMagnitudeWithErrors(mag, err_mag,ib);
 }
 
 void TApparentMagnitude::ComputeMagnitudeWithErrors(double *mag, double *err_mag, int ib){
@@ -381,13 +381,13 @@ void TApparentMagnitude::EvalApparentMagnitudeTheorique(double *mag,
     for (int ifilter = 0; ifilter < nband; ifilter++) {
       double k = KcorrectionTable -> EvalFromTable(type, z, ebv, ifilter);
       mag[ifilter] = MA + m_d + k;
-      //cout << ifilter << " mag = " << mag[ifilter] << " = "<< MA << " + " << m_d << " + " << k << endl;
+      //  cout << ifilter << " mag = " << mag[ifilter] << " = "<< MA << " + " << m_d << " + " << k << endl;
     }
   else{
     double k = KcorrectionTable -> EvalFromTable(type, z, ebv, ib);
     mag[ib] = MA + m_d + k;
   }
-    
+  // cout << " mag[3] = " << mag[3] << endl;
 }
 
 void TApparentMagnitude::ComputeApparentMagnitudeTheorique(double *mag,

@@ -1,0 +1,26 @@
+!p.multi=0
+restore,dir+'stat_zp_1pzs_all_errP.sav'
+
+dir='/sps/lsst/data/rcecile/Planck_BAO2/'
+ suff = ['_errP','_errPBDT9','_errPBDT8']
+isuff=0
+ni=[17,35,63,40]
+
+!p.multi=[0,2,2]
+.r
+for i=0,3 do begin
+  file='cat_AllzOrdZP_Slice'+strtrim(ni[i],2)+suff[isuff]+'.fits'
+  m=mrdfits(dir+file,1,h,col=['ZS','ZP'])
+  t = (m.(1)-m.(0))/(1.+m.(0))
+print,minmax(m.	(1))
+h=histogram(t,min=-.6,max=.6,bin=0.0003)
+ x=findgen(n_elements(h))*0.0003-.6
+
+ plot,x,h,/xs,/ys,xra=[-0.02,0.02]
+oplot,[x[where(h eq max(h))],x[where(h eq max(h))]],[0,max(h)*2],th=4
+oplot,[pbias[i],pbias[i]],[0,max(h)*2],th=4,li=2
+legend,'Slice z_p='+strtrim(mean(m.(1)),2),lin=0,box=1,/fill,/left,/top,charsize=1.5
+
+ print,x[where(h eq max(h))],pbias[i]
+endfor
+end

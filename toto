@@ -1,5 +1,0 @@
-/sps/lsst/dev/rcecile/BAOProgs/DirectSim/exe/rdlss -C /sps/lsst/data/rcecile/wHugeCube/simu_s8_128_Slice0_r.fits -O /sps/lsst/data/rcecile/wHugeCube/cat_test0.9.fits -x 0 -i 2 -R -z -G|more
-redshift conversion 0.500001 2926.39
-
-/sps/lsst/dev/rcecile/BAOProgs/DirectSim/exe/rdlss -C /sps/lsst/data/rcecile/HugeCube/simu_s8_128_Slice0_r.fits -O /sps/lsst/data/rcecile/HugeCube/cat_test1.0.fits -x 0 -i 2 -R -z -G|more
-redshift conversion 0.500001 1942.58

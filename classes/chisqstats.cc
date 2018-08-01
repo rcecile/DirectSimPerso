@@ -70,7 +70,7 @@ void ChisqStats::ErrSig(double& siglow, double& sighigh, double& sigbest, double
     // count number of NOT Infs
     int cnt=0;
     for (int i=0; i<xvals_.Size(); i++) {
-	    if(!isinf(logPraw(i)))
+      if(!std::isinf(logPraw(i)))
 	        cnt++;
 	    else 
 	        cout <<"Inf at x="<< xvals_(i) <<endl;
@@ -81,7 +81,7 @@ void ChisqStats::ErrSig(double& siglow, double& sighigh, double& sigbest, double
     int ii=0;
     for (int i=0; i<xvals_.Size(); i++) {
     
-	    if(!isinf(logPraw(i))) {
+      if(!std::isinf(logPraw(i))) {
 	        xv(ii)=xvals_(i);
 		logP(ii)=logPraw(i); 
 		ii++;

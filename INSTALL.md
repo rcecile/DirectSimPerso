@@ -26,6 +26,8 @@ Perform the usual ```./configure```, ```make```, ```make install```. Type ```./c
     - Run the configure script: ```./configure -sbase $SOPHYABASE -scxx g++ -extp [$DIR] -noext lapack -noext astro``` 
       (or include lapack by removing -noext lapack [recommended])
 
+CECILE :  ./configure.sh -sbase $SOPHYABASE -scxx g++ -extp /usr/local 
+
  * Compile and build the libraries 
 
     - ``make libs extlibs slb slbext`` 

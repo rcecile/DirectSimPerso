@@ -137,13 +137,14 @@ void FitBAObaselineScale::ComputeChisq( int degmax)
 	    bestfitS_=myfit.GetParm(1);
 	    errup_=myfit.GetParmErr(1);   
 	    errdown_=myfit.GetParmErr(1);
+	    errA_=myfit.GetParmErr(0);
 	    mybestfitpoly_.Realloc(degree_);
 	    mybestfitpoly_=myfitpoly_;
 	    bestChisq_=myfit.GetChi2Red();
 	  }
       }
   }
-  cout<<"  A = "<<bestfitA_<<"     s = "<<bestfitS_<<" +/- "<<errup_<<"       Chi2 = "<<bestChisq_<<endl; 
+  cout<<"Fit res  A = "<<bestfitA_<<" +/- "<<errA_ << "(so detection at " << bestfitA_/errA_ << " sigma ;     s = "<<bestfitS_<<" +/- "<<errup_<<"       Chi2 = "<<bestChisq_<<endl; 
   cout<<" sVals = "<<sloop<<endl;
 
   // Recompute the baseline with the best-fit parameters

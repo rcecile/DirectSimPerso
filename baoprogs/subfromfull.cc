@@ -17,6 +17,7 @@
 #include <string>
 #include <math.h>
 #include <typeinfo>
+#include <getopt.h>
 
 // sophya
 #include "machdefs.h"

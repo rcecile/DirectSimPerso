@@ -3,7 +3,7 @@
 ################################################################################
 
 ifndef SOPHYABASE
-	SOPHYABASE := /sps/lsst/dev/rcecile/BAOProgs/LUC/SrcSophyaPersoPourTests/SObjs/
+	SOPHYABASE := /sps/lsst/users/rcecile/BAOProgs/LUC/SrcSophyaPersoPourTests/SObjs/
 	echo "sophyabase = ${SOPHYABASE}"
 endif
 
@@ -12,9 +12,8 @@ include $(SOPHYABASE)/include/sophyamake.inc
 #### Automatically set up GALSIM variable if it doesn't exist
 ifndef GALSIM
 	GALSIM := ${PWD}
-	echo "GALSIM = ${GALSIM}"
+#	echo "GALSIM = ${GALSIM}"
 endif
-
 
 #define GEN3D_FLOAT
 
@@ -38,8 +37,9 @@ LIBH := $(MYCL)/cosmocalcs.h $(MYCL)/geneutils.h $(MYCL)/gftdist.h \
 $(MYCL)/schechter.h $(MYCL)/sinterp.h $(MYCL)/simdata.h $(MYCL)/reddening.h \
 $(MYCL)/sedfilter.h $(MYCL)/sedpca.h $(MYCL)/genefluct3d.h  $(MYCL)/pkspectrum.h \
 $(MYCL)/mass2gal.h $(MYCL)/powerspec.h $(MYCL)/matrix.h $(MYCL)/igm.h \
+$(MYCL)/myschechter.h  $(MYCL)/multitypzlf.h   $(MYCL)/powerspecfromgrids.h \
 $(MYCL)/hpoly.h $(MYCL)/shapelets.h $(MYCL)/em.h $(MYCL)/cat2grid.h  $(MYCL)/projgrid.h \
-$(MYCL)/fitkbaoscale.h $(MYCL)/chisqstats.h \
+$(MYCL)/fitkbaoscale.h $(MYCL)/fitkbaobaselinescale.h $(MYCL)/chisqstats.h \
 $(MYCL)/TAM.h $(MYCL)/TApparentMagnitude.h $(MYCL)/TDataCard.h $(MYCL)/TFilter.h $(MYCL)/TIGM.h \
 $(MYCL)/TReddening.h $(MYCL)/TBFilter.h $(MYCL)/TDistance.h $(MYCL)/TFlux.h \
 $(MYCL)/TKcorrection.h  $(MYCL)/TSed.h
@@ -49,40 +49,37 @@ $(MYCL)/TKcorrection.h  $(MYCL)/TSed.h
 LIBO := $(OBJ)/cosmocalcs.o $(OBJ)/geneutils.o $(OBJ)/gftdist.o \
 $(OBJ)/schechter.o $(OBJ)/sinterp.o $(OBJ)/simdata.o $(OBJ)/reddening.o \
 $(OBJ)/sedfilter.o $(OBJ)/sedpca.o $(OBJ)/genefluct3d.o  $(OBJ)/pkspectrum.o $(OBJ)/mass2gal.o \
+$(OBJ)/myschechter.o  $(OBJ)/multitypzlf.o  $(OBJ)/powerspecfromgrids.o \
 $(OBJ)/powerspec.o $(OBJ)/matrix.o $(OBJ)/igm.o $(OBJ)/hpoly.o $(OBJ)/shapelets.o\
-$(OBJ)/em.o $(OBJ)/cat2grid.o $(OBJ)/fitkbaoscale.o $(OBJ)/chisqstats.o \
+$(OBJ)/em.o $(OBJ)/cat2grid.o $(OBJ)/fitkbaoscale.o $(OBJ)/fitkbaobaselinescale.o $(OBJ)/chisqstats.o \
 $(OBJ)/TAM.o $(OBJ)/TApparentMagnitude.o $(OBJ)/TDataCard.o $(OBJ)/TFilter.o $(OBJ)/TIGM.o \
 $(OBJ)/TReddening.o $(OBJ)/TBFilter.o $(OBJ)/TDistance.o $(OBJ)/TFlux.o \
 $(OBJ)/TKcorrection.o  $(OBJ)/TSed.o
 #$(OBJ)/root_plots.o
 
 # root libraries
-ROOTLIB   = $(shell root-config --libs) -lMathMore
+ROOTLIB = $(shell root-config --libs) -lMathMore
 ROOTINC = $(shell root-config --incdir)
-
-MYLIB = -lfftw3_threads
+MYLIB = -lfftw3_threads  
 MINUIT = -lMinuit
 
 
 ################################################################################
 
-all : progs tests bao
+#all : progs tests bao
+all : progs bao
 
 progs : addIGMToSED analyzeBPZ baseSimulation calculateKcorrections cfhtColors \
 colorDistributions convertSEDS fitLSSTspectra lineOfSightLymanAlpha lineOfSightMagnitude \
 lsstPicklesLibrary lymanAlphaToDensity pcaTemplates photoZdist priorFitter \
-rdlss sdssElColors sdssPicklesLibrary simdensity  \
+make_cat sdssElColors sdssPicklesLibrary simdensity  \
 simulateAbsorberLinesOfSight simulateLSSTobs simulateLSSTobsFromTruth 
 
 tests : test2Dinterp testbasesim testEMalgorithm testErrors testgoodsmagsim \
 testKcorrColors testKcorrMethod testLF testLymanAlphaAbs testMadau testMeiksin \
 testSimReadKcorr testsimulateIGM testSimulation testTemplateFitting 
-# testGoldenInterp2D
-# testsimdensity 
 
-#bao : addGausszerr computepsfromarray fitkbao getpzconvf getsf grid_data \
-sim_mcgrids subfromfull 
-bao : addGausszerr computepsfromarray fitkbao getpzconvf getsf grid_data \
+bao : addGausszerr computepsfromgrids fitkbao fitkbaobaseline getpzconvf getsf grid_data \
  subfromfull 
 
 clean : 
@@ -138,8 +135,8 @@ priorFitter : $(EXE)/priorFitter
 #projectTemplates : $(EXE)/projectTemplates
 #	@echo 'makefile : projectTemplates made'
 
-rdlss : $(EXE)/rdlss
-	@echo 'makefile : rdlss made'
+make_cat : $(EXE)/make_cat
+	@echo 'makefile : make_cat made'
 
 sdssElColors : $(EXE)/sdssElColors
 	@echo 'makefile : sdssElColors made'
@@ -167,24 +164,24 @@ simulateLSSTobsFromTruth : $(EXE)/simulateLSSTobsFromTruth
 addGausszerr : $(EXE)/addGausszerr
 	@echo 'makefile : addGausszerr made'
 
-computepsfromarray : $(EXE)/computepsfromarray
-	@echo 'makefile : computepsfromarray made'
+computepsfromgrids : $(EXE)/computepsfromgrids
+	@echo 'makefile : computepsfromgrids made'
 
 fitkbao : $(EXE)/fitkbao
 	@echo 'makefile : fitkbao made'
+
+fitkbaobaseline : $(EXE)/fitkbaobaseline
+	@echo 'makefile : fitkbaobaseline made'
 
 getpzconvf : $(EXE)/getpzconvf
 	@echo 'makefile : getpzconvf made'
 
 getsf : $(EXE)/getsf
 	@echo 'makefile : getsf made'
-	
+
 grid_data : $(EXE)/grid_data
 	@echo 'makefile : grid_data made'
-	
-#sim_mcgrids : $(EXE)/sim_mcgrids
-#	@echo 'makefile : sim_mcgrids made'
-	
+
 subfromfull : $(EXE)/subfromfull
 	@echo 'makefile : subfromfull made'
 
@@ -193,33 +190,30 @@ subfromfull : $(EXE)/subfromfull
 test2Dinterp : $(EXE)/test2Dinterp 
 	@echo 'makefile :test2Dinterp made'
 
-#testGoldenInterp2D : $(EXE)/testGoldenInterp2D 
-#	@echo 'makefile :testGoldenInterp2D made'
-	
 testbasesim : $(EXE)/testbasesim 
 	@echo 'makefile :testbasesim made'
-	
+
 test : $(EXE)/test
 	@echo 'makefile : test made'
-	
+
 testEMalgorithm : $(EXE)/testEMalgorithm
 	@echo 'makefile : testEMalgorithm made'
-	
+
 testErrors : $(EXE)/testErrors
 	@echo 'makefile : testErrors made'
-	
+
 testgoodsmagsim : $(EXE)/testgoodsmagsim
 	@echo 'makefile : testgoodsmagsim made'
 
 testKcorrColors : $(EXE)/testKcorrColors 
 	@echo 'makefile : testKcorrColors made'
-	
+
 testKcorrMethod : $(EXE)/testKcorrMethod 
 	@echo 'makefile : testKcorrMethod made'
 
 testLF : $(EXE)/testLF 
 	@echo 'makefile :testLF made'
-	
+
 testLymanAlphaAbs : $(EXE)/testLymanAlphaAbs 
 	@echo 'makefile :testLymanAlphaAbs made'
 
@@ -228,16 +222,16 @@ testMadau : $(EXE)/testMadau
 
 testMeiksin : $(EXE)/testMeiksin
 	@echo 'makefile : testMeiksin made'
-	
+
 testSimReadKcorr : $(EXE)/testSimReadKcorr
 	@echo 'makefile : testSimReadKcorr made'
-	
+
 testsimulateIGM : $(EXE)/testsimulateIGM
 	@echo 'makefile : testsimulateIGM made'
-	
+
 testSimulation : $(EXE)/testSimulation
 	@echo 'makefile : testSimulation made'
-	
+
 testTemplateFitting : $(EXE)/testTemplateFitting
 	@echo 'makefile : testTemplateFitting made'
 
@@ -248,18 +242,21 @@ testpsdenscube : $(EXE)/testpsdenscube
 
 testsimdensity : $(EXE)/testsimdensity
 	@echo 'makefile :  testsimdensity made'
-	
+
 ###################### MAIN PROGRAMS ###########################################
 
 # ADD LINE OF SIGHT TRANSMISSON TO SEDS IN A LIBRARY
-$(EXE)/addIGMToSED : $(OBJ)/addIGMToSED.o $(LIBO) 
+$(EXE)/addIGMToSED :	$(OBJ)/addIGMToSED.o $(LIBO) 
 	mkdir -p $(EXE)
+	@echo 'SOPHYA LIB'
+	@echo 	$(SOPHYAEXTSLBLIST)
+	@echo 'SOPHYA LIB'
 	$(CXXLINK) -o $(EXE)/addIGMToSED $(OBJ)/addIGMToSED.o $(LIBO) \
 	$(SOPHYAEXTSLBLIST)	$(MYLIB) $(ROOTLIB)
 
 $(OBJ)/addIGMToSED.o : $(PROGS)/addIGMToSED.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/addIGMToSED.o $(PROGS)/addIGMToSED.cc
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/addIGMToSED.o $(PROGS)/addIGMToSED.cc
 
 # ANALYZE A BPZ CATALOG
 $(EXE)/analyzeBPZ : $(OBJ)/analyzeBPZ.o $(LIBO) 
@@ -270,8 +267,8 @@ $(EXE)/analyzeBPZ : $(OBJ)/analyzeBPZ.o $(LIBO)
 
 $(OBJ)/analyzeBPZ.o : $(PROGS)/analyzeBPZ.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/analyzeBPZ.o $(PROGS)/analyzeBPZ.cc 
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/analyzeBPZ.o $(PROGS)/analyzeBPZ.cc 
+
 # BASE SIMULATION
 $(EXE)/baseSimulation : $(OBJ)/baseSimulation.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -280,8 +277,8 @@ $(EXE)/baseSimulation : $(OBJ)/baseSimulation.o $(LIBO)
 
 $(OBJ)/baseSimulation.o : $(PROGS)/baseSimulation.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/baseSimulation.o $(PROGS)/baseSimulation.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/baseSimulation.o $(PROGS)/baseSimulation.cc
+
 # CALCULATE K CORRECTION TABLES
 $(EXE)/calculateKcorrections : $(OBJ)/calculateKcorrections.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -291,8 +288,8 @@ $(EXE)/calculateKcorrections : $(OBJ)/calculateKcorrections.o $(LIBO)
 
 $(OBJ)/calculateKcorrections.o : $(PROGS)/calculateKcorrections.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/calculateKcorrections.o $(PROGS)/calculateKcorrections.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/calculateKcorrections.o $(PROGS)/calculateKcorrections.cc
+
 # CALCULATE U-G, I-Z CFHT colors w/ and wo/ host galaxy reddening
 $(EXE)/cfhtColors : $(OBJ)/cfhtColors.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -302,8 +299,8 @@ $(EXE)/cfhtColors : $(OBJ)/cfhtColors.o $(LIBO)
 
 $(OBJ)/cfhtColors.o : $(PROGS)/cfhtColors.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/cfhtColors.o $(PROGS)/cfhtColors.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/cfhtColors.o $(PROGS)/cfhtColors.cc
+
 # COLOR DISTRIBUTIONS
 $(EXE)/colorDistributions : $(OBJ)/colorDistributions.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -312,7 +309,7 @@ $(EXE)/colorDistributions : $(OBJ)/colorDistributions.o $(LIBO)
 
 $(OBJ)/colorDistributions.o : $(PROGS)/colorDistributions.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/colorDistributions.o $(PROGS)/colorDistributions.cc
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/colorDistributions.o $(PROGS)/colorDistributions.cc
 
 # CONVERT SED UNITS
 $(EXE)/convertSEDS : $(OBJ)/convertSEDS.o
@@ -322,8 +319,8 @@ $(EXE)/convertSEDS : $(OBJ)/convertSEDS.o
 
 $(OBJ)/convertSEDS.o : $(PROGS)/convertSEDS.cc
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -o $(OBJ)/convertSEDS.o $(PROGS)/convertSEDS.cc 
-	
+	$(CXXCOMPILE) -std=c++11 -o $(OBJ)/convertSEDS.o $(PROGS)/convertSEDS.cc 
+
 # FIT LSST SPECTRA TO CWWK
 $(EXE)/fitLSSTspectra : $(OBJ)/fitLSSTspectra.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -333,8 +330,8 @@ $(EXE)/fitLSSTspectra : $(OBJ)/fitLSSTspectra.o $(LIBO)
 
 $(OBJ)/fitLSSTspectra.o : $(PROGS)/fitLSSTspectra.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/fitLSSTspectra.o $(PROGS)/fitLSSTspectra.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/fitLSSTspectra.o $(PROGS)/fitLSSTspectra.cc
+
 # SIMULATE LINE OF SIGHT LYMAN ALPHA TRANSMISSION
 $(EXE)/lineOfSightLymanAlpha : $(OBJ)/lineOfSightLymanAlpha.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -344,8 +341,8 @@ $(EXE)/lineOfSightLymanAlpha : $(OBJ)/lineOfSightLymanAlpha.o $(LIBO)
 
 $(OBJ)/lineOfSightLymanAlpha.o : $(PROGS)/lineOfSightLymanAlpha.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/lineOfSightLymanAlpha.o $(PROGS)/lineOfSightLymanAlpha.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/lineOfSightLymanAlpha.o $(PROGS)/lineOfSightLymanAlpha.cc
+
 # U,G MAGNITUDES WITH IGM LINE OF SIGHT
 $(EXE)/lineOfSightMagnitude : $(OBJ)/lineOfSightMagnitude.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -355,7 +352,7 @@ $(EXE)/lineOfSightMagnitude : $(OBJ)/lineOfSightMagnitude.o $(LIBO)
 
 $(OBJ)/lineOfSightMagnitude.o : $(PROGS)/lineOfSightMagnitude.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/lineOfSightMagnitude.o $(PROGS)/lineOfSightMagnitude.cc
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/lineOfSightMagnitude.o $(PROGS)/lineOfSightMagnitude.cc
 
 # CALCULATE LSST COLORS FOR PICKLES' LIBRARY OF STARS 
 $(EXE)/lsstPicklesLibrary : $(OBJ)/lsstPicklesLibrary.o $(LIBO) 
@@ -366,8 +363,8 @@ $(EXE)/lsstPicklesLibrary : $(OBJ)/lsstPicklesLibrary.o $(LIBO)
 
 $(OBJ)/lsstPicklesLibrary.o : $(PROGS)/lsstPicklesLibrary.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/lsstPicklesLibrary.o $(PROGS)/lsstPicklesLibrary.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/lsstPicklesLibrary.o $(PROGS)/lsstPicklesLibrary.cc
+
 # LYMAN ALPHA ALONG LINE OF SIGHT CONVERTED TO DENSITY
 $(EXE)/lymanAlphaToDensity : $(OBJ)/lymanAlphaToDensity.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -377,8 +374,8 @@ $(EXE)/lymanAlphaToDensity : $(OBJ)/lymanAlphaToDensity.o $(LIBO)
 
 $(OBJ)/lymanAlphaToDensity.o : $(PROGS)/lymanAlphaToDensity.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/lymanAlphaToDensity.o $(PROGS)/lymanAlphaToDensity.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/lymanAlphaToDensity.o $(PROGS)/lymanAlphaToDensity.cc
+
 # TEMPLATE PCA
 $(EXE)/pcaTemplates : $(OBJ)/pcaTemplates.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -388,8 +385,8 @@ $(EXE)/pcaTemplates : $(OBJ)/pcaTemplates.o $(LIBO)
 
 $(OBJ)/pcaTemplates.o : $(PROGS)/pcaTemplates.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/pcaTemplates.o $(PROGS)/pcaTemplates.cc 
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/pcaTemplates.o $(PROGS)/pcaTemplates.cc 
+
 # PHOTO-Z DISTRIBUTION
 $(EXE)/photoZdist : $(OBJ)/photoZdist.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -399,8 +396,8 @@ $(EXE)/photoZdist : $(OBJ)/photoZdist.o $(LIBO)
 
 $(OBJ)/photoZdist.o : $(PROGS)/photoZdist.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/photoZdist.o $(PROGS)/photoZdist.cc 
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/photoZdist.o $(PROGS)/photoZdist.cc 
+
 # PRIOR FITTER
 $(EXE)/priorFitter : $(OBJ)/priorFitter.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -410,8 +407,8 @@ $(EXE)/priorFitter : $(OBJ)/priorFitter.o $(LIBO)
 
 $(OBJ)/priorFitter.o : $(PROGS)/priorFitter.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/priorFitter.o $(PROGS)/priorFitter.cc 
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/priorFitter.o $(PROGS)/priorFitter.cc 
+
 # PROJECT TEMPLATES
 #$(EXE)/projectTemplates : $(OBJ)/projectTemplates.o $(LIBO) 
 #	mkdir -p $(EXE)
@@ -423,17 +420,18 @@ $(OBJ)/priorFitter.o : $(PROGS)/priorFitter.cc $(LIBH)
 #	mkdir -p $(OBJ)
 #	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/projectTemplates.o $(PROGS)/projectTemplates.cc 
 
-# SIMULATE CATALOG OF BASIC GALAXY PROPERTIES FROM OVER-DENSITY GRID
-$(EXE)/rdlss : $(OBJ)/rdlss.o $(LIBO)
+
+# SIMULATE CATALOG OF BASIC GALAXY PROPERTIES FROM OVER-DENSITY GRID - NEW VERSION
+$(EXE)/make_cat : $(OBJ)/make_cat.o $(LIBO)
 	mkdir -p $(EXE)
 	mkdir -p $(ROOTOUT)
-	$(CXXLINK) -o $(EXE)/rdlss $(OBJ)/rdlss.o $(LIBO) \
+	$(CXXLINK) -o $(EXE)/make_cat $(OBJ)/make_cat.o $(LIBO) \
 	$(SOPHYAEXTSLBLIST) $(MYLIB) $(ROOTLIB)
 
-$(OBJ)/rdlss.o : $(PROGS)/rdlss.cc $(LIBH)
+$(OBJ)/make_cat.o : $(PROGS)/make_cat.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/rdlss.o $(PROGS)/rdlss.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/make_cat.o $(PROGS)/make_cat.cc
+
 # CALCULATE SDSS COLORS OF ELLIPTICAL GALAXY
 $(EXE)/sdssElColors : $(OBJ)/sdssElColors.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -443,7 +441,7 @@ $(EXE)/sdssElColors : $(OBJ)/sdssElColors.o $(LIBO)
 
 $(OBJ)/sdssElColors.o : $(PROGS)/sdssElColors.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/sdssElColors.o $(PROGS)/sdssElColors.cc 
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/sdssElColors.o $(PROGS)/sdssElColors.cc 
 
 # CALCULATE SDSS COLORS FOR PICKLES' LIBRARY OF STARS 
 $(EXE)/sdssPicklesLibrary : $(OBJ)/sdssPicklesLibrary.o $(LIBO) 
@@ -454,8 +452,8 @@ $(EXE)/sdssPicklesLibrary : $(OBJ)/sdssPicklesLibrary.o $(LIBO)
 
 $(OBJ)/sdssPicklesLibrary.o : $(PROGS)/sdssPicklesLibrary.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/sdssPicklesLibrary.o $(PROGS)/sdssPicklesLibrary.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/sdssPicklesLibrary.o $(PROGS)/sdssPicklesLibrary.cc
+
 # SIMULATE OVERDENSITY GRID
 $(EXE)/simdensity : $(OBJ)/simdensity.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -465,8 +463,8 @@ $(EXE)/simdensity : $(OBJ)/simdensity.o $(LIBO)
 
 $(OBJ)/simdensity.o : $(PROGS)/simdensity.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/simdensity.o $(PROGS)/simdensity.cc 
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/simdensity.o $(PROGS)/simdensity.cc 
+
 # SIMULATE LINE OF SIGHT ABSORBER DISTRIBUTIONS 
 $(EXE)/simulateAbsorberLinesOfSight : $(OBJ)/simulateAbsorberLinesOfSight.o $(LIBO)
 	mkdir -p $(EXE)
@@ -476,9 +474,9 @@ $(EXE)/simulateAbsorberLinesOfSight : $(OBJ)/simulateAbsorberLinesOfSight.o $(LI
 
 $(OBJ)/simulateAbsorberLinesOfSight.o : $(PROGS)/simulateAbsorberLinesOfSight.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/simulateAbsorberLinesOfSight.o \
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/simulateAbsorberLinesOfSight.o \
 	$(PROGS)/simulateAbsorberLinesOfSight.cc 
-	
+
 # SIMULATE CFHT OBSERVATIONS FROM BASE SIMULATION
 $(EXE)/simulateCFHTobs : $(OBJ)/simulateCFHTobs.o $(LIBO)
 	mkdir -p $(EXE)
@@ -488,9 +486,9 @@ $(EXE)/simulateCFHTobs : $(OBJ)/simulateCFHTobs.o $(LIBO)
 
 $(OBJ)/simulateCFHTobs.o : $(PROGS)/simulateCFHTobs.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/simulateCFHTobs.o \
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/simulateCFHTobs.o \
 	$(PROGS)/simulateCFHTobs.cc 
-	
+
 # SIMULATE LSST OBSERVATIONS FROM BASE SIMULATION
 $(EXE)/simulateLSSTobs : $(OBJ)/simulateLSSTobs.o $(LIBO)
 	mkdir -p $(EXE)
@@ -500,9 +498,9 @@ $(EXE)/simulateLSSTobs : $(OBJ)/simulateLSSTobs.o $(LIBO)
 
 $(OBJ)/simulateLSSTobs.o : $(PROGS)/simulateLSSTobs.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/simulateLSSTobs.o \
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/simulateLSSTobs.o \
 	$(PROGS)/simulateLSSTobs.cc 
-	
+
 # SIMULATE LSST OBSERVATIONS FROM INPUT IMSIM CATALOG OF TRUE MAGS AND REDSHIFTS
 $(EXE)/simulateLSSTobsFromTruth : $(OBJ)/simulateLSSTobsFromTruth.o $(LIBO)
 	mkdir -p $(EXE)
@@ -512,35 +510,37 @@ $(EXE)/simulateLSSTobsFromTruth : $(OBJ)/simulateLSSTobsFromTruth.o $(LIBO)
 
 $(OBJ)/simulateLSSTobsFromTruth.o : $(PROGS)/simulateLSSTobsFromTruth.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/simulateLSSTobsFromTruth.o \
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/simulateLSSTobsFromTruth.o \
 	$(PROGS)/simulateLSSTobsFromTruth.cc 
-	
+
 ###################### BAO PROGRAMS ############################################
 
 # ADD GAUSSIAN Z ERROR TO CATALOG
 $(EXE)/addGausszerr : $(OBJ)/addGausszerr.o $(LIBO)
 	mkdir -p $(EXE)
 	mkdir -p $(ROOTOUT)
-	$(CXXLINK) -o $(EXE)/addGausszerr $(OBJ)/addGausszerr.o $(LIBO) \
+	$(CXXLINK) -std=c++11  -o $(EXE)/addGausszerr $(OBJ)/addGausszerr.o $(LIBO) \
 	$(SOPHYAEXTSLBLIST) $(MYLIB) $(ROOTLIB)
+
 
 $(OBJ)/addGausszerr.o : $(BAOPROGS)/addGausszerr.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/addGausszerr.o \
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/addGausszerr.o \
 	$(BAOPROGS)/addGausszerr.cc 
-	
+
 # COMPUTE POWER SPECTRA
-$(EXE)/computepsfromarray : $(OBJ)/computepsfromarray.o $(LIBO)
+
+$(EXE)/computepsfromgrids : $(OBJ)/computepsfromgrids.o $(LIBO)
 	mkdir -p $(EXE)
 	mkdir -p $(ROOTOUT)
-	$(CXXLINK) -o $(EXE)/computepsfromarray $(OBJ)/computepsfromarray.o $(LIBO) \
+	$(CXXLINK) -o $(EXE)/computepsfromgrids $(OBJ)/computepsfromgrids.o $(LIBO) \
 	$(SOPHYAEXTSLBLIST) $(MYLIB) $(ROOTLIB)
 
-$(OBJ)/computepsfromarray.o : $(BAOPROGS)/computepsfromarray.cc $(LIBH)
+$(OBJ)/computepsfromgrids.o : $(BAOPROGS)/computepsfromgrids.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/computepsfromarray.o \
-	$(BAOPROGS)/computepsfromarray.cc 
-	
+	$(CXXCOMPILE) -std=c++11  -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/computepsfromgrids.o \
+	$(BAOPROGS)/computepsfromgrids.cc 
+
 # FIT K BAO
 $(EXE)/fitkbao : $(OBJ)/fitkbao.o $(LIBO)
 	mkdir -p $(EXE)
@@ -550,21 +550,33 @@ $(EXE)/fitkbao : $(OBJ)/fitkbao.o $(LIBO)
 
 $(OBJ)/fitkbao.o : $(BAOPROGS)/fitkbao.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/fitkbao.o \
+	$(CXXCOMPILE) -std=c++11  -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/fitkbao.o \
 	$(BAOPROGS)/fitkbao.cc
-	
+
+# FIT K BAO WITH BASELINE
+$(EXE)/fitkbaobaseline : $(OBJ)/fitkbaobaseline.o $(LIBO)
+	mkdir -p $(EXE)
+	mkdir -p $(ROOTOUT)
+	$(CXXLINK) -o $(EXE)/fitkbaobaseline $(OBJ)/fitkbaobaseline.o $(LIBO) \
+	$(SOPHYAEXTSLBLIST) $(MYLIB) $(ROOTLIB)
+
+$(OBJ)/fitkbaobaseline.o : $(BAOPROGS)/fitkbaobaseline.cc $(LIBH)
+	mkdir -p $(OBJ)
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/fitkbaobaseline.o \
+	$(BAOPROGS)/fitkbaobaseline.cc
+
 # CALCULATE PHOTO-Z CONVOLUTION FUNCTION
 $(EXE)/getpzconvf : $(OBJ)/getpzconvf.o $(LIBO)
 	mkdir -p $(EXE)
 	mkdir -p $(ROOTOUT)
-	$(CXXLINK) -o $(EXE)/getpzconvf $(OBJ)/getpzconvf.o $(LIBO) \
+	$(CXXLINK) -std=c++11  -o $(EXE)/getpzconvf $(OBJ)/getpzconvf.o $(LIBO) \
 	$(SOPHYAEXTSLBLIST) $(MYLIB) $(ROOTLIB)
 
 $(OBJ)/getpzconvf.o : $(BAOPROGS)/getpzconvf.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/getpzconvf.o \
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/getpzconvf.o \
 	$(BAOPROGS)/getpzconvf.cc 
-	
+
 # CALCULATE SELECTION FUNCTION OF OBSERVED CATALOG
 $(EXE)/getsf : $(OBJ)/getsf.o $(LIBO)
 	mkdir -p $(EXE)
@@ -574,9 +586,9 @@ $(EXE)/getsf : $(OBJ)/getsf.o $(LIBO)
 
 $(OBJ)/getsf.o : $(BAOPROGS)/getsf.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/getsf.o \
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/getsf.o \
 	$(BAOPROGS)/getsf.cc 
-	
+
 # GRID GALAXY DATA
 $(EXE)/grid_data : $(OBJ)/grid_data.o $(LIBO)
 	mkdir -p $(EXE)
@@ -586,9 +598,9 @@ $(EXE)/grid_data : $(OBJ)/grid_data.o $(LIBO)
 
 $(OBJ)/grid_data.o : $(BAOPROGS)/grid_data.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/grid_data.o \
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/grid_data.o \
 	$(BAOPROGS)/grid_data.cc
-	
+
 # SIMULATE RANDOM CATALOGS
 # $(EXE)/sim_mcgrids : $(OBJ)/sim_mcgrids.o $(LIBO)
 #	mkdir -p $(EXE)
@@ -600,7 +612,7 @@ $(OBJ)/grid_data.o : $(BAOPROGS)/grid_data.cc $(LIBH)
 #	mkdir -p $(OBJ)
 #	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/sim_mcgrids.o \
 #	$(BAOPROGS)/sim_mcgrids.cc
-	
+
 # GET DATA SUB GRID
 $(EXE)/subfromfull : $(OBJ)/subfromfull.o $(LIBO)
 	mkdir -p $(EXE)
@@ -610,7 +622,7 @@ $(EXE)/subfromfull : $(OBJ)/subfromfull.o $(LIBO)
 
 $(OBJ)/subfromfull.o : $(BAOPROGS)/subfromfull.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/subfromfull.o \
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/subfromfull.o \
 	$(BAOPROGS)/subfromfull.cc
 
 
@@ -638,7 +650,7 @@ $(EXE)/test2Dinterp : $(OBJ)/test2Dinterp.o $(LIBO)
 
 $(OBJ)/test2Dinterp.o : $(PROGS)/test2Dinterp.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/test2Dinterp.o $(PROGS)/test2Dinterp.cc
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/test2Dinterp.o $(PROGS)/test2Dinterp.cc
 
 # TEST BASESIM
 $(EXE)/testbasesim : $(OBJ)/testbasesim.o $(LIBO) 
@@ -649,8 +661,8 @@ $(EXE)/testbasesim : $(OBJ)/testbasesim.o $(LIBO)
 
 $(OBJ)/testbasesim.o : $(PROGS)/testbasesim.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testbasesim.o $(PROGS)/testbasesim.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testbasesim.o $(PROGS)/testbasesim.cc
+
 # TEST EXPECTATION-MAXIMIZATION ALGORITHM
 $(EXE)/testEMalgorithm : $(OBJ)/testEMalgorithm.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -660,8 +672,8 @@ $(EXE)/testEMalgorithm : $(OBJ)/testEMalgorithm.o $(LIBO)
 
 $(OBJ)/testEMalgorithm.o : $(PROGS)/testEMalgorithm.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testEMalgorithm.o $(PROGS)/testEMalgorithm.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testEMalgorithm.o $(PROGS)/testEMalgorithm.cc
+
 # TEST LSST ERRORS
 $(EXE)/testErrors : $(OBJ)/testErrors.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -671,8 +683,8 @@ $(EXE)/testErrors : $(OBJ)/testErrors.o $(LIBO)
 
 $(OBJ)/testErrors.o : $(PROGS)/testErrors.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testErrors.o $(PROGS)/testErrors.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testErrors.o $(PROGS)/testErrors.cc
+
 # TEST GOODS SIM
 $(EXE)/testgoodsmagsim : $(OBJ)/testgoodsmagsim.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -682,7 +694,7 @@ $(EXE)/testgoodsmagsim : $(OBJ)/testgoodsmagsim.o $(LIBO)
 
 $(OBJ)/testgoodsmagsim.o : $(PROGS)/testgoodsmagsim.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testgoodsmagsim.o $(PROGS)/testgoodsmagsim.cc
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testgoodsmagsim.o $(PROGS)/testgoodsmagsim.cc
 
 # TEST K CORRECTION 
 $(EXE)/testKcorrColors : $(OBJ)/testKcorrColors.o $(LIBO) 
@@ -693,8 +705,8 @@ $(EXE)/testKcorrColors : $(OBJ)/testKcorrColors.o $(LIBO)
 
 $(OBJ)/testKcorrColors.o : $(PROGS)/testKcorrColors.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testKcorrColors.o $(PROGS)/testKcorrColors.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testKcorrColors.o $(PROGS)/testKcorrColors.cc
+
 # TEST K CORRECTION INTERPOLATION
 $(EXE)/testKcorrMethod : $(OBJ)/testKcorrMethod.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -704,7 +716,7 @@ $(EXE)/testKcorrMethod : $(OBJ)/testKcorrMethod.o $(LIBO)
 
 $(OBJ)/testKcorrMethod.o : $(PROGS)/testKcorrMethod.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testKcorrMethod.o $(PROGS)/testKcorrMethod.cc
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testKcorrMethod.o $(PROGS)/testKcorrMethod.cc
 
 # TEST LF 
 $(EXE)/testLF : $(OBJ)/testLF.o $(LIBO) 
@@ -715,7 +727,7 @@ $(EXE)/testLF : $(OBJ)/testLF.o $(LIBO)
 
 $(OBJ)/testLF.o : $(PROGS)/testLF.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -o $(OBJ)/testLF.o $(PROGS)/testLF.cc 
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -o $(OBJ)/testLF.o $(PROGS)/testLF.cc 
 
 # TEST Lyman-alpha absorption calculation parts 
 $(EXE)/testLymanAlphaAbs : $(OBJ)/testLymanAlphaAbs.o $(LIBO) 
@@ -726,8 +738,8 @@ $(EXE)/testLymanAlphaAbs : $(OBJ)/testLymanAlphaAbs.o $(LIBO)
 
 $(OBJ)/testLymanAlphaAbs.o : $(PROGS)/testLymanAlphaAbs.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -o $(OBJ)/testLymanAlphaAbs.o $(PROGS)/testLymanAlphaAbs.cc 
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -o $(OBJ)/testLymanAlphaAbs.o $(PROGS)/testLymanAlphaAbs.cc 
+
 # TEST MADAU
 $(EXE)/testMadau : $(OBJ)/testMadau.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -737,8 +749,8 @@ $(EXE)/testMadau : $(OBJ)/testMadau.o $(LIBO)
 
 $(OBJ)/testMadau.o : $(PROGS)/testMadau.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testMadau.o $(PROGS)/testMadau.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testMadau.o $(PROGS)/testMadau.cc
+
 # TEST MEIKSIN
 $(EXE)/testMeiksin : $(OBJ)/testMeiksin.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -748,8 +760,8 @@ $(EXE)/testMeiksin : $(OBJ)/testMeiksin.o $(LIBO)
 
 $(OBJ)/testMeiksin.o : $(PROGS)/testMeiksin.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testMeiksin.o $(PROGS)/testMeiksin.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testMeiksin.o $(PROGS)/testMeiksin.cc
+
 # TEST SIMULATE DATA USING K CORRECTION TABLES
 $(EXE)/testSimReadKcorr : $(OBJ)/testSimReadKcorr.o $(LIBO)
 	mkdir -p $(EXE)
@@ -760,7 +772,7 @@ $(EXE)/testSimReadKcorr : $(OBJ)/testSimReadKcorr.o $(LIBO)
 
 $(OBJ)/testSimReadKcorr.o : $(PROGS)/testSimReadKcorr.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testSimReadKcorr.o $(PROGS)/testSimReadKcorr.cc 
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testSimReadKcorr.o $(PROGS)/testSimReadKcorr.cc 
 
 # TEST SIMULATE IGM
 $(EXE)/testsimulateIGM : $(OBJ)/testsimulateIGM.o $(LIBO)
@@ -772,8 +784,8 @@ $(EXE)/testsimulateIGM : $(OBJ)/testsimulateIGM.o $(LIBO)
 
 $(OBJ)/testsimulateIGM.o : $(PROGS)/testsimulateIGM.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testsimulateIGM.o $(PROGS)/testsimulateIGM.cc 
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testsimulateIGM.o $(PROGS)/testsimulateIGM.cc 
+
 # TEST SIMULATION
 $(EXE)/testSimulation : $(OBJ)/testSimulation.o $(LIBO)
 	mkdir -p $(EXE)
@@ -783,8 +795,8 @@ $(EXE)/testSimulation : $(OBJ)/testSimulation.o $(LIBO)
 
 $(OBJ)/testSimulation.o : $(PROGS)/testSimulation.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testSimulation.o $(PROGS)/testSimulation.cc
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testSimulation.o $(PROGS)/testSimulation.cc
+
 # TEST TEMPLATE FITTING
 $(EXE)/testTemplateFitting : $(OBJ)/testTemplateFitting.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -794,10 +806,8 @@ $(EXE)/testTemplateFitting : $(OBJ)/testTemplateFitting.o $(LIBO)
 
 $(OBJ)/testTemplateFitting.o : $(PROGS)/testTemplateFitting.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testTemplateFitting.o $(PROGS)/testTemplateFitting.cc
-	
-	
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testTemplateFitting.o $(PROGS)/testTemplateFitting.cc
+
 # TEMPORARY TEST CODE
 $(EXE)/test : $(OBJ)/test.o $(LIBO)
 	mkdir -p $(EXE)
@@ -807,7 +817,7 @@ $(EXE)/test : $(OBJ)/test.o $(LIBO)
 
 $(OBJ)/test.o : $(PROGS)/test.cc $(LIBH)
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/test.o $(PROGS)/test.cc
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/test.o $(PROGS)/test.cc
 
 ## programs below here have not been CHECKED or maybe even finished...
 
@@ -820,8 +830,8 @@ $(EXE)/testpsdenscube : $(OBJ)/testpsdenscube.o $(LIBO)
 
 $(OBJ)/testpsdenscube.o : $(PROGS)/testpsdenscube.cc $(LIBH)  
 	mkdir -p $(OBJ)
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testpsdenscube.o $(PROGS)/testpsdenscube.cc 
-	
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testpsdenscube.o $(PROGS)/testpsdenscube.cc 
+
 # TEST DENSITY SIMULATION
 $(EXE)/testsimdensity : $(OBJ)/testsimdensity.o $(LIBO) 
 	mkdir -p $(EXE)
@@ -832,7 +842,7 @@ $(EXE)/testsimdensity : $(OBJ)/testsimdensity.o $(LIBO)
 $(OBJ)/testsimdensity.o : $(PROGS)/testsimdensity.cc $(LIBH)  
 	mkdir -p $(OBJ)/usr/include/c++/4.6/bits/stl_vector.h:142:9: error: invalid use of incomplete type ???struct SOPHYA::FunRan???
 
-	$(CXXCOMPILE) -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testsimdensity.o $(PROGS)/testsimdensity.cc 
+	$(CXXCOMPILE) -std=c++11 -I$(MYCL) -I$(ROOTINC) -o $(OBJ)/testsimdensity.o $(PROGS)/testsimdensity.cc 
 
 ############################# UTILITIES ########################################
 
@@ -845,7 +855,7 @@ $(OBJ)/testsimdensity.o : $(PROGS)/testsimdensity.cc $(LIBH)
 $(OBJ)/%.o : $(MYCL)/%.cc $(MYCL)/%.h 
 	mkdir -p $(OBJ)
 	mkdir -p $(TESTS)
-	$(CXXCOMPILE) -I$(ROOTINC) -I$(MYCL) -o $@ $<
+	$(CXXCOMPILE) -std=c++11 -I$(ROOTINC) -I$(MYCL) -o $@ $<
 
 #$(OBJ)genefluct3df.o: $(MYCL)genefluct3d.cc $(MYCL)genefluct3d.h
 #	$(CXXCOMPILE) -I$(MYCL) -DGEN3D_FLOAT -o $@ $(MYCL)genefluct3d.cc

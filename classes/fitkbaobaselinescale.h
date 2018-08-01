@@ -217,6 +217,7 @@ protected:
 	double h_;               /**< Hubble parameter in units of 100 km/s/Mpc   */
 	double bestfitS_;         /**< best fit s                                  */
 	double bestfitA_;     /**< best fit amp (adeline)      		  */
+	double errA_;          /**< error on fit amp (adeline)      		  */
 	double bestChisq_;     /**< best fit amp (adeline)      		  */
 	double errup_;           /**< upper error range                           */
 	double errdown_;         /**< lower error range                           */

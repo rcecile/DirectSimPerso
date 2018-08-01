@@ -178,7 +178,7 @@ void PowerSpec::BlowUpCheck()
 
 
 double PowerSpec::AccumulatePowerSpectra(HProf& hp, bool pixcor, double maxk, 
-					 double Err, bool undamp, double tol_corr, Histo* hmode_, Histo* hkeepMode_, double snoise)
+					 double Err, bool undamp, double tol_corr, double snoise)
 // Compute spectrum from "four_" and fill profile histogram "hp"
 // (Defaults: Err=0, coeff = 1, bool undamp=true, pixcor=true, snoise=0);
 // Power spectrum in hp is NOT normalised
@@ -297,9 +297,6 @@ double PowerSpec::AccumulatePowerSpectra(HProf& hp, bool pixcor, double maxk,
 	 //fx = (pixcor) ? vfx(ix): 1.;
 	 double f = fx*fy*fz;
 	 
-	 if (hmode_) 
-	   hmode_->Add(kmod);
-	 
 	 if(Err_>0 && undamp_)  // if want to undamp	
 	   
 	   g = exp(-(kz*Err_)*(kz*Err_));
@@ -307,9 +304,7 @@ double PowerSpec::AccumulatePowerSpectra(HProf& hp, bool pixcor, double maxk,
 	 else g =  1.;
 	 
 	 if (kz<=maxk_)
-	   { hp.Add(kmod, pk/(f*g));  sum+=pk; nkeep++; if (hkeepMode_)   hkeepMode_->Add(kmod);
-	     //  hp_z.Add(kmod, pk_z/(f*g)); 
-	     //  hp_xy.Add(kmod, pk_xy/(f*g)); 
+	   { hp.Add(kmod, pk/(f*g));  sum+=pk; nkeep++; 
 	   }
 	 
        }// end loop over X dim
@@ -331,124 +326,28 @@ double PowerSpec::AccumulatePowerSpectra(HProf& hp, bool pixcor, double maxk,
  };
 
 
-void PowerSpec::WritePS(string fname, HProf& Pdata, r_4 Voldata, string PSimlssfile, double meandens)
-{
-	cout << "    PowerSpec::WritePS()" << " meandens" << meandens <<endl;
-	
-	// Read in SimLSS power spectra into an array
-	ifstream ifs(PSimlssfile.c_str());
-	TArray<r_8> SimLSSPSfile;
-	sa_size_t nr, nc;
-	SimLSSPSfile.ReadASCII(ifs,nr,nc);
-	int icolk=0,icols=1,icolf=2,icolv=3;
-	double Volsimlss = SimLSSPSfile(icolv,0);
-	cout << "    Volume of SimLSS cube = "<< Volsimlss <<endl;
-  	cout << "    Read in SimLSS power spectra, file has "<< nr <<" rows and ";
-  	cout << nc <<" columns"<<endl;
-	cout << "    SimLSSPSfile array has "<< SimLSSPSfile.SizeX();
-	cout <<" rows and "<< SimLSSPSfile.SizeY() <<" columns"<<endl;
-	
-	// Make an interpolation table
-	vector<double> kvals,pvals1,pvals2;
-	for(int kk=0; kk<nr; kk++) {
-		
-		double kv=SimLSSPSfile(icolk,kk);
-		double p1=SimLSSPSfile(icols,kk);
-		double p2=SimLSSPSfile(icolf,kk);
-		kvals.push_back(kv);
-		pvals1.push_back(p1);
-		pvals2.push_back(p2);
-		//cout << kvals[kk] << "  "<< pvals1[kk] << "  "<< pvals2[kk] <<endl;
-		}
-	double kmin=kvals[0],kmax=kvals[nr-1];
-	cout <<"    K range is "<< kmin <<"<k<"<< kmax <<endl;
-	
-	
-	int_8 nk=1000000;
-	SInterp1D simlss,simlssf; 
-	simlss.DefinePoints(kvals,pvals1,kmin,kmax,nk);
-	cout << "define point s OK "<< endl;
-	simlssf.DefinePoints(kvals,pvals2,kmin,kmax,nk);
-	
-	cout << endl;
-	
-	// Data power spectrum
-	Histo Pdatah=Pdata.GetHisto();
-	// number of k bins	
-	int_4 nbk=Pdatah.NBins();
-	cout << "    Number of bins in data power spectrum = "<< nbk <<endl;
-
-	//read histogram values into a file
-	ifstream inp;
-	ofstream outp;
-	inp.open(fname.c_str(), ifstream::in);
-	inp.close();
-	if(inp.fail()) {
-		
-		inp.clear(ios::failbit);
-		cout << "Writing to file ..." << fname.c_str() <<endl<<endl<<endl;
-		outp.open(fname.c_str(), ofstream::out);
-		outp << "# Volume of data = "<< Voldata <<", Volume of SimLSS = ";
-		outp << Volsimlss <<", mean density of fudged simlss grid = "<< meandens <<endl;
-		outp << "# Nx,Ny,Nz,R(Mpc),zc = "<< Nx_ <<","<< Ny_ <<","<< Nz_ <<",";
-		outp << Dx_ <<","<< zc_ <<endl;
-		for(int_4 i=0;i<nbk;i++) {
-			
-			r_8 kv = Pdatah.BinCenter(i);
-			r_8 Praw = Pdatah.operator()(i);
-			r_8 Pslss = simlss(kv);
-			r_8 Pslssf = simlssf(kv);
-
-			r_8 Pnorm_uncorr = Praw*Voldata*(1+meandens)*(1+meandens);
-			r_8 Pnorm = Pnorm_uncorr*(Pslss/Pslssf);
-
-			outp << kv <<"    "<< Pnorm <<"    "<< Pnorm_uncorr <<"    ";
-			outp << Praw*Voldata <<"    "<< Pslss*Volsimlss <<"    ";
-			outp << Pslssf*Volsimlss <<endl;
-			}
-		outp.close();
-		}
-	else
-	    cout << "Error...file """ << fname.c_str() << """ exists" << endl;
-
-	cout << "    EXIT PowerSpec::WritePS()"<<endl;
-};
-
-
 void PowerSpec::WritePS(string fname, HProf& Pdata, r_4 Voldata, HProf& PSimlss, 
 			HProf& PSimlssf, r_4 Volsimlss, HProf& Pdata_noise, 
-			double meandens, double nGalGrid, Histo* hmode_, Histo* hkeepMode_)
-// Writes 4 power spectra to a text file
+			double meandens, double nGalGrid)
+// Writes power spectra to a text file
 // the format is:
-// [k values] [normalised galaxy PS] [normalised-uncorrected galaxy PS] 
-// [raw galaxy PS] [simlss PS] [simlss PS after setting delta<-1 ->-1]
-// To get undistorted galaxy power spectrum P_g(k) [normalised galaxy PS]:
-// P_g(k) = P(k)*VolCat*f(k)/(1+meandens)^2
-// where f(k) is found by dividing the SimLSS PS by the SimLSS PS when delta<-1 ->-1.
-// Additional corrections will need to be made for shot noise, photo-z errors
+// [k values] 
+// [normalised galaxy PS] 
+// [simlss PS / simlss PS after setting delta<-1 ->-1] (not used, for check, should be very close to the normalization factor)
+// [normalized shot-noise PS] 
+// [error on normalised galaxy PS] 
 {
 	cout << "    PowerSpec::WritePS()" << " meandens "<< meandens  <<endl;
 	Histo Pdatah=Pdata.GetHisto();
-	//	Histo Pdatah_z=Pdata_z.GetHisto();
-	//	Histo Pdatah_xy=Pdata_xy.GetHisto();
 
 	Histo PSimlssh =PSimlss.GetHisto();
 	Histo PSimlssfh=PSimlssf.GetHisto();
 	
 	Histo Pnoiseh=Pdata_noise.GetHisto();
-	//	Histo Pnoiseh_z=Pdata_noise_z.GetHisto();
-	//	Histo Pnoiseh_xy=Pdata_noise_xy.GetHisto();
 	
-	Histo& hmode = (*hmode_);
-  	Histo& hkeepMode = (*hkeepMode_);
-  	
 	Histo fracmodok;
 
 	cout <<"check Nbins : " << Pdatah.NBins() <<endl;
-	if((hmode_!=NULL) && (hkeepMode_!=NULL)){
-	   fracmodok = hkeepMode/hmode;
-	   cout << " " << hmode.NBins() << " " << hkeepMode.NBins() <<endl;
-	}
 	
 	// number of k bins	
 	int_4 nbk=Pdatah.NBins();
@@ -474,7 +373,6 @@ void PowerSpec::WritePS(string fname, HProf& Pdata, r_4 Voldata, HProf& PSimlss,
 		outp.open(fname.c_str(), ofstream::out);
 		
 		outp << "# Volume of data = "<< Voldata <<", Volume of SimLSS = "<< Volsimlss;
-		//modif Adeline write also ngalGrid,  hmode_,and hkeepMode_ (number of total mode and kept mode (if GaussError)
 		outp << ", number of galaxies in weight grid = " << nGalGrid <<endl;
 		outp << "# Nx,Ny,Nz,R(Mpc),zc = "<< Nx_ <<","<< Ny_ <<","<< Nz_ <<",";
 		outp << Dx_ <<","<< zc_ <<endl;
@@ -483,34 +381,29 @@ void PowerSpec::WritePS(string fname, HProf& Pdata, r_4 Voldata, HProf& PSimlss,
 	
 		for(int_4 i=0;i<nbk;i++) {
 		
-			r_8 kvals=Pdatah.BinCenter(i);
-			r_8 Praw=Pdatah.operator()(i);
+			r_8 kvals = Pdatah.BinCenter(i);
 
-			r_8 kv2= PSimlssh.BinCenter(i);
-			r_8 Pslss= PSimlssh.operator()(i);
-			r_8 kv3=PSimlssfh.BinCenter(i);
-			r_8 Pslssf=PSimlssfh.operator()(i);
+			r_8 kv2   = PSimlssh.BinCenter(i);
+			r_8 Pslss = PSimlssh.operator()(i);
+			r_8 kv3   = PSimlssfh.BinCenter(i);
+			r_8 Pslssf= PSimlssfh.operator()(i);
 
 			if(abs(kvals-kv2)>eps||abs(kvals-kv3)>eps)
 				throw ParmError("ERROR! k bins are different between data and SimLSS");
-
-			r_8 Pnorm = Praw*Voldata;
-			r_8 Prap = Pslss/Pslssf;
 			
-			r_8 kv4=Pnoiseh.BinCenter(i);
+			r_8 kv4 = Pnoiseh.BinCenter(i);
 			if(abs(kvals-kv4)>eps)
 				throw ParmError("ERROR! k bins are different between data and shot-noise");
 
-			r_8 Pnoise = Pnoiseh.operator()(i) *Voldata;
-		
-			r_8 sigmaP  = (Pnorm) / kvals * sigma_factor;
- 
+			r_8 Pnorm  = Pdatah.operator()(i)  * Voldata;
+			r_8 Prap   = Pslss/Pslssf;
+			r_8 Pnoise = Pnoiseh.operator()(i) * Voldata;		
+			r_8 sigmaP = Pnorm / kvals * sigma_factor;
 			
-			outp << kvals <<"    \t"<< Pnorm <<"    \t" << Prap <<"    \t";
-			outp << Pnoise <<"    \t" << sigmaP << endl;
-			}
-		outp.close();
+			outp << kvals <<"   \t"<< Pnorm <<"   \t" << Prap <<"   \t" << Pnoise <<"   \t" << sigmaP << endl;
 		}
+		outp.close();
+	}
 	else
 	  cout << "Error...file """ << fname.c_str() << """ exists" << endl;
 

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <math.h>
+#include <getopt.h>
 
 #include <typeinfo>
 #include "timing.h"

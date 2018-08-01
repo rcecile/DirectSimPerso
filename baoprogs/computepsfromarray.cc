@@ -136,8 +136,6 @@ int main(int narg, char* arg[]) {
 	// Set defaults etc ....
 	// FILES TO READ IN/OUT
 	string infile, overdensityfile, outfileroot, subinfo;
-	// HOW TO COMPUTE SIMLSS POWER SPECTRUM
-	bool computeOvDensityPS = false; // default don't compute, read from file
 	// CATALOG-TYPE AND REDSHIFT-TYPE PARAMETERS
 	double photoZerror = 0;		// Photo-z error size is 0
 	// IF HAVE PHOTO-Z ERR>0 PARAMETERS
@@ -213,26 +211,7 @@ int main(int narg, char* arg[]) {
 	}
 
 
-    // process whether reading in or computing over-density power spectrum
-	int nc = 4; // 4 characters 
-	int lf = overdensityfile.size(); // length of the filename
-	string endf; // last 4 characters of overdensityfile
-	for (int i=0;i<nc; i++) {
-		int val=lf-nc+i;
-		endf.push_back(overdensityfile[val]);
-		}
-	string textfile=".txt";
-	string fitsfile="fits";
-
-	if ( strcmp(textfile.c_str(),endf.c_str())!=0 ) // if strings are not the same
-		computeOvDensityPS = true; 		// will be reading it from a file
-	else if ( strcmp(fitsfile.c_str(),endf.c_str())!=0 )
-		computeOvDensityPS = false;
-	else 
-		throw ParmError("SimLSS file is of unknown file type: not fits or .txt");
-	cout << textfile.c_str() <<"  "<< endf.c_str() << " " <<  strcmp(textfile.c_str(),endf.c_str()) << " "<< strcmp(fitsfile.c_str(),endf.c_str()) << endl ;
-
-
+ 
 	// Command line argument printing
 	cout << "     Printing command line arguments ... "<<endl;
 	cout << "     Galaxy sub-array file is "<< infile <<endl;
@@ -250,11 +229,7 @@ int main(int narg, char* arg[]) {
 		cout << "     Pixel correction is ON"<<endl;
 	else
 		cout << "     Pixel correction is OFF"<<endl;
-	if (computeOvDensityPS) {
-		cout << "     Reading simulated over-density grid from file "<< overdensityfile <<endl;
-		}
-	else
-		cout << "     Reading over-density power spectrum from file "<< overdensityfile <<endl;
+	cout << "     Reading simulated over-density grid from file "<< overdensityfile <<endl;
 	cout << "     Galaxy power spectrum will be output to "<< outfileroot <<endl;
 	cout << endl;
 
@@ -342,9 +317,6 @@ int main(int narg, char* arg[]) {
 	  HProf histogram_random_z(kmin, kmax, nbin);
 	  HProf histogram_weighted_xy(kmin, kmax, nbin);
 	  HProf histogram_random_xy(kmin, kmax, nbin);
-	  //modif Adeline : count nuber of mode
-	  Histo* hmode_ = new Histo(kmin, kmax, nbin);
-	  Histo* hkeepMode_ = new Histo(kmin, kmax, nbin);
 	  HProf hp(kmin, kmax, nbin);
 	  HProf hpf(kmin, kmax, nbin);
 	  HProf hp_z(kmin, kmax, nbin);
@@ -384,7 +356,7 @@ int main(int narg, char* arg[]) {
 	      MeanSigma(wrgals, meangr, siggr);
 	      cout << "    Input random galaxy grid: Mean="<< meangr <<", Sigma="<< siggr <<endl;
 	      double MeanNgBar;
-	      MeanNgBar = meangr;// / NormNgalMean ;
+	      MeanNgBar = meangr / NormNgalMean ;
 	      wrgals -= MeanNgBar ;
 	      wrgals /= MeanNgBar ;
 
@@ -396,7 +368,7 @@ int main(int narg, char* arg[]) {
 	      
 	      cout << "AccumulatePowerSpectra for random grid with maxk_in_calc="<<maxk_in_calc<<" tol_corr="<<tol_corr<<endl;
 	      sum_FourierCoeffs = powerSpectrum_random.AccumulatePowerSpectra(histogram_random, 
-									      doPixCorr, maxk_in_calc, photoZerrorMpc, doUnDamp);
+									      doPixCorr, maxk_in_calc, photoZerrorMpc, doUnDamp, tol_corr);
 	      
 	      cout <<"     Check: sum of Fourier coefficients = "<< sum_FourierCoeffs <<endl;
 	      cout <<"            variance of real space field / 2 = "<< siggr*siggr/2 <<endl;
@@ -404,197 +376,177 @@ int main(int narg, char* arg[]) {
 	    cout << endl;
 	  	  
 	    cout << "_____________________________________________________________________________________"<< endl;
-	  }  
+	  }
 	  // read wngals ///////////////////////////////////////////////////////////////////////////
 	  
 	  for (int igd=0; igd< Ngrids;igd ++) {
+	    
+	    fin.MoveAbsToHDU (igd+1);
+	    TArray<r_8> wngals;
+	    fin >> wngals; // in the case where there is no selection effects on the galaxy catalog: ngals=wngals	  
+	    
+	    // Read data from file header
+	    sa_size_t nx = wngals.SizeX(); 
+	    sa_size_t ny = wngals.SizeY(); 
+	    sa_size_t nz = wngals.SizeZ(); 
+	    
+	    
+	    if(!isMeanDensitySpec)
+	      meandens=atof(fin.KeyValue("MeanOverDensity").c_str());
+	    cout << "    Size of sub-array Nx,Ny,Nz = "<< nx <<","<< ny <<","<< nz;
+	    cout <<", resolution = "<< grid_res;
+	    cout <<" Mpc, mean density of distorted overdensity grid = "<< meandens <<endl;
+	    cout <<" number of galaxies in grid = "<< nGalGrid << endl;
+	    
+	    RandomGenerator rg; // need this for cat2grid
+	    
+	    // Calculate photo-z error if needed
+	    if (photoZerror>0) {
+	      cout << "     Calculate comoving photo-z error:"<<endl;
+	      photoZerrorMpc = ZErr2CoDistErr(su,photoZerror,z_center); 
+	      cout <<"    Redshift of array center = "<< z_center <<", photo-z error (redshift or Zaxis) = ";
+	      cout << photoZerror <<", photo-z co-distance error = "<< photoZerrorMpc;
+	      cout <<" Mpc"<<endl;
+	      cout <<endl;
+	    }
 
+	    // grid of galaxies nG is replaced by (nG - <nG>)/<nG> whith <nG> corrected for cells set to 0 by NormNgalMean
+	    MeanSigma(wngals, meangw, siggw);
+	    cout << "    Input weighted galaxy grid: Mean="<< meangw <<", Sigma="<< siggw <<endl;
+	    double MeanNgBar;
+	    MeanNgBar = meangw / NormNgalMean ;
+	    wngals -= MeanNgBar ;
+	    wngals /= MeanNgBar ;
+	    
+	    MeanSigma(wngals, meangw, siggw);
+	    cout << "   Normalized weighted galaxy grid: Mean="<< meangw <<", Sigma="<< siggw <<endl;
+	    cout << endl;
+	    
+	    volcat = wngals.SizeX()*wngals.SizeY()*wngals.SizeZ()*pow(grid_res,3); 
+	    cout <<"    Grid volume = "<< volcat <<endl<<endl; 
+	    
+	    // over-density grid read in - compute its power spectrum
+	    
+	    cout << "     Compute over-density power spectra "<<endl;
+	    cout << "     i) with unmodified density distribution "<<endl;
+	    cout << "    ii) when grid cells of delta<-1 were set to delta=-1"<<endl;
+	    
+	    cout << "     Reading over-density file " << overdensityfile << endl<<endl;  
+	    FitsInOutFile fsin(overdensityfile, FitsInOutFile::Fits_RO);
+	    TArray<r_8> drho; 
+	    fsin >> drho; // delta distribution
+	      
+	    cout << " test drho.size() "<< drho.SizeX()  <<endl;
+	    double min, max;
+	    drho.MinMax(min, max);
+	    cout <<"     min = "<< min <<", max = "<< max <<endl;	    
+	    
+	    int xplanes=1;
+	    Mass2Gal m2g(drho, su, rg, xplanes);
+	    cout << endl;
+	    m2g.ReadHeader(fsin);
+	    // double zc = m2g.ReturnZref();
+	    cout << endl;
+	    TArray<r_8> dens, densf;
+	    
+	    cout <<"     Read out density distribution ... "<<endl;
+	    m2g.MassArray(dens);
+	    cout << endl;
+	    
+	    cout <<"     Zero size of original over-density array read in"<<endl;
+	    drho.ZeroSize();
+	    cout << endl;
+	      
+	    cout <<"     Get new array with grid cells of delta<-1 were set to delta=-1"<<endl;
+	    cout <<"     Mean and Sigma of density fluctuations BEFORE ..."<<endl;
+	    double meanm, sigm;
+	    MeanSigma(dens, meanm, sigm);
+	    cout <<"    Mean="<< meanm <<", Sigma="<< sigm <<", Variance="<< sigm*sigm <<endl;
+	    m2g.CleanNegativeMassCells();	      
+	    cout <<"     Read out distorted density distribution ... "<<endl;
+	    m2g.MassArray(densf);    
+	    volsim = m2g.ReturnCubeVol();
+	    
+	    cout << endl;
+	    
+	    cout <<"     Mean and Sigma of density fluctuations AFTER ..."<<endl;
+	    double meanmf, sigmf;
+	    MeanSigma(densf, meanmf, sigmf);
+	    cout <<"     Mean="<< meanmf <<", Sigma="<< sigmf <<", Variance="<< sigmf*sigmf <<endl;
+	    
+	    
+	    if ( (meanmf-1)!=meandens ) {
+	      cout <<"     mean of fudged density cube (="<< meanmf-1 <<")";
+	      cout <<" not equal to stored mean of fudge density cube";
+	      cout <<" (="<< meandens <<")"<<endl;
+	      cout <<"     probably because mean was never stored in the first";
+	      cout <<" place (likely if 2nd value above is 0)"<<endl;
+	      if (meandens==0)
+		meandens=meanmf-1;
+	      cout <<"     Mean density using to correct power spectrum = ";
+	      cout << meandens <<endl;
+	    }
+	    cout <<endl;
+	    
+	    res.Update();
+	    cout << " Memory size (KB):" << res.getMemorySize() << endl;
+	    cout << " Resource usage info : \n" << res << endl;
+	    
+	    cout <<"     Zero size of arrays"<<endl;
+	    m2g.ZeroSizeMassArrays();
+	    
+	    cout <<"     Computing overdensity power spectra"<<endl<<endl;
+	    double Dx = m2g.ReturnDX(); double Dy=m2g.ReturnDY(); double Dz=m2g.ReturnDZ();
+	    if(Dx-Dy>0||Dz-Dy>0) cout <<"   CAREFUL! Pixels are not cuboid"<<endl;
+	    
+	    
+	    cout <<"     Power spectrum defined using:"<<endl;
+	    cout <<"     kmin="<< kmin <<", kmax="<< kmax <<", nbin="<< nbin <<endl;
+	    
 	    {
-	      fin.MoveAbsToHDU (igd+1);
-	      TArray<r_8> wngals;
-	      fin >> wngals; // in the case where there is no selection effects on the galaxy catalog: ngals=wngals	  
-	    
-	      // Read data from file header
-	      sa_size_t nx = wngals.SizeX(); 
-	      sa_size_t ny = wngals.SizeY(); 
-	      sa_size_t nz = wngals.SizeZ(); 
-	    
-
-	      if(!isMeanDensitySpec)
-		meandens=atof(fin.KeyValue("MeanOverDensity").c_str());
-	      cout << "    Size of sub-array Nx,Ny,Nz = "<< nx <<","<< ny <<","<< nz;
-	      cout <<", resolution = "<< grid_res;
-	      cout <<" Mpc, mean density of distorted overdensity grid = "<< meandens <<endl;
-	      cout <<" number of galaxies in grid = "<< nGalGrid << endl;
-	      
-	      RandomGenerator rg; // need this for cat2grid
-	      
-	      // Calculate photo-z error if needed
-	      if (photoZerror>0) {
-		cout << "     Calculate comoving photo-z error:"<<endl;
-		//su.SetEmissionRedShift(z_center);
-		//Reza-DEL	photoZerrorMpc = su.ZErr2CoDistErr(photoZerror);
-		photoZerrorMpc = ZErr2CoDistErr(su,photoZerror,z_center);  // Changed by Reza, 08/07/2014, then Cecile 30/04/15
-		cout <<"    Redshift of array center = "<< z_center <<", photo-z error (redshift or Zaxis) = ";
-		cout << photoZerror <<", photo-z co-distance error = "<< photoZerrorMpc;
-		cout <<" Mpc"<<endl;
-		cout <<endl;
-	      }
-	      
-	      // grid of galaxies nG is replaced by (nG - <nG>)/<nG> whith <nG> corrected for cells set to 0 by NormNgalMean
-	      MeanSigma(wngals, meangw, siggw);
-	      cout << "    Input weighted galaxy grid: Mean="<< meangw <<", Sigma="<< siggw <<endl;
-	      double MeanNgBar;
-	      MeanNgBar = meangw / NormNgalMean ;
-	      wngals -= MeanNgBar ;
-	      wngals /= MeanNgBar ;
-
-	      MeanSigma(wngals, meangw, siggw);
-	      cout << "   Normalized weighted galaxy grid: Mean="<< meangw <<", Sigma="<< siggw <<endl;
-	      cout << endl;
-	      
-	      volcat = wngals.SizeX()*wngals.SizeY()*wngals.SizeZ()*pow(grid_res,3); 
-	      cout <<"    Grid volume = "<< volcat <<endl<<endl; 
-	      
-	      // If over-density grid read in - compute its power spectrum
-	      if (computeOvDensityPS) {
-		
-		cout << "     Compute over-density power spectra "<<endl;
-		cout << "     i) with unmodified density distribution "<<endl;
-		cout << "    ii) when grid cells of delta<-1 were set to delta=-1"<<endl;
-		
-		
-		cout << "     Reading over-density file " << overdensityfile << endl<<endl;  
-		FitsInOutFile fsin(overdensityfile, FitsInOutFile::Fits_RO);
-		TArray<r_8> drho; 
-		fsin >> drho; // delta distribution
-		
-		
-		cout << " test drho.size() "<< drho.SizeX()  <<endl;
-		double min, max;
-		drho.MinMax(min, max);
-		cout <<"     min = "<< min <<", max = "<< max <<endl;	    
-		
-		int xplanes=1;
-		Mass2Gal m2g(drho, su, rg, xplanes);
-		cout << endl;
-		m2g.ReadHeader(fsin);
-		// double zc = m2g.ReturnZref();
-		cout << endl;
-		TArray<r_8> dens, densf;
-		
-		cout <<"     Read out density distribution ... "<<endl;
-		m2g.MassArray(dens);
-		cout << endl;
-		
-		cout <<"     Zero size of original over-density array read in"<<endl;
-		drho.ZeroSize();
-		cout << endl;
-		
-		
-		cout <<"     Get new array with grid cells of delta<-1 were set to delta=-1"<<endl;
-		cout <<"     Mean and Sigma of density fluctuations BEFORE ..."<<endl;
-		double meanm, sigm;
-		MeanSigma(dens, meanm, sigm);
-		cout <<"    Mean="<< meanm <<", Sigma="<< sigm <<", Variance="<< sigm*sigm <<endl;
-		m2g.CleanNegativeMassCells();	      
-		cout <<"     Read out distorted density distribution ... "<<endl;
-		m2g.MassArray(densf);    
-		volsim = m2g.ReturnCubeVol();
-		
-		cout << endl;
-		
-		cout <<"     Mean and Sigma of density fluctuations AFTER ..."<<endl;
-		double meanmf, sigmf;
-		MeanSigma(densf, meanmf, sigmf);
-		cout <<"     Mean="<< meanmf <<", Sigma="<< sigmf <<", Variance="<< sigmf*sigmf <<endl;
-		
-		
-		if ( (meanmf-1)!=meandens ) {
-		  cout <<"     mean of fudged density cube (="<< meanmf-1 <<")";
-		  cout <<" not equal to stored mean of fudge density cube";
-		  cout <<" (="<< meandens <<")"<<endl;
-		  cout <<"     probably because mean was never stored in the first";
-		  cout <<" place (likely if 2nd value above is 0)"<<endl;
-		  if (meandens==0)
-		    meandens=meanmf-1;
-		  cout <<"     Mean density using to correct power spectrum = ";
-		  cout << meandens <<endl;
-		}
-		cout <<endl;
-		
-		res.Update();
-		cout << " Memory size (KB):" << res.getMemorySize() << endl;
-		cout << " Resource usage info : \n" << res << endl;
-		
-		cout <<"     Zero size of arrays"<<endl;
-		m2g.ZeroSizeMassArrays();
-		
-		cout <<"     Computing overdensity power spectra"<<endl<<endl;
-		double Dx = m2g.ReturnDX(); double Dy=m2g.ReturnDY(); double Dz=m2g.ReturnDZ();
-		if(Dx-Dy>0||Dz-Dy>0) cout <<"   CAREFUL! Pixels are not cuboid"<<endl;
-		
-		
-		cout <<"     Power spectrum defined using:"<<endl;
-		cout <<"     kmin="<< kmin <<", kmax="<< kmax <<", nbin="<< nbin <<endl;
-		
-		{
-		  PowerSpec powerSpectrum_overdensity(dens,Dx,Dy,Dz,ratio_AngDiam);
-		  sum_FourierCoeffs = powerSpectrum_overdensity.AccumulatePowerSpectra(hp,doPixCorr);
-		  cout <<"     Check: sum of Fourier coefficients = "<< sum_FourierCoeffs <<endl;
-		  cout <<"            variance of real space field / 2 = "<< sigm*sigm/2 <<endl;
-		}
-		{
-		  PowerSpec powerSpectrum_overdensityf(densf,Dx,Dy,Dz,ratio_AngDiam);
-		  sum_FourierCoeffs = powerSpectrum_overdensityf.AccumulatePowerSpectra(hpf, doPixCorr);
-		  cout <<"     Check: sum of Fourier coefficients = "<< sum_FourierCoeffs <<endl;
-		  cout <<"            variance of real space field / 2 = "<< sigmf*sigmf/2 <<endl;
-		}
-	      }
-	      
-	      cout <<"     Overdensity cube volume="<< volsim <<" Mpc";
-	      cout <<", survey volume="<< volcat <<" Mpc"<<endl<<endl;
-	      
-	      // Compute power spectrum
-	      cout <<"     Compute power spectrum of gridded galaxy data "<<endl;
-	      
-	      PowerSpec powerSpectrum_weighted(wngals,grid_res,ratio_AngDiam); // does FT in constructor
-	      powerSpectrum_weighted.Setzc(z_center);
-	      
-	      cout << "AccumulatePowerSpectra for weighted gal-grid with maxk_in_calc="<<maxk_in_calc;
-	      cout <<" tol_corr="<<tol_corr<<endl;
-	      sum_FourierCoeffs = 
-		powerSpectrum_weighted.AccumulatePowerSpectra(histogram_weighted, 
-							      doPixCorr, maxk_in_calc, photoZerrorMpc, doUnDamp, tol_corr, hmode_, hkeepMode_);
-	      
+	      PowerSpec powerSpectrum_overdensity(dens,Dx,Dy,Dz,ratio_AngDiam);
+	      sum_FourierCoeffs = powerSpectrum_overdensity.AccumulatePowerSpectra(hp,doPixCorr);
 	      cout <<"     Check: sum of Fourier coefficients = "<< sum_FourierCoeffs <<endl;
-	      cout <<"            variance of real space field / 2 = "<< siggw*siggw/2 <<endl;
+	      cout <<"            variance of real space field / 2 = "<< sigm*sigm/2 <<endl;
+	    }
+	    {
+	      PowerSpec powerSpectrum_overdensityf(densf,Dx,Dy,Dz,ratio_AngDiam);
+	      sum_FourierCoeffs = powerSpectrum_overdensityf.AccumulatePowerSpectra(hpf, doPixCorr);
+	      cout <<"     Check: sum of Fourier coefficients = "<< sum_FourierCoeffs <<endl;
+	      cout <<"            variance of real space field / 2 = "<< sigmf*sigmf/2 <<endl;
+	    }
+	    
+	    
+	    cout <<"     Overdensity cube volume="<< volsim <<" Mpc";
+	    cout <<", survey volume="<< volcat <<" Mpc"<<endl<<endl;
+	    
+	    // Compute power spectrum
+	    cout <<"     Compute power spectrum of gridded galaxy data "<<endl;
+	    
+	    PowerSpec powerSpectrum_weighted(wngals,grid_res,ratio_AngDiam); // does FT in constructor
+	    powerSpectrum_weighted.Setzc(z_center);
+	    
+	    cout << "AccumulatePowerSpectra for weighted gal-grid with maxk_in_calc="<<maxk_in_calc <<" tol_corr="<<tol_corr<<endl;
+	    sum_FourierCoeffs = 
+	      powerSpectrum_weighted.AccumulatePowerSpectra(histogram_weighted, 
+							    doPixCorr, maxk_in_calc, photoZerrorMpc, doUnDamp, tol_corr);
+	    
+	    cout <<"     Check: sum of Fourier coefficients = "<< sum_FourierCoeffs <<endl;
+	    cout <<"            variance of real space field / 2 = "<< siggw*siggw/2 <<endl;
 	      
-	      /*if (photoZerrorMpc>0) {
-		cout <<"     If throwing out some modes the above will NOT be equal"<<endl;
-		cout <<"     max k_radial = "<< maxk_in_calc <<", kmax = "<< kmax <<endl;
-		if ( (coeff/photoZerrorMpc) < kmax)
-		cout <<"    Will throw out k_radial > "<< coeff/photoZerrorMpc <<endl;
-		}*/
-	      
-	      // Write out power spectrum
-	      // Write out shot noise power spectrum not done anymore as main information in coloumn 6 of _wngal file
-	      string sigd = static_cast<ostringstream*>( &(ostringstream() << igd) )->str();
-	      outfile = outfileroot + "_G"+ sigd + "_wngal.txt";
-	      //modif Adeline : add nGalGrid, hmode_ and  hkeepMode_ in outputfile
-	      //modif Cecile  : add shot noise and sigma in outputfile
-	      if(computeOvDensityPS)
-		powerSpectrum_weighted.WritePS(outfile,histogram_weighted, 
-					       volcat,hp,hpf,volsim, histogram_random, meandens, nGalGrid, hmode_, hkeepMode_);
-	      else
-		powerSpectrum_weighted.WritePS(outfile,histogram_weighted,volcat,overdensityfile,meandens);
-	    }	  
+	    // Write out power spectrum
+	    // Write out shot noise power spectrum not done anymore as main information in coloumn 6 of _wngal file
+	    string sigd = static_cast<ostringstream*>( &(ostringstream() << igd) )->str();
+	    outfile = outfileroot + "_G"+ sigd + "_wngal.txt";
+	    
+	    powerSpectrum_weighted.WritePS(outfile,histogram_weighted, 
+					   volcat,hp,hpf,volsim, histogram_random, meandens, nGalGrid);
 	    cout << "_____________________________________________________________________________________"<< endl;
 	  }
-
-	}  // End of try bloc 
+	   
+	} // End of try bloc 
 	
-  
+	
 	catch (PThrowable & exc) {  // catching SOPHYA exceptions
 	  cerr << " computepsfromarray.cc: Catched Exception (PThrowable)" << (string)typeid(exc).name() 
 	       << "\n...exc.Msg= " << exc.Msg() << endl;

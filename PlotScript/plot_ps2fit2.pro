@@ -7,8 +7,8 @@ h= 0.679
 h3 = h*h*h
 
 loadct,12
-restore,'temp_ascii.sav'        ; contient dir
-dir="/sps/lsst/data/rcecile/Planck_BAO_PS/"
+restore,'temp_ascii_new.sav'        ; contient dir
+dir="/sps/lsst/data/rcecile/Planck_BAO2_PS/"
 
 
 nsuff=['','_errP','_errPBDT8']
@@ -24,9 +24,12 @@ nx= ['_120','_225', '_320']
 
 
 kmax = intarr(n_elements(namez), n_elements(nsuff))
-kmax[*,0] = [20,18,14]
-kmax[*,1] = [18,16,10]
-kmax[*,2] = [16,16,10]
+kmax[*,0] = [20,20,20] ; spectr0 : 0.20
+kmax[0,*] = [20,20,20] ; z=0.5 : 0.20 qqs erreur
+kmax[1,1:*] = [16,16]  ; z=0.9 avec erreur : 0.16
+kmax[2,1:*] = [10,10]  ; z=1.5 avec erreur : 0.10
+
+
 lkmax = kmax/100.
 skmax = strarr(n_elements(namez), n_elements(nsuff))
 for i=0,n_elements(namez)-1 do for j=0,n_elements(nsuff)-1 do $
@@ -62,8 +65,8 @@ for iz=0,2 do begin
 for ierr=0,2 do begin
    
    mysuff = nsuff[ierr]
-   t  =  dir + 'PS_2fit_SN_Ref'+nx[iz]+'_z'+namez[iz]+mysuff+'_wngal.txt'
-   pcorr = read_ascii(t, template =  TEMP_2FIT)     
+   t  =  dir + 'PS_superSN5'+nx[iz]+'_z'+namez[iz]+mysuff+'_wngal.txt'
+   pcorr = read_ascii(t, template = TEMP_POW_SPEC_4col)     
    xs = pcorr.(0)
    okk = where(xs ge 0.02 and xs le kmax[iz,ierr]/100.)
                             ; spectre th??orique no osc, no error

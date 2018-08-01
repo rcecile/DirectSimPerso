@@ -6,6 +6,7 @@
 #include <string>
 #include <math.h>
 #include <typeinfo>
+#include <getopt.h>
 
 #include "timing.h"
 #include "array.h"

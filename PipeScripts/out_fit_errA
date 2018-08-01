@@ -1,0 +1,1573 @@
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_wngal.txt -k 0.020.20 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.2
+-------------------------------------------------------------------------
+Fit res  A = 2.09495 +/- 0.128037(so detection at 16.3621 sigma ;     s = 149.548 +/- 0.619221       Chi2 = 0.851987
+ sVals = 148.342
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_err0.03_wngal.txt -k 0.020.20 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_err0.03
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.2
+-------------------------------------------------------------------------
+Fit res  A = 1.83215 +/- 0.231055(so detection at 7.92951 sigma ;     s = 154.44 +/- 1.65194       Chi2 = 1.32032
+ sVals = 166.131
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_err0.03_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_err0.03_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_err0.03_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_err0.03_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_err0.03_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_err0.03_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_err0.03_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errP_wngal.txt -k 0.020.20 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errP
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.2
+-------------------------------------------------------------------------
+Fit res  A = 1.83429 +/- 0.226878(so detection at 8.0849 sigma ;     s = 150.797 +/- 1.6125       Chi2 = 1.43926
+ sVals = 178.191
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errP_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errP_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errP_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errP_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errP_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errP_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errP_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT9_wngal.txt -k 0.020.20 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT9
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.2
+-------------------------------------------------------------------------
+Fit res  A = 1.94258 +/- 0.235613(so detection at 8.24478 sigma ;     s = 154.406 +/- 1.60665       Chi2 = 1.01901
+ sVals = 153.769
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT9_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT9_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT9_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT9_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT9_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT9_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT9_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT8_wngal.txt -k 0.020.20 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT8
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.2
+-------------------------------------------------------------------------
+Fit res  A = 1.90765 +/- 0.248591(so detection at 7.67384 sigma ;     s = 150.991 +/- 1.75967       Chi2 = 1.26289
+ sVals = 171.558
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT8_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT8_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT8_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT8_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT8_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT8_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.20_300_z1.3_errPBDT8_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_wngal.txt -k 0.030.20 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.2
+-------------------------------------------------------------------------
+Fit res  A = 2.03334 +/- 0.128314(so detection at 15.8466 sigma ;     s = 149.532 +/- 0.638078       Chi2 = 0.76487
+ sVals = 147.739
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_err0.03_wngal.txt -k 0.030.20 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_err0.03
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.2
+-------------------------------------------------------------------------
+Fit res  A = 1.73511 +/- 0.233343(so detection at 7.43589 sigma ;     s = 155.088 +/- 1.7457       Chi2 = 1.15045
+ sVals = 167.94
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_err0.03_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_err0.03_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_err0.03_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_err0.03_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_err0.03_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_err0.03_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_err0.03_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errP_wngal.txt -k 0.030.20 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errP
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.2
+-------------------------------------------------------------------------
+Fit res  A = 1.64632 +/- 0.228633(so detection at 7.20073 sigma ;     s = 151.581 +/- 1.7998       Chi2 = 1.32456
+ sVals = 164.623
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errP_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errP_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errP_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errP_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errP_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errP_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errP_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT9_wngal.txt -k 0.030.20 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT9
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.2
+-------------------------------------------------------------------------
+Fit res  A = 1.92511 +/- 0.237862(so detection at 8.09338 sigma ;     s = 154.639 +/- 1.62337       Chi2 = 0.992399
+ sVals = 180
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT9_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT9_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT9_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT9_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT9_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT9_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT9_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT8_wngal.txt -k 0.030.20 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT8
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.2
+-------------------------------------------------------------------------
+Fit res  A = 1.76968 +/- 0.250846(so detection at 7.05484 sigma ;     s = 151.832 +/- 1.89977       Chi2 = 1.11426
+ sVals = 162.513
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT8_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT8_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT8_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT8_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT8_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT8_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.20_300_z1.3_errPBDT8_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_wngal.txt -k 0.040.20 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.2
+-------------------------------------------------------------------------
+Fit res  A = 2.02943 +/- 0.131238(so detection at 15.4638 sigma ;     s = 149.585 +/- 0.640748       Chi2 = 0.774721
+ sVals = 148.04
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_err0.03_wngal.txt -k 0.040.20 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_err0.03
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.2
+-------------------------------------------------------------------------
+Fit res  A = 1.80408 +/- 0.244297(so detection at 7.38478 sigma ;     s = 155.371 +/- 1.69444       Chi2 = 1.01938
+ sVals = 145.93
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_err0.03_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_err0.03_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_err0.03_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_err0.03_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_err0.03_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_err0.03_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_err0.03_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errP_wngal.txt -k 0.040.20 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errP
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.2
+-------------------------------------------------------------------------
+Fit res  A = 1.81391 +/- 0.241007(so detection at 7.52636 sigma ;     s = 151.478 +/- 1.64601       Chi2 = 1.31825
+ sVals = 145.327
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errP_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errP_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errP_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errP_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errP_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errP_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errP_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT9_wngal.txt -k 0.040.20 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT9
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.2
+-------------------------------------------------------------------------
+Fit res  A = 1.94309 +/- 0.249295(so detection at 7.79435 sigma ;     s = 155.274 +/- 1.62515       Chi2 = 0.953334
+ sVals = 157.085
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT9_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT9_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT9_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT9_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT9_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT9_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT9_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT8_wngal.txt -k 0.040.20 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT8
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.2
+-------------------------------------------------------------------------
+Fit res  A = 1.89622 +/- 0.266776(so detection at 7.10789 sigma ;     s = 151.639 +/- 1.79148       Chi2 = 1.1546
+ sVals = 154.975
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT8_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT8_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT8_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT8_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT8_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT8_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.20_300_z1.3_errPBDT8_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_wngal.txt -k 0.020.15 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.15
+-------------------------------------------------------------------------
+Fit res  A = 2.0435 +/- 0.132596(so detection at 15.4114 sigma ;     s = 149.497 +/- 0.702111       Chi2 = 0.859554
+ sVals = 147.739
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_err0.03_wngal.txt -k 0.020.15 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_err0.03
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.15
+-------------------------------------------------------------------------
+Fit res  A = 1.89017 +/- 0.233018(so detection at 8.11169 sigma ;     s = 155.048 +/- 1.63713       Chi2 = 1.65812
+ sVals = 176.683
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_err0.03_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_err0.03_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_err0.03_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_err0.03_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_err0.03_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_err0.03_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_err0.03_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errP_wngal.txt -k 0.020.15 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errP
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.15
+-------------------------------------------------------------------------
+Fit res  A = 1.83063 +/- 0.228542(so detection at 8.01007 sigma ;     s = 151.299 +/- 1.6585       Chi2 = 1.73196
+ sVals = 170.352
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errP_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errP_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errP_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errP_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errP_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errP_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errP_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT9_wngal.txt -k 0.020.15 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT9
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.15
+-------------------------------------------------------------------------
+Fit res  A = 1.98944 +/- 0.237133(so detection at 8.38954 sigma ;     s = 154.112 +/- 1.60029       Chi2 = 1.30236
+ sVals = 153.166
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT9_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT9_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT9_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT9_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT9_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT9_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT9_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT8_wngal.txt -k 0.020.15 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT8
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.15
+-------------------------------------------------------------------------
+Fit res  A = 1.92262 +/- 0.24984(so detection at 7.6954 sigma ;     s = 150.981 +/- 1.78247       Chi2 = 1.51251
+ sVals = 170.05
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT8_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT8_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT8_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT8_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT8_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT8_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.15_300_z1.3_errPBDT8_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_wngal.txt -k 0.030.15 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.15
+-------------------------------------------------------------------------
+Fit res  A = 2.01464 +/- 0.132925(so detection at 15.1562 sigma ;     s = 149.499 +/- 0.71227       Chi2 = 0.847271
+ sVals = 147.136
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_err0.03_wngal.txt -k 0.030.15 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_err0.03
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.15
+-------------------------------------------------------------------------
+Fit res  A = 1.76653 +/- 0.23536(so detection at 7.50567 sigma ;     s = 155.77 +/- 1.75366       Chi2 = 1.52879
+ sVals = 154.07
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_err0.03_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_err0.03_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_err0.03_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_err0.03_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_err0.03_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_err0.03_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_err0.03_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errP_wngal.txt -k 0.030.15 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errP
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.15
+-------------------------------------------------------------------------
+Fit res  A = 1.77201 +/- 0.230527(so detection at 7.68676 sigma ;     s = 152.082 +/- 1.71283       Chi2 = 1.70544
+ sVals = 150.754
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errP_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errP_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errP_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errP_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errP_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errP_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errP_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT9_wngal.txt -k 0.030.15 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT9
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.15
+-------------------------------------------------------------------------
+Fit res  A = 1.88763 +/- 0.239572(so detection at 7.87919 sigma ;     s = 154.67 +/- 1.68824       Chi2 = 1.28815
+ sVals = 152.864
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT9_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT9_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT9_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT9_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT9_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT9_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT9_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT8_wngal.txt -k 0.030.15 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT8
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.15
+-------------------------------------------------------------------------
+Fit res  A = 1.72929 +/- 0.252533(so detection at 6.84778 sigma ;     s = 152.049 +/- 1.98207       Chi2 = 1.43187
+ sVals = 151.357
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT8_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT8_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT8_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT8_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT8_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT8_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.15_300_z1.3_errPBDT8_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_wngal.txt -k 0.040.15 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.15
+-------------------------------------------------------------------------
+Fit res  A = 2.0285 +/- 0.13596(so detection at 14.9198 sigma ;     s = 149.475 +/- 0.708988       Chi2 = 0.887625
+ sVals = 146.533
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_err0.03_wngal.txt -k 0.040.15 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_err0.03
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.15
+-------------------------------------------------------------------------
+Fit res  A = 1.83296 +/- 0.24705(so detection at 7.41938 sigma ;     s = 155.065 +/- 1.70907       Chi2 = 1.41309
+ sVals = 172.462
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_err0.03_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_err0.03_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_err0.03_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_err0.03_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_err0.03_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_err0.03_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_err0.03_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errP_wngal.txt -k 0.040.15 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errP
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.15
+-------------------------------------------------------------------------
+Fit res  A = 1.86592 +/- 0.243017(so detection at 7.67814 sigma ;     s = 151.999 +/- 1.64245       Chi2 = 1.71945
+ sVals = 151.357
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errP_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errP_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errP_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errP_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errP_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errP_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errP_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT9_wngal.txt -k 0.040.15 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT9
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.15
+-------------------------------------------------------------------------
+Fit res  A = 1.90514 +/- 0.25202(so detection at 7.55947 sigma ;     s = 154.492 +/- 1.69332       Chi2 = 1.30048
+ sVals = 172.161
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT9_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT9_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT9_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT9_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT9_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT9_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT9_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT8_wngal.txt -k 0.040.15 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT8
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.15
+-------------------------------------------------------------------------
+Fit res  A = 1.89373 +/- 0.269284(so detection at 7.03246 sigma ;     s = 150.815 +/- 1.83272       Chi2 = 1.43341
+ sVals = 168.844
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT8_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT8_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT8_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT8_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT8_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT8_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.15_300_z1.3_errPBDT8_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_wngal.txt -k 0.020.10 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.1
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.81793 +/- 0.162352(so detection at 11.1975 sigma ;     s = 154.929 +/- 1.36969       Chi2 = 0.906786
+ sVals = 157.99
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_err0.03_wngal.txt -k 0.020.10 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_err0.03
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.1
+-------------------------------------------------------------------------
+Fit res  A = 1.66767 +/- 0.24935(so detection at 6.68808 sigma ;     s = 151.451 +/- 2.4129       Chi2 = 3.08295
+ sVals = 149.548
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_err0.03_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_err0.03_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_err0.03_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_err0.03_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_err0.03_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_err0.03_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_err0.03_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errP_wngal.txt -k 0.020.10 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errP
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.1
+-------------------------------------------------------------------------
+Fit res  A = 1.79194 +/- 0.250698(so detection at 7.1478 sigma ;     s = 145.283 +/- 2.12545       Chi2 = 3.50689
+ sVals = 139.899
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errP_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errP_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errP_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errP_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errP_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errP_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errP_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT9_wngal.txt -k 0.020.10 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT9
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.1
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+Fit res  A = 1.84489 +/- 0.253183(so detection at 7.28681 sigma ;     s = 151.94 +/- 2.21915       Chi2 = 2.3588
+ sVals = 150.151
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT9_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT9_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT9_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT9_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT9_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT9_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT9_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT8_wngal.txt -k 0.020.10 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT8
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.1
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.7706 +/- 0.265553(so detection at 6.66761 sigma ;     s = 152.056 +/- 2.44963       Chi2 = 2.81376
+ sVals = 150.452
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT8_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT8_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT8_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT8_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT8_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT8_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.10_300_z1.3_errPBDT8_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_wngal.txt -k 0.030.10 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.1
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 2.1583 +/- 0.162396(so detection at 13.2904 sigma ;     s = 151.566 +/- 1.1514       Chi2 = 0.443814
+ sVals = 152.563
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_err0.03_wngal.txt -k 0.030.10 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_err0.03
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.1
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.71138 +/- 0.251124(so detection at 6.81486 sigma ;     s = 154.822 +/- 2.35708       Chi2 = 2.48184
+ sVals = 154.07
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_err0.03_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_err0.03_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_err0.03_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_err0.03_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_err0.03_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_err0.03_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_err0.03_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errP_wngal.txt -k 0.030.10 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errP
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.1
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.97857 +/- 0.246313(so detection at 8.03275 sigma ;     s = 151.205 +/- 1.99743       Chi2 = 2.92203
+ sVals = 150.452
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errP_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errP_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errP_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errP_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errP_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errP_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errP_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT9_wngal.txt -k 0.030.10 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT9
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.1
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 2.02239 +/- 0.255121(so detection at 7.92718 sigma ;     s = 153.893 +/- 2.03291       Chi2 = 1.73499
+ sVals = 152.563
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT9_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT9_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT9_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT9_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT9_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT9_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT9_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT8_wngal.txt -k 0.030.10 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT8
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.1
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.80364 +/- 0.268069(so detection at 6.72827 sigma ;     s = 155.706 +/- 2.39725       Chi2 = 1.93813
+ sVals = 155.578
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT8_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT8_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT8_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT8_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT8_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT8_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.10_300_z1.3_errPBDT8_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_wngal.txt -k 0.040.10 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.1
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 2.17047 +/- 0.168726(so detection at 12.8639 sigma ;     s = 151.601 +/- 1.16054       Chi2 = 0.755167
+ sVals = 151.658
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_err0.03_wngal.txt -k 0.040.10 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_err0.03
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.1
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.68777 +/- 0.265981(so detection at 6.34543 sigma ;     s = 155.78 +/- 2.43576       Chi2 = 2.68369
+ sVals = 157.085
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_err0.03_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_err0.03_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_err0.03_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_err0.03_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_err0.03_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_err0.03_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_err0.03_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errP_wngal.txt -k 0.040.10 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errP
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.1
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.90789 +/- 0.263078(so detection at 7.25219 sigma ;     s = 152.688 +/- 2.13118       Chi2 = 3.39464
+ sVals = 152.563
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errP_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errP_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errP_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errP_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errP_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errP_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errP_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT9_wngal.txt -k 0.040.10 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT9
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.1
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.90886 +/- 0.269053(so detection at 7.09471 sigma ;     s = 155.804 +/- 2.18235       Chi2 = 1.92179
+ sVals = 157.085
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT9_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT9_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT9_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT9_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT9_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT9_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT9_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT8_wngal.txt -k 0.040.10 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT8
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.1
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.76931 +/- 0.284211(so detection at 6.22533 sigma ;     s = 156.046 +/- 2.49465       Chi2 = 2.17759
+ sVals = 157.085
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT8_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT8_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT8_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT8_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT8_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT8_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.10_300_z1.3_errPBDT8_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_wngal.txt -k 0.020.12 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.12
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 2.0146 +/- 0.140231(so detection at 14.3662 sigma ;     s = 150.336 +/- 0.862619       Chi2 = 0.847903
+ sVals = 150.151
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_err0.03_wngal.txt -k 0.020.12 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_err0.03
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.12
+-------------------------------------------------------------------------
+Fit res  A = 1.71485 +/- 0.237437(so detection at 7.22234 sigma ;     s = 154.395 +/- 1.92468       Chi2 = 2.43881
+ sVals = 151.96
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_err0.03_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_err0.03_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_err0.03_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_err0.03_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_err0.03_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_err0.03_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_err0.03_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errP_wngal.txt -k 0.020.12 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errP
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.12
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.73556 +/- 0.232595(so detection at 7.46171 sigma ;     s = 152.161 +/- 1.87889       Chi2 = 2.58469
+ sVals = 150.754
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errP_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errP_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errP_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errP_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errP_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errP_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errP_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT9_wngal.txt -k 0.020.12 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT9
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.12
+-------------------------------------------------------------------------
+Fit res  A = 1.75374 +/- 0.241089(so detection at 7.27424 sigma ;     s = 152.903 +/- 1.93698       Chi2 = 1.98124
+ sVals = 150.452
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT9_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT9_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT9_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT9_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT9_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT9_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT9_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT8_wngal.txt -k 0.020.12 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT8
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.02                maxk = 0.12
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.63357 +/- 0.253908(so detection at 6.43372 sigma ;     s = 152.642 +/- 2.22749       Chi2 = 2.07154
+ sVals = 150.452
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT8_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT8_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT8_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT8_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT8_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT8_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.02_0.12_300_z1.3_errPBDT8_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_wngal.txt -k 0.030.12 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.12
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 2.07543 +/- 0.139989(so detection at 14.8257 sigma ;     s = 149.119 +/- 0.841434       Chi2 = 0.898233
+ sVals = 148.342
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_err0.03_wngal.txt -k 0.030.12 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_err0.03
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.12
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.80233 +/- 0.240007(so detection at 7.5095 sigma ;     s = 155.721 +/- 1.82593       Chi2 = 1.98729
+ sVals = 153.769
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_err0.03_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_err0.03_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_err0.03_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_err0.03_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_err0.03_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_err0.03_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_err0.03_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errP_wngal.txt -k 0.030.12 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errP
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.12
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.82875 +/- 0.234275(so detection at 7.806 sigma ;     s = 152.496 +/- 1.78357       Chi2 = 2.10194
+ sVals = 150.754
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errP_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errP_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errP_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errP_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errP_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errP_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errP_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT9_wngal.txt -k 0.030.12 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT9
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.12
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.94013 +/- 0.243645(so detection at 7.96294 sigma ;     s = 154.96 +/- 1.74148       Chi2 = 1.51
+ sVals = 152.864
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT9_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT9_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT9_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT9_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT9_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT9_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT9_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT8_wngal.txt -k 0.030.12 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT8
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.03                maxk = 0.12
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.67667 +/- 0.256449(so detection at 6.53804 sigma ;     s = 154 +/- 2.16012       Chi2 = 1.46974
+ sVals = 153.467
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT8_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT8_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT8_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT8_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT8_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT8_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.03_0.12_300_z1.3_errPBDT8_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_wngal.txt -k 0.040.12 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.12
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 2.00012 +/- 0.144238(so detection at 13.8668 sigma ;     s = 149.99 +/- 0.874816       Chi2 = 1.19333
+ sVals = 149.246
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_err0.03_wngal.txt -k 0.040.12 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_err0.03
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.12
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.82946 +/- 0.252118(so detection at 7.25635 sigma ;     s = 155.475 +/- 1.82167       Chi2 = 1.96822
+ sVals = 154.07
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_err0.03_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_err0.03_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_err0.03_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_err0.03_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_err0.03_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_err0.03_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_err0.03_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errP_wngal.txt -k 0.040.12 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errP
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.12
+-------------------------------------------------------------------------
+Fit res  A = 1.97752 +/- 0.247364(so detection at 7.99437 sigma ;     s = 152.516 +/- 1.66915       Chi2 = 2.20524
+ sVals = 152.261
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errP_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errP_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errP_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errP_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errP_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errP_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errP_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT9_wngal.txt -k 0.040.12 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT9
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.12
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.9985 +/- 0.256426(so detection at 7.79366 sigma ;     s = 154.717 +/- 1.71281       Chi2 = 1.56642
+ sVals = 153.467
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT9_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT9_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT9_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT9_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT9_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT9_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT9_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 
+===========================================================================
+I launch /sps/lsst/users/rcecile/BAOProgs/DirectSimPerso/exe/fitkbaobaseline -P /sps/lsst/data/rcecile/Planck_BAO2_PS/PS_lfZuccaAllFalse_300_z1.3_errPBDT8_wngal.txt -k 0.040.12 -O /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT8
+ PIOPersist::Initialize() Starting Sophya Persistence management service 
+SOPHYA Version  2.3 Revision 70 (V_Jun2015) -- Jan 24 2018 09:56:35 gcc 4.4.7 20120313 (Red Hat 4.4.7-18)
+my h 0.679
+
+
+-------------------------------------------------------------------------
+    mink = 0.04                maxk = 0.12
+-------------------------------------------------------------------------
+GeneralFit : pas de convergence
+GeneralFit : pas de convergence
+Fit res  A = 1.75247 +/- 0.272103(so detection at 6.44046 sigma ;     s = 153.491 +/- 2.1026       Chi2 = 1.46829
+ sVals = 151.96
+     Print chisq and results to files
+     Write chi^2 to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT8_chisq.txt
+     Write results to file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT8_result.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT8_result.txt exists
+
+     Write  --k----P(k)----Psmooth(k)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT8_baseline.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT8_baseline.txt exists
+
+     Write  --k----AvrgPoints(*k^2)--  to file :/sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT8_avrg.txt
+Error...file /sps/lsst/data/rcecile/Planck_BAO2_PS/fit_lfZuccaAllFalse_k0.04_0.12_300_z1.3_errPBDT8_avrg.txt exists
+
+--------------- fitkbao.cc / END --------------------- 

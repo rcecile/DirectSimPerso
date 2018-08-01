@@ -47,10 +47,12 @@ TAM::~TAM() {
 
 bool TAM::PassGoldenCut(double mag_abs, int type, double z){
   double ebv = tam->GetEBV(type);
-  tam->EvalApparentMagnitudes(appmag, err_appmag, mag_abs, type, z, ebv, 3);
-  //cout << "AM : " << appmag[3] << " (type = " << type << ", z = " << z << ")" << endl;
+  tam->EvalApparentMagnitudes(appmag, err_appmag, mag_abs, type, z, ebv, 3); // Dahlen etc: LF in mag_B
+  // tam->EvalApparentMagnitudes(appmag, err_appmag, mag_abs, type, z, ebv, -1); // Ramos: LF in mag_i
+  // cout << "AM : " << appmag[3] << " (type = " << type << ", z = " << z << ")" << endl;
   bool pass = appmag[3]<25.3;
-  
+  // bool pass = appmag[3]<22.5; // TEST PROVISOIRE pour comparaison Zucca
+  // if (pass) cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!! PASS = " << pass*1 << endl;
   return pass;
 }
 

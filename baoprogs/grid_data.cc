@@ -437,7 +437,7 @@ int main(int narg, char* arg[]) {
 	  vgc[igg].r_center=radial_distance;
 	  GridDef gdef(Nx, Ny, Nz, R_XY, R_XY, R_Z, vgc[igg].r_center, vgc[igg].theta0, vgc[igg].phi0);
 	  vprojgrids.push_back(ProjGrid(gdef));
-	  cout << " Grid["<<igg<<"] : "<<vgc[igg].theta0 << "," << vgc[igg].phi0<<endl;
+	  cout << " Grid["<<igg<<"] : "<<vgc[igg].theta0 << "," << vgc[igg].phi0 << endl;
 	}
 	
 	cout << endl;
@@ -481,7 +481,7 @@ int main(int narg, char* arg[]) {
 	cout <<"    Input cell size in x,y is "<< R_XY <<endl;
 	cout <<"    Input cell size in z is "<< R_Z <<endl;
 	cat.SetGrid(Nx,Ny,Nz,R_Z,zref);
-	
+
 	cout <<"No check that grids are embedded in the cone filled with galaxies: do it a posteriori"<<endl;
 	
 	// Selection function
@@ -556,8 +556,6 @@ int main(int narg, char* arg[]) {
 		cout <<"    Sigma file for random grid  will be read from file " << sfile.c_str() <<endl;
 	      }
 	    }
-
-
 	  }
 	  
 	  // 3) set selection function in Cat2Grid
@@ -587,8 +585,7 @@ int main(int narg, char* arg[]) {
 	  
 	cout <<"    Return actual grid specification:"<<endl;
 	TVector<r_8> gridv = cat.ReturnGridSpec();
-	cout <<"    Nx,Ny,Nz,L="<< gridv(0) <<","<< gridv(1) <<","<< gridv(2);
-	cout <<","<< gridv(3) <<endl;
+	cout <<"    Nx,Ny,Nz,L="<< gridv(0) <<","<< gridv(1) <<","<< gridv(2) << ","<< gridv(3) <<endl;
 	cout << endl;
 	
 	// Make random galaxy grid with mean density 

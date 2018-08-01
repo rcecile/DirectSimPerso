@@ -1,0 +1,52 @@
+
+!p.charsize=2
+!p.thick=3
+!p.multi=0
+
+z=findgen(61)/60.*3
+h0=dblarr(61,3)
+h2=dblarr(61,3)
+
+islice=13
+islice=10
+islice=50
+islice=25
+islice=20
+islice=35
+islice=0
+islice=15
+islice=11
+islice=51
+islice=1
+islice=21
+islice=36
+islice=23
+islice=2
+islice=6
+m0=mrdfits("/sps/lsst/data/rcecile/Planck_BAO/cat_gold_Slice"+strtrim(islice,2)+".fits",1,h)
+m2=mrdfits("/sps/lsst/data/rcecile/Planck_BAO2/cat_zSch_Slice"+strtrim(islice,2)+".fits",1,h)
+
+print,minmax(m2.(3))
+.r
+for i=1,3 do begin
+   ok = where(m0.(4) ge i and m0.(4) lt i+1)
+   h = histogram((m0.(3))[ok],min=0,max=3,bin=0.05)
+   h0[*,i-1] = h0[*,i-1]+h
+
+endfor
+end
+
+.r
+for i=1,3 do begin
+   ok = where(m2.(4) ge i and m2.(4) lt i+1)
+   h = histogram((m2.(3))[ok],min=0,max=3,bin=0.05)
+   h2[*,i-1] = h2[*,i-1]+h
+endfor
+end
+
+plot,z,h2[*,2],/xs,/ys,/nodata,xra=[0.2,2.45],/yl,yra=[1e4,max(h2)*1.1]
+for i=0,2 do oplot,z,h0[*,i],psym=-1,col=i*10
+for i=0,2 do oplot,z,h2[*,i],col=150+i*10,li=2,psym=-1
+ 
+print,100.*(total(h2)-total(h0))/total(h0)
+

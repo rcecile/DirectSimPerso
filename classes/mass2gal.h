@@ -33,12 +33,13 @@
 //class FunRan;
 
 // DirectSim classes
-#include "schechter.h"
+#include "myschechter.h"
 #include "gftdist.h"
 #include "sinterp.h"
 #include "cosmocalcs.h"
 #include "simdata.h"
 #include "selectfunc.h"
+#include "multitypzlf.h"
 
 #include "TAM.h"  // TAM.h modified to avoid including ROOT files 
 
@@ -109,31 +110,23 @@ class Mass2Gal
     
       /** conv=ngal_per_mpc3*pixel vol; ngal_per_mpc3 calculated by integrating 
           Schechter function of ALL gals                                            */
-      void ConvertToMeanNGal(float conv1, float conv2, float conv3, bool Simple=false); // writes to ngals_ array  
-    
+      void ConvertToMeanNGalLF(MultiType_Z_LF const & mult_LF, double Vc);
+
       /** Poisson fluctuate ngals_                                              */
       sa_size_t ApplyPoisson();
     
       /** MAIN FUNCTION: simulates galaxies and puts them into a catalog        
           @param idsim    id number of simulation
           @param fitsname FITS file to write catalog to
-          @param gfd      galaxy distributions to simulate with 
+          @param mult_LF  luminosity functions class to simulate with 
           @param extinct  add host galaxy extinction
           @param AMcut    throw out galaxies with too faint absolute magnitudes
           @param SkyArea  area of sky to simulate (in radians) 
           @param ZisRad   simulate cubic sky -> z dimension is exactly the radial
           direction                                             */
-      sa_size_t CreateGalCatalog(int idsim, string fitsname, GalFlxTypDist& gfd1, GalFlxTypDist& gfd2, GalFlxTypDist& gfd3, 
+      sa_size_t CreateGalCatalogLF(string FITSnameLF, int idsim, MultiType_Z_LF const & mult_LF, 
                                  bool extinct=false, bool AMcut=false, double SkyArea=6.3, bool GoldCut=false);
-        
-      /** Instead of outputing whole simulation, just output a Histo object
-          of redshifts to a PPF file 
-          @param fitsname FITS file to write catalog to
-          @param gfd      galaxy distributions to simulate wit
-          @param SkyArea  area of sky to simulate (in radians)                  */
-      void CreateNzHisto(string fitsname, GalFlxTypDist& gfd1, GalFlxTypDist& gfd2, GalFlxTypDist& gfd3, bool extinct=false, 
-                         double SkyArea=6.3);
-                
+               
       /** Instead of outputing whole simulation, just output all the true redshifts
           to a FITS file 
           @param idsim    id number of simulation
